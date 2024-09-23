@@ -23,4 +23,8 @@
     <ProjectReference Include="..\..\HealthCare340B.ViewModel\HealthCare340B.ViewModel.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\lib\mazer\" />
+  </ItemGroup>
+
 </Project>

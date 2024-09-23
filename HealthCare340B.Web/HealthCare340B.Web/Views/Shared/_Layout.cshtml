@@ -8,12 +8,12 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" /> *@
     <link rel="stylesheet" href="~/HealthCare340B.Web.styles.css" asp-append-version="true" />
 
-    <link rel="stylesheet" crossorigin href="~/assets/compiled/css/app.css">
-    <link rel="stylesheet" crossorigin href="~/assets/compiled/css/app-dark.css">
-    <link rel="stylesheet" crossorigin href="~/assets/compiled/css/iconly.css">
+    <link rel="stylesheet" crossorigin href="~/lib/mazer/compiled/css/app.css">
+    <link rel="stylesheet" crossorigin href="~/lib/mazer/compiled/css/app-dark.css">
+    <link rel="stylesheet" crossorigin href="~/lib/mazer/compiled/css/iconly.css">
 </head>
 <body>
-    <script src="~/assets/static/js/initTheme.js"></script>
+    <script src="~/lib/mazer/static/js/initTheme.js"></script>
     <div id="app">
         <div id="sidebar">
             <div class="sidebar-wrapper active">
@@ -81,7 +81,7 @@
             <footer>
                 <div class="footer clearfix mb-0 text-muted">
                     <div class="float-start">
-                        <p>2024 &copy; BCare</p>
+                        <p>2024 &copy; 340B</p>
                     </div>
                     <div class="float-end">
                         <p>
@@ -92,17 +92,17 @@
             </footer>
         </div>
     </div>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    @*<script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>*@
 
-    <script src="~/assets/static/js/components/dark.js"></script>
-    <script src="~/assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js"></script>
-    <script src="~/assets/compiled/js/app.js"></script>
+    <script src="~/lib/mazer/static/js/components/dark.js"></script>
+    <script src="~/lib/mazer/extensions/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="~/lib/mazer/compiled/js/app.js"></script>
 
     <!-- Need: Apexcharts -->
-    @*<script src="~/assets/extensions/apexcharts/apexcharts.min.js"></script>
-    <script src="~/assets/static/js/pages/dashboard.js"></script>*@
+    @*<script src="~/lib/mazer/extensions/apexcharts/apexcharts.min.js"></script>
+        <script src="~/lib/mazer/static/js/pages/dashboard.js"></script>*@
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
