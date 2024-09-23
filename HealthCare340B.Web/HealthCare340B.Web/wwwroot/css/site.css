@@ -16,3 +16,18 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.breadcrumb {
+    background-color: #F5F8FF; /* Light blue background */
+}
+
+.breadcrumb a {
+    font-size: 16px; /* Adjust text size */
+    font-weight: 500; /* Optional: Make text slightly bolder */
+}
+
+.breadcrumb .breadcrumb-item.active {
+    font-size: 16px;
+    font-weight: 500;
+    color: #007bff; /* Make the active breadcrumb text blue */
+}

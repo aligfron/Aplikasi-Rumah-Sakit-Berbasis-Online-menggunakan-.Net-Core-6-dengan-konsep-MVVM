@@ -39,12 +39,19 @@
                 <li class="sidebar-title">Menu</li>
 
                 <li class="sidebar-item active">
-                    <a asp-controller="DokterProfilSharedLayout" asp-action="Index" class="sidebar-link">
+                    <button id="btnDashboard" asp-controller="DokterProfilSharedLayout" asp-action="Index" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#staticModal">
                         <i class="bi bi-grid-fill"></i>
                         <span>Dashboard</span>
-                    </a>
+                    </button>
                 </li>
             </ul>
         </div>
     </div>
 </div>
+
+<script>
+    $("#btnDashboard").click(function (e) {
+        $("#staticModalBody").html("")
+        $("#staticModalBody").load("/Dokter/CariDokter")
+    })
+</script>

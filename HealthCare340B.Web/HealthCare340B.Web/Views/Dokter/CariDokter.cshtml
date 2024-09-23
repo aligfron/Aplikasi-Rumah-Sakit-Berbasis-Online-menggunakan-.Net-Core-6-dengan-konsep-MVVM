@@ -4,3 +4,52 @@
 @{
     Layout = null;
 }
+<div class="card">
+    <div class="card-body" >
+        <form id="frmCariDokter">
+            <div class="card-title row mb-1">
+                <label class="col-6 col-form-label ">Lokasi</label>
+                <div class="row mb-1">
+                    <div class="col-12">
+                        <input class="form-select" type="text" name="Location" />
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-1">
+                <label class="col-6 col-form-label ">Nama Dokter</label>
+                <div class="row mb-1">
+                    <div class="col-12">
+                        <input class="form-control" type="text" name="DoctorName" />
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-1">
+                <label class="col-10 col-form-label">Spesialisasi/Sub-spesialisasi <span class="text-danger">*</span></label>
+                <div class="row mb-1">
+                    <div class="col-12">
+                        <input class="form-select" type="text" name="Specialization" />
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-1">
+                <label class="col-6 col-form-label ">Tindakan Medis</label>
+                <div class="row mb-1">
+                    <div class="col-12">
+                        <input class="form-select" type="text" name="MedicalAction" />
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="CreateBy" value="1" />
+        </form>
+    </div>
+    <div class="card-footer d-flex justify-content-between">
+        <button type="button" id="btnAturUlang" class="btn btn-success">Atur Ulang</button>
+        <button type="reset" id="btnSearch" class="btn btn-primary">Search</button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(() => {
+        $("#staticModalLabel").text("@ViewBag.Title");
+    });
+</script>
