@@ -1,0 +1,131 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+
+    Layout = "_Layout";
+}
+
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-12 order-md-1 order-last text-start">
+                            <!-- Tambahkan text-start untuk merapikan teks ke kiri -->
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start">
+                                <!-- Menggunakan float-start agar breadcrumb mepet ke kiri -->
+                                <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Profile</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+    <section class="section">
+        <div class="row">
+            <div class="col-12 col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center align-items-center flex-column">
+                            <div class="avatar avatar-2xl">
+                                <img src="~/lib/mazer/compiled/jpg/2.jpg" alt="Avatar">
+                            </div>
+
+                            <h3 class="mt-1">John Doe</h3>
+                            <p class="text-small">Junior Software Engineer</p>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <br />
+
+                            <!-- Navbar-like Tab Navigation -->
+                            <ul class="nav nav-tabs flex-column mt-3 w-100" id="myTab1" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link w-100 text-start d-flex justify-content-between align-items-center" id="Janji-tab" data-bs-toggle="tab" data-bs-target="#Janji" type="button" role="tab" aria-controls="Janji" aria-selected="true">
+                                        Janji <span class="badge bg-primary ms-2">3</span>
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link w-100 text-start" id="Obrolan-tab" data-bs-toggle="tab" data-bs-target="#Obrolan" type="button" role="tab" aria-controls="Obrolan" aria-selected="false">Obrolan / Konsultasi</button>
+                                </li>
+                            </ul>
+
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title text-primary">Tentang Saya</h3> <!-- Menambahkan judul card -->
+                        <div>
+                            <h5 class="mt-1">Tindakan Medis</h5>
+                            <p class="text-small">Junior Software Engineer</p>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <br />
+                            <h5 class="mt-1">Riwayat Praktek</h5>
+                            <p class="text-small">Junior Software Engineer</p>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <br />
+                            <h5 class="mt-1">Pendidikan</h5>
+                            <p class="text-small">Junior Software Engineer</p>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <br />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-12 col-lg-8">
+                <div class="card" style=" height: 70vh;">
+                    <div class="card-body">
+                        <div class="page-content">
+                            @RenderBody()
+
+                            <!-- Tab Content -->
+                            <div class="tab-content mt-3" id="profileTabsContent">
+                                <div class="tab-pane fade" id="Janji" role="tabpanel" aria-labelledby="Janji-tab">
+                                    <h5>Janji</h5>
+                                    <p>Konten tentang Janji.</p>
+                                </div>
+                                <div class="tab-pane fade" id="Obrolan" role="tabpanel" aria-labelledby="Obrolan-tab">
+                                    <h5>Obrolan</h5>
+                                    <p>Konten tentang Obrolan.</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        $('#Obrolan-tab').on('click', function () {
+            // Kosongkan konten tab pertama
+            if ($(this).hasClass('active')) {
+                $('#tindakan').empty();
+                $('#aktivitas').empty();
+                $('#konsultasi').empty();
+                $('#pengaturan').empty();
+                $('#myTab').hide();
+            }
+        });
+
+        $('#Janji-tab').on('click', function () {
+            // Kosongkan konten tab pertama
+            if ($(this).hasClass('active')) {
+                $('#tindakan').empty();
+                $('#aktivitas').empty();
+                $('#konsultasi').empty();
+                $('#pengaturan').empty();
+                $('#myTab').hide();
+            }
+        });
+    });
+
+</script>         

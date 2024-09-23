@@ -8,7 +8,7 @@ namespace HealthCare340B.Web.Controllers
         {
             // Mengirim role ke view
             ViewBag.Title = "Profil";
-            ViewBag.Role = "ROLE_PASIEN";
+            ViewBag.Role = "ROLE_DOKTER";
 
             return View();
         }
