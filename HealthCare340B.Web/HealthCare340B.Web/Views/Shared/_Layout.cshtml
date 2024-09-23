@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - HealthCare340B</title>
     @* <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" /> *@
-    <link rel="stylesheet" href="~/HealthCare340B.Web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" /> 
+    <link rel="stylesheet" href="~/HealthCare340B.Web.styles.css" asp-append-version="true" />*@
 
     <link rel="stylesheet" crossorigin href="~/lib/mazer/compiled/css/app.css">
     <link rel="stylesheet" crossorigin href="~/lib/mazer/compiled/css/app-dark.css">
@@ -18,30 +18,21 @@
     <div id="app">
         <!-- Sidebar -->
         <partial name="_Sidebar" />
-        <div id="main" class='layout-navbar navbar-fixed'>
+
+        <div id="main" class="layout-navbar navbar-fixed">
             <partial name="_Header" />
 
-            <div class="page-heading">
-                <h3>@ViewData["Title"]</h3>
-            </div>
-            <div class="page-content">
-                @RenderBody()
-            </div>
-            <!-- Footer -->
-            <footer>
-
-                <div class="footer clearfix mb-0 text-muted">
-                    <div class="float-start">
-                        <p>2024 &copy; 340B</p>
-                    </div>
-                    <div class="float-end">
-                        <p>
-                            Crafted with <span class="text-danger"><i class="bi bi-heart-fill icon-mid"></i></span> by <a href="https://saugi.me">Saugi</a>
-                        </p>
-                    </div>
+            <div id="main-content">
+                <div class="page-heading">
+                    <h3>@ViewData["Title"]</h3>
                 </div>
-            </footer>
-            
+                <div class="page-content">
+                    @RenderBody()
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <partial name="_Footer" />
         </div>
     </div>
     @*<script src="~/lib/jquery/dist/jquery.min.js"></script>
