@@ -1,0 +1,44 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model VMMPaymentMethod?
+@{
+    Layout = null;
+}
+
+<div class="card">
+    <div class="card-body">
+        <i class="fa fa-exclamation-triangle fa-align-left text-danger h1 me-3"></i>
+        <span>Are you sure want to DELETE Payment Method @Model.Name ?</span>
+    </div>
+    <div class="card-footer d-flex justify-content-end">
+        <button id="btnDelete" class="btn btn-danger">Confirm</button>
+        &nbsp;
+        <button class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+    </div>
+</div>
+
+<script>
+    $("#btnDelete").click(function (e) {
+        $.ajax({
+            url: "/PaymentMethod/Delete",
+            type: "post",
+            data: {
+                "id": @Model.Id
+            },
+            dataType: "json",
+            beforeSend: () => { },
+            success: function (response) {
+                alert(response.message);
+                //delay(5000);
+                if (response.statusCode == 200) {
+                    location.reload();
+                }
+            },
+            error: function (errResponse) {
+                console.error("Payment Method deletion failed", errResponse);
+                debugger;
+            }
+        });
+    });
+</script>

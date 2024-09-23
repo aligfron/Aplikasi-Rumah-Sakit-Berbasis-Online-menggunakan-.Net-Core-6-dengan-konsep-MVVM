@@ -188,7 +188,7 @@ namespace HealthCare340B.Web.Models
             try
             {
                 apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMPaymentMethod>?>(     // Convert the Json string to a class
-                        await httpClient.DeleteAsync($"{apiUrl}PaymentMethod?id={id}&userId={userId}")    // Call the API
+                        await httpClient.DeleteAsync($"{apiUrl}PaymentMethod?id={id}&deletedBy={userId}")    // Call the API
                         .Result                                                     // Read the Result
                         .Content                                                    // Get the Content Result
                         .ReadAsStringAsync()                                        // Convert the content as string

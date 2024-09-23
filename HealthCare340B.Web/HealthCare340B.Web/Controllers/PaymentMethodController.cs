@@ -1,4 +1,5 @@
 ﻿using HealthCare340B.ViewModel;
+using HealthCare340B.Web.AddOns;
 using HealthCare340B.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,18 +9,20 @@ namespace HealthCare340B.Web.Controllers
     {
         private readonly PaymentMethodModel paymentMethod;
 
-        private readonly int pageSize;
+        private readonly int pageSize = 5;
 
         public PaymentMethodController(IConfiguration _config)
         {
             paymentMethod = new PaymentMethodModel(_config);
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? filter, int? pageNumber, int? currPageSize)
         {
-            List<VMMPaymentMethod>? data = await paymentMethod.GetByFilter("");
+            List<VMMPaymentMethod>? data = await paymentMethod.GetByFilter(filter);
             ViewBag.Title = "Payment Method";
-            return View(data);
+            ViewBag.Filter = filter;
+            ViewBag.PageSize = (currPageSize ?? pageSize);
+            return View(Pagination<VMMPaymentMethod>.Create(data ?? new List<VMMPaymentMethod>(), pageNumber ?? 1, ViewBag.PageSize));
         }
 
         public IActionResult Create()
@@ -31,6 +34,7 @@ namespace HealthCare340B.Web.Controllers
         [HttpPost]
         public async Task<VMResponse<VMMPaymentMethod>?> CreateAsync(VMMPaymentMethod data)
         {
+            data.CreatedBy = 1;
             return await paymentMethod.Create(data);
         }
 
@@ -44,13 +48,15 @@ namespace HealthCare340B.Web.Controllers
         [HttpPost]
         public async Task<VMResponse<VMMPaymentMethod>?> UpdateAsync(VMMPaymentMethod data)
         {
+            data.ModifiedBy = 1;
             return await paymentMethod.Update(data);
         }
 
-        public IActionResult Delete(long id)
+        public async Task<IActionResult> Delete(long id)
         {
+            VMMPaymentMethod? data = await paymentMethod.GetById(id);
             ViewBag.Title = "Delete Payment Method";
-            return View();
+            return View(data);
         }
 
         [HttpPost]

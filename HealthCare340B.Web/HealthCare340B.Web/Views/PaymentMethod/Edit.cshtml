@@ -1,6 +1,7 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+@model VMMPaymentMethod?
 @{
     Layout = null;
 }
@@ -10,7 +11,8 @@
         <form id="frmPaymentMethod">
             <div class="row mb-3">
                 <div class="col-4 bg-light">Name: <span class="text-danger">*</span></div>
-                <div class="col-8"><input class="form-control" type="text" name="Name" /></div>
+                <div class="col-8"><input class="form-control" type="text" name="Name" value="@Model.Name"></div>
+                <input type="hidden" name="Id" value="@Model.Id" />
             </div>
         </form>
     </div>
@@ -48,13 +50,13 @@
         $("#btnSave").click(function (e) {
             if ($("#frmPaymentMethod").valid()) {
                 $.ajax({
-                    url: "/PaymentMethod/Create",
+                    url: "/PaymentMethod/Update",
                     type: "post",
                     data: $("#frmPaymentMethod").serialize(),
                     dataType: "json",
                     beforeSend: () => { },
                     success: function (response) {
-                        if (response.statusCode == 200 || response.statusCode == 201) {
+                        if (response.statusCode == 200) {
                             location.reload();
                         }
                         else {
