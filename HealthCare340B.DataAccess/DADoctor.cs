@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace HealthCare340B.DataAccess
 {
-    internal class DADoctor
+    public class DADoctor
     {
         private readonly HealthCare340BContext db;
 

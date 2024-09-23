@@ -11,14 +11,17 @@
         <i class="fa fa-exclamation-triangle fa-align-left text-danger h1 me-3"></i>
         <span>Are you sure want to DELETE Payment Method @Model.Name ?</span>
     </div>
-    <div class="card-footer d-flex justify-content-end">
-        <button id="btnDelete" class="btn btn-danger">Confirm</button>
-        &nbsp;
-        <button class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+    <div class="d-flex justify-content-between">
+        <div class="w-10"></div>
+        <div class="w-30"><button class="btn btn-outline-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button></div>
+        <div class="w-10"></div>
+        <div class="w-30"><button id="btnDelete" class="btn btn-outline-danger">Confirm</button></div>
+        <div class="w-10"></div>
     </div>
 </div>
 
 <script>
+    $("#staticModalLabel").text("@ViewBag.Title");
     $("#btnDelete").click(function (e) {
         $.ajax({
             url: "/PaymentMethod/Delete",

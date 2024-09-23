@@ -16,12 +16,27 @@ namespace HealthCare340B.Web.Controllers
             paymentMethod = new PaymentMethodModel(_config);
         }
 
-        public async Task<IActionResult> Index(string? filter, int? pageNumber, int? currPageSize)
+        public async Task<IActionResult> Index(string? filter, int? pageNumber, int? currPageSize, string? orderBy)
         {
             List<VMMPaymentMethod>? data = await paymentMethod.GetByFilter(filter);
+
+            switch (orderBy)
+            {
+                case "Asc":
+                    data = data?.OrderBy(p => p.Name).ToList();
+                    break;
+                case "Desc":
+                    data = data?.OrderByDescending(p => p.Name).ToList();
+                    break;
+                default:
+                    data = data?.OrderBy(p => p.Name).ToList();
+                    break;
+            }
+
             ViewBag.Title = "Payment Method";
             ViewBag.Filter = filter;
             ViewBag.PageSize = (currPageSize ?? pageSize);
+            ViewBag.OrderBy = orderBy ?? "Asc";
             return View(Pagination<VMMPaymentMethod>.Create(data ?? new List<VMMPaymentMethod>(), pageNumber ?? 1, ViewBag.PageSize));
         }
 

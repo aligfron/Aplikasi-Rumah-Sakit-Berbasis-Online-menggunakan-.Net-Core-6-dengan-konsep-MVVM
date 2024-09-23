@@ -10,22 +10,24 @@
     <div class="card-body">
         <form id="frmPaymentMethod">
             <div class="row mb-3">
-                <div class="col-4 bg-light">Name: <span class="text-danger">*</span></div>
+                <div class="col-4">Name<span class="text-danger">*</span></div>
                 <div class="col-8"><input class="form-control" type="text" name="Name" value="@Model.Name"></div>
                 <input type="hidden" name="Id" value="@Model.Id" />
             </div>
         </form>
     </div>
-    <div class="card-footer d-flex justify-content-end">
-        <button id="btnSave" class="btn btn-success">Save</button>
-        &nbsp;
-        <button id="btnCancel" class="btn btn-danger">Cancel</button>
+    <div class="d-flex justify-content-between">
+        <div class="w-10"></div>
+        <div class="w-30"><button id="btnCancel" class="btn btn-outline-danger">Cancel</button></div>
+        <div class="w-10"></div>
+        <div class="w-30"><button id="btnSave" class="btn btn-outline-success">Save</button></div>
+        <div class="w-10"></div>
     </div>
 </div>
 
 <script>
     $(document).ready(() => {
-        $("#staticModalLgLabel").text("@ViewBag.Title");
+        $("#staticModalLabel").text("@ViewBag.Title");
 
         $("#frmPaymentMethod").submit(function (e) {
             e.preventDefault();
