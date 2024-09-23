@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthCare340B.Web", "HealthCare340B.Web\HealthCare340B.Web.csproj", "{8489A8D4-85C3-405F-B19F-5E7BB2DF9F2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HealthCare340B.Web", "HealthCare340B.Web\HealthCare340B.Web.csproj", "{8489A8D4-85C3-405F-B19F-5E7BB2DF9F2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthCare340B.API", "..\HealthCare340B.API\HealthCare340B.API.csproj", "{224F373B-310E-4C84-A54A-F02FFAAB5840}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HealthCare340B.API", "..\HealthCare340B.API\HealthCare340B.API.csproj", "{224F373B-310E-4C84-A54A-F02FFAAB5840}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthCare340B.DataAccess", "..\HealthCare340B.DataAccess\HealthCare340B.DataAccess.csproj", "{41928B3F-8DDC-4077-9F7E-3CFE18F18A1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HealthCare340B.DataAccess", "..\HealthCare340B.DataAccess\HealthCare340B.DataAccess.csproj", "{41928B3F-8DDC-4077-9F7E-3CFE18F18A1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthCare340B.DataModel", "..\HealthCare340B.DataModel\HealthCare340B.DataModel.csproj", "{2A5386D1-9570-4B8C-B887-2AC60B891A97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HealthCare340B.DataModel", "..\HealthCare340B.DataModel\HealthCare340B.DataModel.csproj", "{2A5386D1-9570-4B8C-B887-2AC60B891A97}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthCare340B.ViewModel", "..\HealthCare340B.ViewModel\HealthCare340B.ViewModel.csproj", "{5A0427FC-F884-415F-92C7-6D78D911FD92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HealthCare340B.ViewModel", "..\HealthCare340B.ViewModel\HealthCare340B.ViewModel.csproj", "{5A0427FC-F884-415F-92C7-6D78D911FD92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
