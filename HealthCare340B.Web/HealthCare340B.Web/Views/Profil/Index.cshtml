@@ -5,11 +5,19 @@
     Layout = (string)ViewBag.Role != "ROLE_DOKTER" ? "_ProfilLayout" : "_DokterProfilLayout";
 }
 
-@if ((string)ViewBag.Role != "ROLE_DOKTER")
+@if ((string)ViewBag.Role == "ROLE_PASIEN")
 {
     @Html.Partial("TabPasien")
 }
-else
+else if ((string)ViewBag.Role == "ROLE_DOKTER")
 {
     @Html.Partial("TabDokter")
+}
+else if ((string)ViewBag.Role == "ROLE_ADMIN")
+{
+    @Html.Partial("TabAdmin")
+}
+else
+{
+    @Html.Partial("TabPasien")
 }
