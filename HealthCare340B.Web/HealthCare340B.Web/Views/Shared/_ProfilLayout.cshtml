@@ -1,0 +1,133 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout";
+}
+
+<div class="page-title">
+    <div class="row">
+        <div class="col-12 col-md-6 order-md-1 order-last">
+            <h3>@ViewData["Title"]</h3>
+            <p class="text-subtitle text-muted"></p>
+        </div>
+        <div class="col-12 col-md-6 order-md-2 order-first">
+            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Beranda</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Profile</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<section class="section">
+    <div class="row">
+        <div class="col-12 col-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-center align-items-center flex-column">
+                        <div class="avatar avatar-2xl">
+                            <img src="~/lib/mazer/compiled/jpg/2.jpg" alt="Avatar" />
+                        </div>
+
+                        <h3 class="mt-3">John Doe</h3>
+                        <p class="text-small">Junior Software Engineer</p>
+                    </div>
+                </div> 
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist"
+                                 aria-orientation="vertical">
+                                <a class="nav-link" id="v-pills-pasien-tab" data-bs-toggle="pill"
+                                   href="#v-pills-pasien" role="tab" aria-controls="v-pills-pasien"
+                                   aria-selected="false">Pasien</a>
+                                <a class="nav-link" id="v-pills-pembelianobat-tab" data-bs-toggle="pill"
+                                   href="#v-pills-pembelianobat" role="tab" aria-controls="v-pills-pembelianobat"
+                                   aria-selected="false">Pembelian Obat</a>
+                                <a class="nav-link" id="v-pills-rencanakedatangan-tab" data-bs-toggle="pill"
+                                   href="#v-pills-rencanakedatangan" role="tab" aria-controls="v-pills-rencanakedatangan"
+                                   aria-selected="false">Rencana Kedatangan</a>
+                                <a class="nav-link" id="v-pills-riwayatchatdokter-tab" data-bs-toggle="pill"
+                                   href="#v-pills-riwayatchatdokter" role="tab" aria-controls="v-pills-riwayatchatdokter"
+                                   aria-selected="false">Riwayat Chat Dokter</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-9">
+            <div class="card">
+                <div class="card-body">
+                    <div class="tab-content" id="v-pills-tabContent">
+                        <div class="tab-pane fade" id="v-pills-pasien" role="tabpanel"
+                            aria-labelledby="v-pills-pasien-tab">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ut nulla neque.
+                            Ut hendrerit nulla a euismod pretium.
+                            Fusce venenatis sagittis ex efficitur suscipit. In tempor mattis fringilla. Sed
+                            id tincidunt orci, et volutpat ligula.
+                            Aliquam sollicitudin sagittis ex, a rhoncus nisl feugiat quis. Lorem ipsum dolor
+                            sit amet, consectetur adipiscing elit.
+                            Nunc ultricies ligula a tempor vulputate. Suspendisse pretium mollis ultrices.
+                        </div>
+                        <div class="tab-pane fade" id="v-pills-pembelianobat" role="tabpanel"
+                            aria-labelledby="v-pills-pembelianobat-tab">
+                            Integer interdum diam eleifend metus lacinia, quis gravida eros mollis. Fusce
+                            non sapien sit amet magna dapibus
+                            ultrices. Morbi tincidunt magna ex, eget faucibus sapien bibendum non. Duis a
+                            mauris ex. Ut finibus risus sed massa
+                            mattis porta. Aliquam sagittis massa et purus efficitur ultricies.
+                        </div>
+                        <div class="tab-pane fade" id="v-pills-rencanakedatangan" role="tabpanel"
+                            aria-labelledby="v-pills-rencanakedatangan-tab">
+                            Integer pretium dolor at sapien laoreet ultricies. Fusce congue et lorem id
+                            convallis. Nulla volutpat tellus nec
+                            molestie finibus. In nec odio tincidunt eros finibus ullamcorper. Ut sodales,
+                            dui nec posuere finibus, nisl sem aliquam
+                            metus, eu accumsan lacus felis at odio.
+                        </div>
+                        <div class="tab-pane fade" id="v-pills-riwayatchatdokter" role="tabpanel"
+                            aria-labelledby="v-pills-riwayatchatdokter-tab">
+                            Sed lacus quam, convallis quis condimentum ut, accumsan congue massa.
+                            Pellentesque et quam vel massa pretium ullamcorper
+                            vitae eu tortor.
+                        </div>
+                    </div>
+                    
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
+        // Saat salah satu tombol pill diklik
+        $('.nav-pills .nav-link').on('click', function (e) {
+            e.preventDefault();  // Mencegah aksi default link
+
+            // Sembunyikan tab Profil, Alamat, Pembayaran
+            $('#myTab').hide();
+            $('#myTabContent').hide();
+            // Hapus semua 'active' di pill sebelumnya
+            $('.nav-pills .nav-link').removeClass('active');
+            // Tambahkan 'active' ke tombol pill yang diklik
+            $(this).addClass('active');
+
+            // Sembunyikan semua konten pill
+            $('.tab-pane').hide();
+
+            // Tampilkan konten sesuai dengan tombol pill yang dipilih
+            var target = $(this).attr('href');
+            $(target).show();
+        });
+    });
+</script>
+
