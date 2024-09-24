@@ -9,8 +9,13 @@ namespace HealthCare340B.ViewModel
     public class VMMMenuRole
     {
         public long Id { get; set; }
+        public string? Name { get; set; }
         public long? MenuId { get; set; }
         public long? RoleId { get; set; }
+        public long? ParentId { get; set; }
+        public string? Url { get; set; }
+        public string? BigIcon { get; set; }
+        public string? SmallIcon { get; set; }
         public long CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
         public long? ModifiedBy { get; set; }

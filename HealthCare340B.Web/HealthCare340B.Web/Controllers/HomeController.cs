@@ -15,6 +15,7 @@ namespace HealthCare340B.Web.Controllers
 
         public IActionResult Index()
         {
+
             return View();
         }
 

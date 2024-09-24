@@ -9,6 +9,13 @@ namespace HealthCare340B.Web
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+            builder.Services.AddSession(opt =>
+            {
+
+                opt.IdleTimeout = TimeSpan.FromMinutes(30);
+            });
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -25,6 +32,8 @@ namespace HealthCare340B.Web
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseSession();
 
             app.MapControllerRoute(
                 name: "default",
