@@ -1,28 +1,23 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-
+﻿@{
     Layout = "_Layout";
 }
 
-
-            <div class="page-heading">
-                <div class="page-title">
-                    <div class="row">
-                        <div class="col-12 col-md-12 order-md-1 order-last text-start">
-                            <!-- Tambahkan text-start untuk merapikan teks ke kiri -->
-                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start">
-                                <!-- Menggunakan float-start agar breadcrumb mepet ke kiri -->
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-12 order-md-1 order-last text-start">
+                <!-- Tambahkan text-start untuk merapikan teks ke kiri -->
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start">
+                    <!-- Menggunakan float-start agar breadcrumb mepet ke kiri -->
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
                         <li class="breadcrumb-item"><a href="#" id="breadcrumbProfile">Profile</a></li> <!-- Menambahkan link pada Profile -->
                         <li class="breadcrumb-item active" aria-current="page" id="breadcrumbCurrent">Profile</li>
                     </ol>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
+                </nav>
+            </div>
+        </div>
+    </div>
 
     <section class="section">
         <div class="row">
@@ -30,9 +25,20 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex justify-content-center align-items-center flex-column">
-                            <div class="avatar avatar-2xl">
-                                <img src="~/lib/mazer/compiled/jpg/2.jpg" alt="Avatar">
+                            <!-- Avatar dengan Icon Edit -->
+                            <div class="avatar avatar-2xl position-relative">
+                                <!-- Gambar Avatar -->
+                                <img id="profileImage" src="~/lib/mazer/compiled/jpg/2.jpg" alt="Avatar" class="rounded-circle">
+
+                                <!-- Tombol Pensil untuk Edit Gambar tanpa background dan tidak mepet -->
+                                <label for="imageUpload" class="position-absolute" style="top: 0px; right: -20px; cursor: pointer;">
+                                    <i class="bi bi-pencil-fill" style="font-size: 1rem;"></i>
+                                </label>
+
+                                <!-- Input File Gambar (Tersembunyi) -->
+                                <input type="file" id="imageUpload" class="d-none" accept="image/*" onchange="previewImage(event)">
                             </div>
+
 
                             <h3 class="mt-1">John Doe</h3>
                             <p class="text-small">Junior Software Engineer</p>
@@ -50,8 +56,6 @@
                                     <button class="nav-link w-100 text-start" id="Obrolan-tab" data-bs-toggle="tab" data-bs-target="#Obrolan" type="button" role="tab" aria-controls="Obrolan" aria-selected="false">Obrolan / Konsultasi</button>
                                 </li>
                             </ul>
-
-                            
                         </div>
                     </div>
                 </div>
@@ -74,10 +78,10 @@
                         </div>
                     </div>
                 </div>
-
             </div>
+
             <div class="col-12 col-lg-8">
-                <div class="card" style=" height: 70vh;">
+                <div class="card" style="height: 70vh;">
                     <div class="card-body">
                         <div class="page-content">
                             @RenderBody()
@@ -92,7 +96,6 @@
                                     <h5>Obrolan</h5>
                                     <p>Konten tentang Obrolan.</p>
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -102,9 +105,21 @@
     </section>
 </div>
 
-
-
 <script>
+    function previewImage(event) {
+        const reader = new FileReader();
+        const file = event.target.files[0];
+
+        reader.onload = function () {
+            const output = document.getElementById('profileImage');
+            output.src = reader.result; // Ubah source image menjadi hasil file yang diunggah
+        };
+
+        if (file) {
+            reader.readAsDataURL(file); // Mulai membaca file gambar
+        }
+    }
+
     $(document).ready(function () {
         // Event ketika tab Obrolan di klik
         $('#Obrolan-tab').on('click', function () {
@@ -125,8 +140,6 @@
         // Event ketika tab Janji di klik
         $('#Janji-tab').on('click', function () {
             $('#breadcrumbCurrent').text('Janji'); // Update breadcrumb menjadi Janji
-
-            // Update href untuk kembali ke Profil index
             $('#breadcrumbProfile').attr('href', '@Url.Action("Index", "Profile")');
 
             if ($(this).hasClass('active')) {
@@ -138,13 +151,9 @@
             }
         });
 
-
         // Default profile breadcrumb behavior
         $('#breadcrumbProfile').on('click', function () {
-            // Reset to profile when clicking the Profile breadcrumb
             $('#breadcrumbProfile').attr('href', '@Url.Action("Index", "Profile")')
         });
     });
-
-
-</script>         
+</script>
