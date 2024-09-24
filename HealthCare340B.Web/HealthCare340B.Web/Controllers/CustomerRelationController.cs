@@ -73,6 +73,8 @@ namespace HealthCare340B.Web.Controllers
 
             try
             {
+                data.CreatedBy = long.Parse(HttpContext.Session.GetString("userId")!);
+
                 response = await _customerRelationModel.CreateAsync(data);
             }
             catch (Exception ex)
@@ -108,6 +110,8 @@ namespace HealthCare340B.Web.Controllers
 
             try
             {
+                data.ModifiedBy = long.Parse(HttpContext.Session.GetString("userId")!);
+
                 response = await _customerRelationModel.UpdateAsync(data);
             }
             catch (Exception ex)
@@ -137,12 +141,14 @@ namespace HealthCare340B.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<VMResponse<VMMCustomerRelation>?> DeleteAsync(long id, long userId)
+        public async Task<VMResponse<VMMCustomerRelation>?> DeleteAsync(long id)
         {
             VMResponse<VMMCustomerRelation>? response = null;
 
             try
             {
+                long userId = long.Parse(HttpContext.Session.GetString("userId")!);
+
                 response = await _customerRelationModel.DeleteAsync(id, userId);
             }
             catch (Exception ex)

@@ -1,0 +1,96 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model VMMCustomerRelation?;
+@{
+    Layout = null;
+}
+
+<div class="card mb-0">
+    <div class="card-body">
+        @if (Model != null)
+        {
+            <form id="frmCustomerRelation">
+                <div class="form-group">
+                    <label for="name">Nama<span class="text-danger">*</span></label>
+                    <input type="text" id="name" class="form-control" name="Name" value="@Model.Name">
+                </div>
+                <input type="hidden" name="Id" value="@Model.Id" />
+            </form>
+        }
+        else
+        {
+            <div class="card-title">
+                -- Customer Relation dose not exist! --
+            </div>
+        }
+    </div>
+    <div class="card-footer d-flex justify-content-end">
+        @*<button type="reset" id="btnReset" class="btn btn-primary">Reset</button>*@
+        <button type="reset" id="btnReset" class="btn btn-primary" data-bs-dismiss="modal">Batal</button>
+        &nbsp;
+        <button type="button" id="btnSave" class="btn btn-success">Simpan</button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#staticModalLabel").text("@ViewBag.Title");
+
+        $("#btnSave").click((e) => $("#frmCustomerRelation").submit());
+
+        $("#frmCustomerRelation").submit(function (e) {
+            //Disable form submit function
+            e.preventDefault();
+
+            if ($("#frmCustomerRelation").valid()) {
+                $.ajax({
+                    url: "/CustomerRelation/Edit",
+                    type: "POST",
+                    data: $("#frmCustomerRelation").serialize(),
+                    dataType: "json",
+                    beforeSend: () => {
+
+                    },
+                    success: function (response) {
+                        if (response.statusCode == 200 || response.statusCode == 201) {
+                            location.reload();
+                        }
+                        else {
+                            alert(response.statusCode + " - " + response.message);
+                        }
+                    },
+                    error: function (errResponse) {
+                        console.error(errResponse);
+                    }
+                });
+            }
+            else {
+                console.error("Form is invalid!");
+            }
+
+            return false;
+        });
+
+        $("#frmCustomerRelation").validate({
+            rules: {
+                Name: {
+                    required: true,
+                    minlength: 3
+                },
+            },
+            messages: {
+                Name: {
+                    required: "Silakan masukkan nama",
+                    minlength: "Nama harus terdiri dari minimal 3 karakter"
+                },
+            },
+            errorClass: "text-danger"
+        });
+
+        //$("#btnReset").click(() => {
+        //    $("#frmCustomerRelation")[0].reset();
+        //});
+    });
+
+</script>
