@@ -10,9 +10,16 @@
             <div class="card-title row mb-1">
                 <label class="col-6 col-form-label ">Lokasi</label>
                 <div class="row mb-1">
-                    <div class="col-12">
-                        <input class="form-select" type="text" name="Location" />
-                    </div>
+                    <select id="MedFacilityId" name="MedicalFacilityName" class="form-select">
+                        <option value="">--Select Medical Facility--</option>
+                        @if (ViewBag.MedicalFacility != null)
+                        {
+                            foreach (VMMMedicalFacility medFac in ViewBag.MedicalFacility)
+                            {
+                                <option value="@medFac.Id">@medFac.Name</option>
+                            }
+                        }
+                    </select>
                 </div>
             </div>
             <div class="row mb-1">
@@ -26,17 +33,31 @@
             <div class="row mb-1">
                 <label class="col-10 col-form-label">Spesialisasi/Sub-spesialisasi <span class="text-danger">*</span></label>
                 <div class="row mb-1">
-                    <div class="col-12">
-                        <input class="form-select" type="text" name="Specialization" />
-                    </div>
+                    <select id="SpecialityId" name="Specialization" class="form-select">
+                        <option value="">--Select Specialization / Sub-Specialicity--</option>
+                        @if (ViewBag.Specialization != null)
+                        {
+                            foreach (VMMSpecialization spec in ViewBag.Specialization)
+                            {
+                                <option value="@spec.Id">@spec.Name</option>
+                            }
+                        }
+                    </select>
                 </div>
             </div>
             <div class="row mb-1">
                 <label class="col-6 col-form-label ">Tindakan Medis</label>
                 <div class="row mb-1">
-                    <div class="col-12">
-                        <input class="form-select" type="text" name="MedicalAction" />
-                    </div>
+                    <select id="treatmentId" name="Treatment" class="form-select">
+                        <option value="">--Select Treatment--</option>
+                        @if (ViewBag.DoctorTreatment != null)
+                        {
+                            foreach (VMTDoctorTreatment treatment in ViewBag.DoctorTreatment)
+                            {
+                                <option value="@treatment.Id">@treatment.Name</option>
+                            }
+                        }
+                    </select>
                 </div>
             </div>
             <input type="hidden" name="CreateBy" value="1" />

@@ -20,7 +20,7 @@ namespace HealthCare340B.ViewModel
         public bool IsDelete { get; set; }
         public string? Fullname { get; set; }
         public string? Specialization { get; set; }
-        public string? FullAddress { get; set; }
+        public string? MedicalFacilityName { get; set; }
         public string? Treatment { get; set; }
     }
 }

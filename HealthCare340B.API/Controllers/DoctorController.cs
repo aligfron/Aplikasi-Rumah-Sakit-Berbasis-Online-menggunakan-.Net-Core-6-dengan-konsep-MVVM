@@ -18,6 +18,31 @@ namespace HealthCare340B.API.Controllers
         }
 
         [HttpGet("[action]")]
+        public async Task<ActionResult> GetAll()
+        {
+            try
+            {
+                VMResponse<List<VMMDoctor>?> response = await Task.Run(() => doctor.GetAll());
+                if (response.Data != null && response.Data.Count > 0)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    Console.WriteLine(response.Message);
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Console Logging
+                Console.WriteLine("DoctorController.GetAll: " + ex.Message);
+
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("[action]")]
         public async Task<ActionResult> GetByFilter(string? location, string? doctorName, string? specialization, string? treatment)
         {
             try
