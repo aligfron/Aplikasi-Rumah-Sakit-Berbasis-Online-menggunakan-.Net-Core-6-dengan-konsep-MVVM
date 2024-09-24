@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HealthCare340B.DataModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,5 +18,22 @@ namespace HealthCare340B.ViewModel
         public long? DeletedBy { get; set; }
         public DateTime? DeletedOn { get; set; }
         public bool IsDelete { get; set; }
+
+        public VMMSpecialization()
+        {
+        }
+        public VMMSpecialization(MSpecialization specialization)
+        {
+            Id = specialization.Id;
+            Name = specialization.Name;
+            CreatedBy = specialization.CreatedBy;
+            CreatedOn = specialization.CreatedOn;
+            ModifiedBy = specialization.ModifiedBy;
+            ModifiedOn = specialization.ModifiedOn;
+            DeletedBy = specialization.DeletedBy;
+            DeletedOn = specialization.DeletedOn;
+            IsDelete = specialization.IsDelete;
+        }
     }
-}
+    
+    }

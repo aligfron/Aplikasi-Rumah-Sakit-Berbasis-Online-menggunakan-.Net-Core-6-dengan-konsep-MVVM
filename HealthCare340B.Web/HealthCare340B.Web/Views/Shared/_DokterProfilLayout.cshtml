@@ -14,10 +14,11 @@
                             <!-- Tambahkan text-start untuk merapikan teks ke kiri -->
                             <nav aria-label="breadcrumb" class="breadcrumb-header float-start">
                                 <!-- Menggunakan float-start agar breadcrumb mepet ke kiri -->
-                                <ol class="breadcrumb">
+                    <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Profile</li>
-                                </ol>
+                        <li class="breadcrumb-item"><a href="#" id="breadcrumbProfile">Profile</a></li> <!-- Menambahkan link pada Profile -->
+                        <li class="breadcrumb-item active" aria-current="page" id="breadcrumbCurrent">Profile</li>
+                    </ol>
                             </nav>
                         </div>
                     </div>
@@ -105,8 +106,13 @@
 
 <script>
     $(document).ready(function () {
+        // Event ketika tab Obrolan di klik
         $('#Obrolan-tab').on('click', function () {
-            // Kosongkan konten tab pertama
+            $('#breadcrumbCurrent').text('Obrolan'); // Update breadcrumb menjadi Obrolan
+            $('#breadcrumbProfile').attr('href', '#').on('click', function () {
+                // Kembali ke profil ketika breadcrumb Profile diklik
+                $('#breadcrumbProfile').attr('href', '@Url.Action("Index", "Profile")')
+            });
             if ($(this).hasClass('active')) {
                 $('#tindakan').empty();
                 $('#aktivitas').empty();
@@ -116,8 +122,13 @@
             }
         });
 
+        // Event ketika tab Janji di klik
         $('#Janji-tab').on('click', function () {
-            // Kosongkan konten tab pertama
+            $('#breadcrumbCurrent').text('Janji'); // Update breadcrumb menjadi Janji
+
+            // Update href untuk kembali ke Profil index
+            $('#breadcrumbProfile').attr('href', '@Url.Action("Index", "Profile")');
+
             if ($(this).hasClass('active')) {
                 $('#tindakan').empty();
                 $('#aktivitas').empty();
@@ -126,6 +137,14 @@
                 $('#myTab').hide();
             }
         });
+
+
+        // Default profile breadcrumb behavior
+        $('#breadcrumbProfile').on('click', function () {
+            // Reset to profile when clicking the Profile breadcrumb
+            $('#breadcrumbProfile').attr('href', '@Url.Action("Index", "Profile")')
+        });
     });
+
 
 </script>         
