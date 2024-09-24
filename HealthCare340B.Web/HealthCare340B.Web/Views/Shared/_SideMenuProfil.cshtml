@@ -1,0 +1,56 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@if (ViewBag.Role == "ROLE_PASIEN")
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist"
+                 aria-orientation="vertical">
+                <a class="nav-link" id="v-pills-pasien-tab" asp-controller="Pasien" asp-action="Index">Pasien</a>
+                <a class="nav-link" id="v-pills-pembelianobat-tab" href="#">Pembelian Obat</a>
+                <a class="nav-link" id="v-pills-rencanakedatangan-tab" href="#">Rencana Kedatangan</a>
+                <a class="nav-link" id="v-pills-riwayatchatdokter-tab"href="#">Riwayat Chat Dokter</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Menambahkan kelas 'active' pada nav-link sesuai dengan URL
+            var currentUrl = window.location.pathname;
+
+            // Periksa URL dan sesuaikan dengan tombol yang tepat
+            if (currentUrl.includes('/Profil/Pasien')) {
+                $("#v-pills-pasien-tab").addClass("active");
+            } else if (currentUrl.includes('/Profil/PembelianObat')) {
+                $("#v-pills-pembelianobat-tab").addClass("active");
+            } else if (currentUrl.includes('/Profil/RencanaKedatangan')) {
+                $("#v-pills-rencanakedatangan-tab").addClass("active");
+            } else if (currentUrl.includes('/Profil/RiwayatChatDokter')) {
+                $("#v-pills-riwayatchatdokter-tab").addClass("active");
+            }
+
+            // Navigasi klik tanpa refresh halaman
+            $("#v-pills-pasien-tab").click(function (e) {
+                e.preventDefault();
+                location.href = '/Profil/Pasien';
+            });
+
+            $("#v-pills-pembelianobat-tab").click(function () {
+                $("#cardBodyContent").html("<p>Belum ada data</p>");
+            });
+
+            $("#v-pills-rencanakedatangan-tab").click(function () {
+                $("#cardBodyContent").html("<p>Belum ada data</p>");
+            });
+
+            $("#v-pills-riwayatchatdokter-tab").click(function () {
+                $("#cardBodyContent").html("<p>Belum ada data</p>");
+            });
+        });
+    </script>
+}
