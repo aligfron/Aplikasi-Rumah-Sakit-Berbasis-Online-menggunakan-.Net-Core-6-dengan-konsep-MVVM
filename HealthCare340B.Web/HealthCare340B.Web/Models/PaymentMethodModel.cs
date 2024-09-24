@@ -203,7 +203,7 @@ namespace HealthCare340B.Web.Models
                 }
                 else
                 {
-                    throw new Exception("Category API could not be reached");
+                    throw new Exception("Payment Method API could not be reached");
                 }
             }
             catch (Exception e)

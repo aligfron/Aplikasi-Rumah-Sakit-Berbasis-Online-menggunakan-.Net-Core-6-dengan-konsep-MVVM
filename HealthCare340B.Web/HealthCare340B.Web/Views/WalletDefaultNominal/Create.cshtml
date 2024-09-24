@@ -1,0 +1,82 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = null;
+}
+
+<div class="card">
+    <div class="card-body">
+        <form id="frmWalletDefaultNominal">
+            <div class="row mb-3">
+                <div class="col-4">Nominal<span class="text-danger">*</span></div>
+                <div class="col-8"><input class="form-control" type="number" name="Nominal" /></div>
+            </div>
+        </form>
+    </div>
+    <div class="d-flex justify-content-between">
+        <div class="w-10"></div>
+        <div class="w-30"><button id="btnCancel" class="btn btn-outline-danger">Cancel</button></div>
+        <div class="w-10"></div>
+        <div class="w-30"><button id="btnSave" class="btn btn-outline-success">Save</button></div>
+        <div class="w-10"></div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(() => {
+        $("#staticModalLabel").text("@ViewBag.Title");
+
+        $("#frmWalletDefaultNominal").submit(function (e) {
+            e.preventDefault();
+        });
+
+        $("#frmWalletDefaultNominal").validate({
+            rules: {
+                Nominal: {
+                    required: true,
+                    max: 2000000,
+                    min: 1000
+                }
+            },
+            messages: {
+                Nominal: {
+                    min: "Nominal must be at least 1000",
+                    max: "Nominal must be less or equal than 2000000"
+                }
+            }
+        });
+
+        $("#btnSave").click(function (e) {
+            if ($("#frmWalletDefaultNominal").valid()) {
+                $.ajax({
+                    url: "/WalletDefaultNominal/Create",
+                    type: "post",
+                    data: $("#frmWalletDefaultNominal").serialize(),
+                    dataType: "json",
+                    beforeSend: () => { },
+                    success: function (response) {
+                        if (response.statusCode == 200 || response.statusCode == 201) {
+                            location.reload();
+                        }
+                        else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function (errResponse) {
+                        console.error(errResponse);
+                        alert(errResponse);
+                    }
+                });
+            }
+            else {
+                console.error("Wallet Default Nominal data is not valid!");
+            }
+            return false;
+        });
+
+        $("#btnCancel").click(() => {
+            location.reload();
+        })
+    });
+</script>

@@ -8,21 +8,21 @@ namespace HealthCare340B.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PaymentMethodController : ControllerBase
+    public class WalletDefaultNominalController : ControllerBase
     {
-        private DAPaymentMethod paymentMethod;
+        private DAWalletDefaultNominal walletDefaultNominal;
 
-        public PaymentMethodController(HealthCare340BContext _db)
+        public WalletDefaultNominalController(HealthCare340BContext _db)
         {
-            paymentMethod = new DAPaymentMethod(_db);
+            walletDefaultNominal = new DAWalletDefaultNominal(_db);
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetAll()
+        public async Task<IActionResult> GetAll()
         {
             try
             {
-                VMResponse<List<VMMPaymentMethod>?> response = await Task.Run(() => paymentMethod.GetByFilter(""));
+                VMResponse<List<VMMWalletDefaultNominal>?> response = await Task.Run(() => walletDefaultNominal.GetByFilter(null));
                 if (response.Data != null && response.Data.Count > 0)
                 {
                     return Ok(response);
@@ -36,18 +36,18 @@ namespace HealthCare340B.API.Controllers
             catch (Exception e)
             {
                 //Console Logging
-                Console.WriteLine("PaymentMethodController.GetAll: " + e.Message);
+                Console.WriteLine("WalletDefaultNominalController.GetAll: " + e.Message);
 
                 return BadRequest(e.Message);
             }
         }
 
-        [HttpGet("[action]/{filter?}")]
-        public async Task<ActionResult> GetByFilter(string? filter = null)
+        [HttpGet("[action]/{nominal?}")]
+        public async Task<IActionResult> GetByFilter(int? nominal = null)
         {
             try
             {
-                VMResponse<List<VMMPaymentMethod>?> response = await Task.Run(() => paymentMethod.GetByFilter(filter));
+                VMResponse<List<VMMWalletDefaultNominal>?> response = await Task.Run(() => walletDefaultNominal.GetByFilter(nominal));
                 if (response.Data != null && response.Data.Count > 0)
                 {
                     return Ok(response);
@@ -61,20 +61,20 @@ namespace HealthCare340B.API.Controllers
             catch (Exception e)
             {
                 //Console Logging
-                Console.WriteLine("PaymentMethodController.GetByFilter: " + e.Message);
+                Console.WriteLine("WalletDefaultNominalController.GetByFilter: " + e.Message);
 
                 return BadRequest(e.Message);
             }
         }
 
         [HttpGet("[action]/{id?}")]
-        public async Task<ActionResult> GetById(long? id)
+        public async Task<IActionResult> GetById(long? id)
         {
-            if (id == null)
-                throw new Exception("ID cannot be null!");
             try
             {
-                VMResponse<VMMPaymentMethod?> response = await Task.Run(() => paymentMethod.GetById((long)id));
+                if (id == null)
+                    throw new Exception("ID cannot be null!");
+                VMResponse<VMMWalletDefaultNominal?> response = await Task.Run(() => walletDefaultNominal.GetById((long)id));
                 if (response.Data != null)
                 {
                     return Ok(response);
@@ -88,34 +88,34 @@ namespace HealthCare340B.API.Controllers
             catch (Exception e)
             {
                 //Console Logging
-                Console.WriteLine("PaymentMethodController.GetById: " + e.Message);
+                Console.WriteLine("WalletDefaultNominalController.GetById: " + e.Message);
 
                 return BadRequest(e.Message);
             }
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(VMMPaymentMethod data)
+        public async Task<IActionResult> Create(VMMWalletDefaultNominal data)
         {
             try
             {
-                return Created("api/PaymentMethod", await Task.Run(() => paymentMethod.Create(data)));
+                return Created("api/WalletDefaultNominal", await Task.Run(() => walletDefaultNominal.Create(data)));
             }
             catch (Exception e)
             {
                 //Console Logging
-                Console.WriteLine("PaymentMethodController.Create: " + e.Message);
+                Console.WriteLine("WalletDefaultNominalController.Create: " + e.Message);
 
                 return BadRequest(e.Message);
             }
         }
 
         [HttpPut]
-        public async Task<ActionResult> Update(VMMPaymentMethod data)
+        public async Task<IActionResult> Update(VMMWalletDefaultNominal data)
         {
             try
             {
-                VMResponse<VMMPaymentMethod> response = await Task.Run(() => paymentMethod.Update(data));
+                VMResponse<VMMWalletDefaultNominal> response = await Task.Run(() => walletDefaultNominal.Update(data));
                 if (response.Data != null)
                 {
                     return Ok(response);
@@ -128,20 +128,21 @@ namespace HealthCare340B.API.Controllers
             }
             catch (Exception e)
             {
-                Console.WriteLine("PaymentMethodController.Update: " + e.Message);
+                //Console Logging
+                Console.WriteLine("WalletDefaultNominalController.Update: " + e.Message);
 
                 return BadRequest(e.Message);
             }
         }
 
         [HttpDelete]
-        public async Task<ActionResult> Delete(long? id, long? deletedBy)
+        public async Task<IActionResult> Delete(long? id, long? deletedBy)
         {
             try
             {
                 if (id == null || deletedBy == null)
                     throw new Exception("ID or deletedBy cannot be null!");
-                VMResponse<VMMPaymentMethod> response = await Task.Run(() => paymentMethod.Delete((long)id, (long)deletedBy));
+                VMResponse<VMMWalletDefaultNominal> response = await Task.Run(() => walletDefaultNominal.Delete((long)id, (long)deletedBy));
                 if (response.Data != null)
                 {
                     return Ok(response);
@@ -154,7 +155,8 @@ namespace HealthCare340B.API.Controllers
             }
             catch (Exception e)
             {
-                Console.WriteLine("PaymentMethodController.Delete: " + e.Message);
+                //Console Logging
+                Console.WriteLine("WalletDefaultNominalController.Delete: " + e.Message);
 
                 return BadRequest(e.Message);
             }

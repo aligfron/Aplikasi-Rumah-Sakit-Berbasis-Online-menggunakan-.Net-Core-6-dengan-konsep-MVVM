@@ -1,0 +1,85 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model List<VMMWalletDefaultNominal>?
+@{
+}
+
+<div class="d-flex justify-content-between">
+    <div class="w-15">
+        <button id="btnAdd" class="btn btn-outline-success" title="Add New Wallet Default Nominal..."
+                data-bs-toggle="modal" data-bs-target="#staticModal">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+    <div class="w-35">
+    </div>
+    <div class="w-50 d-flex justify-content-between">
+        <div class="w-25">
+        </div>
+        <form class="w-75" id="frmProductFilter" method="get" asp-controller="WalletDefaultNominal" asp-action="Index">
+            <div class="input-group">
+                <span class="input-group-text">Search Nominal</span>
+                <input class="form-control" type="number" id="filter" name="Filter" value="@ViewBag.filter" min="0" max="2000000" />
+            </div>
+        </form>
+    </div>
+</div>
+&nbsp;
+<div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th class="col-9">Nominal</th>
+                <th class="col-3">#</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if(Model != null && Model.Count > 0)
+            {
+                foreach(VMMWalletDefaultNominal wdm in Model)
+                {
+                    <tr>
+                        <td>@("Rp. " + wdm.Nominal?.ToString("N0"))</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button data-id="@wdm.Id" class="btn btn-outline-info" title="Edit..."
+                                        data-bs-toggle="modal" data-bs-target="#staticModal">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                &nbsp;
+                                <button data-id="@wdm.Id" class="btn btn-outline-danger" title="Delete..."
+                                        data-bs-toggle="modal" data-bs-target="#staticModal">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="2" class="text-center">-- No Wallet Default Nominal Data --</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $("#btnAdd").click(function (e) {
+        $("#staticModalBody").html();
+        $("#staticModalBody").load("/WalletDefaultNominal/Create/");
+    });
+
+    $(".btn-outline-info").click(function (e) {
+        $("#staticModalBody").html();
+        $("#staticModalBody").load("/WalletDefaultNominal/Edit/" + $(this).data("id"));
+    });
+
+    $(".btn-outline-danger").click(function (e) {
+        $("#staticModalBody").html();
+        $("#staticModalBody").load("/WalletDefaultNominal/Delete/" + $(this).data("id"));
+    });
+</script>

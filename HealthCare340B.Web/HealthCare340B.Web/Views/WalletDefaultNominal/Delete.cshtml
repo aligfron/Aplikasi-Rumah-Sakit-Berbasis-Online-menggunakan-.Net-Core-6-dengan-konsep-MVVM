@@ -1,0 +1,47 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model VMMWalletDefaultNominal?
+@{
+    Layout = null;
+}
+
+<div class="card">
+    <div class="card-body">
+        <i class="fa fa-exclamation-triangle fa-align-left text-danger h1 me-3"></i>
+        <span>Are you sure want to DELETE Category Rp. @(Model.Nominal?.ToString("N0")) ?</span>
+    </div>
+    <div class="d-flex justify-content-between">
+        <div class="w-10"></div>
+        <div class="w-30"><button class="btn btn-outline-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button></div>
+        <div class="w-10"></div>
+        <div class="w-30"><button id="btnDelete" class="btn btn-outline-danger">Confirm</button></div>
+        <div class="w-10"></div>
+    </div>
+</div>
+
+<script>
+    $("#staticModalLabel").text("@ViewBag.Title");
+    $("#btnDelete").click(function (e) {
+        $.ajax({
+            url: "/WalletDefaultNominal/Delete",
+            type: "post",
+            data: {
+                "id": @Model.Id
+                },
+            dataType: "json",
+            beforeSend: () => { },
+            success: function (response) {
+                alert(response.message);
+                //delay(5000);
+                if (response.statusCode == 200) {
+                    location.reload();
+                }
+            },
+            error: function (errResponse) {
+                console.error("Wallet Default Nominal deletion failed", errResponse);
+                debugger;
+            }
+        });
+    });
+</script>

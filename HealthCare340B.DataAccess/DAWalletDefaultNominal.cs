@@ -19,13 +19,15 @@ namespace HealthCare340B.DataAccess
             db = _db;
         }
 
-        public VMResponse<List<VMMWalletDefaultNominal>?> GetByFilter(int nominal)
+        public VMResponse<List<VMMWalletDefaultNominal>?> GetByFilter(int? nominal)
         {
             VMResponse<List<VMMWalletDefaultNominal>?> response = new VMResponse<List<VMMWalletDefaultNominal>?>();
 
             try
             {
-                response.Data = (
+                if (nominal != null)
+                {
+                    response.Data = (
                     from wdm in db.MWalletDefaultNominals
                     where wdm.IsDelete == false && wdm.Nominal == nominal
                     select new VMMWalletDefaultNominal
@@ -41,7 +43,27 @@ namespace HealthCare340B.DataAccess
                         IsDelete = wdm.IsDelete
                     }
                     ).ToList();
-
+                }
+                else
+                {
+                    response.Data = (
+                    from wdm in db.MWalletDefaultNominals
+                    where wdm.IsDelete == false
+                    select new VMMWalletDefaultNominal
+                    {
+                        Id = wdm.Id,
+                        Nominal = wdm.Nominal,
+                        CreatedBy = wdm.CreatedBy,
+                        CreatedOn = wdm.CreatedOn,
+                        ModifiedBy = wdm.ModifiedBy,
+                        ModifiedOn = wdm.ModifiedOn,
+                        DeletedBy = wdm.DeletedBy,
+                        DeletedOn = wdm.DeletedOn,
+                        IsDelete = wdm.IsDelete
+                    }
+                    ).ToList();
+                }
+               
                 response.Message = (response.Data.Count > 0)
                     ? $"{HttpStatusCode.OK} - {response.Data.Count} Wallet Default Nominal data(s) successfully fetched"
                     : $"{HttpStatusCode.NoContent} - No data is found within Wallet Default Nominal";
@@ -169,6 +191,18 @@ namespace HealthCare340B.DataAccess
 
                         dbTran.Commit();
 
+                        response.Data = new VMMWalletDefaultNominal
+                        {
+                            Id = updatedData.Id,
+                            Nominal = updatedData.Nominal,
+                            CreatedBy = updatedData.CreatedBy,
+                            CreatedOn = updatedData.CreatedOn,
+                            ModifiedBy = updatedData.ModifiedBy,
+                            ModifiedOn = updatedData.ModifiedOn,
+                            DeletedBy = updatedData.DeletedBy,
+                            DeletedOn = updatedData.DeletedOn,
+                            IsDelete = updatedData.IsDelete
+                        };
 
                         response.StatusCode = HttpStatusCode.OK;
                         response.Message = $"{HttpStatusCode.OK} - The Wallet Default Nominal has been successfully updated";
@@ -215,9 +249,21 @@ namespace HealthCare340B.DataAccess
 
                         dbTran.Commit();
 
+                        response.Data = new VMMWalletDefaultNominal
+                        {
+                            Id = updatedData.Id,
+                            Nominal = updatedData.Nominal,
+                            CreatedBy = updatedData.CreatedBy,
+                            CreatedOn = updatedData.CreatedOn,
+                            ModifiedBy = updatedData.ModifiedBy,
+                            ModifiedOn = updatedData.ModifiedOn,
+                            DeletedBy = updatedData.DeletedBy,
+                            DeletedOn = updatedData.DeletedOn,
+                            IsDelete = updatedData.IsDelete
+                        };
 
                         response.StatusCode = HttpStatusCode.OK;
-                        response.Message = $"{HttpStatusCode.OK} - The Wallet Default Nominal has been successfully updated";
+                        response.Message = $"{HttpStatusCode.OK} - The Wallet Default Nominal has been successfully deleted";
                     }
                     else
                     {
