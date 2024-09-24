@@ -9,15 +9,15 @@ namespace HealthCare340B.ViewModel
 {
     public class VMResponse<T>
     {
-        public HttpStatusCode statusCode { get; set; }
-        public string? message { get; set; }
-        public T? data { get; set; }
+        public HttpStatusCode StatusCode { get; set; }
+        public string? Message { get; set; }
+        public T? Data { get; set; }
 
         public VMResponse()
         {
-            statusCode = HttpStatusCode.InternalServerError;
-            message = string.Empty; // sama dengan ""
-            data = default(T); // empty object
+            StatusCode = HttpStatusCode.InternalServerError;
+            Message = string.Empty; // sama dengan ""
+            Data = default(T); // empty object
         }
     }
 }
