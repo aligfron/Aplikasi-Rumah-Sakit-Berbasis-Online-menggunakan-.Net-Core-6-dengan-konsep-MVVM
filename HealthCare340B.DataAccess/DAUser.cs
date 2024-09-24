@@ -71,12 +71,14 @@ namespace HealthCare340B.DataAccess
                     from u in db.MUsers
                     join b in db.MBiodata
                     on u.BiodataId equals b.Id
+                    join r in db.MRoles on u.RoleId equals r.Id
                     where u.IsDelete == false && u.Email == Email
                     select new VMMUser()
                     {
                         Id = u.Id,
                         BiodataId = u.BiodataId,
                         Name = b.Fullname,
+                        RoleName = r.Name,
                         RoleId = u.RoleId,
                         Email = u.Email,
                         Password = u.Password,
