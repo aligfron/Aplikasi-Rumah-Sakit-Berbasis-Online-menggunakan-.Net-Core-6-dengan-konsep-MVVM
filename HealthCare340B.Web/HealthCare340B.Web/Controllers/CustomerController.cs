@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HealthCare340B.Web.Controllers
 {
-    [Route("Profil/Pasien")]
-    public class PasienController : Controller
+    [Route("Profile/Pasien")]
+    public class CustomerController : Controller
     {
         public IActionResult Index()
         {
@@ -14,7 +14,7 @@ namespace HealthCare340B.Web.Controllers
             ViewBag.Breadcrumb = new List<BreadcrumbItem>
             {
                 new BreadcrumbItem { Name = "Beranda", Controller = "Home", Action = "Index" },
-                new BreadcrumbItem { Name = "Profile", Controller = "Profil", Action = "Index" },
+                new BreadcrumbItem { Name = "Profile", Controller = "Profile", Action = "Index" },
                 new BreadcrumbItem { Name = "Pasien", IsActive = true }
             };
 

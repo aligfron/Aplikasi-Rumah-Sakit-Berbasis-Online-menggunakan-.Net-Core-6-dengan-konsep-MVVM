@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HealthCare340B.Web.Controllers
 {
-    public class ProfilController : Controller
+    public class ProfileController : Controller
     {
         public IActionResult Index()
         {

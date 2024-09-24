@@ -24,20 +24,20 @@
             var currentUrl = window.location.pathname;
 
             // Periksa URL dan sesuaikan dengan tombol yang tepat
-            if (currentUrl.includes('/Profil/Pasien')) {
+            if (currentUrl.includes('/Profile/Pasien')) {
                 $("#v-pills-pasien-tab").addClass("active");
-            } else if (currentUrl.includes('/Profil/PembelianObat')) {
+            } else if (currentUrl.includes('/Profile/PembelianObat')) {
                 $("#v-pills-pembelianobat-tab").addClass("active");
-            } else if (currentUrl.includes('/Profil/RencanaKedatangan')) {
+            } else if (currentUrl.includes('/Profile/RencanaKedatangan')) {
                 $("#v-pills-rencanakedatangan-tab").addClass("active");
-            } else if (currentUrl.includes('/Profil/RiwayatChatDokter')) {
+            } else if (currentUrl.includes('/Profile/RiwayatChatDokter')) {
                 $("#v-pills-riwayatchatdokter-tab").addClass("active");
             }
 
             // Navigasi klik tanpa refresh halaman
             $("#v-pills-pasien-tab").click(function (e) {
                 e.preventDefault();
-                location.href = '/Profil/Pasien';
+                location.href = '/Profile/Pasien';
             });
 
             $("#v-pills-pembelianobat-tab").click(function () {
