@@ -1,7 +1,121 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+@model List<VMMCustomerRelation>?;
 @{
 }
 
-HALLO PASIEN
+<div class="page-title">
+    <div class="row">
+        <div class="col-12 col-md-6 order-md-1 order-last">
+            <h3>@ViewData["Title"]</h3>
+            <p class="text-subtitle text-muted"></p>
+        </div>
+        <div class="col-12 col-md-6 order-md-2 order-first">
+            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                <ol class="breadcrumb">
+                    @foreach (var item in ViewBag.Breadcrumb as List<BreadcrumbItem>)
+                    {
+                        if (item.IsActive)
+                        {
+                            <li class="breadcrumb-item active" aria-current="page">@item.Name</li>
+                        }
+                        else
+                        {
+                            <li class="breadcrumb-item">
+                                <a asp-controller="@item.Controller" asp-action="@item.Action">@item.Name</a>
+                            </li>
+                        }
+                    }
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<section class="section">
+    <div class="row" id="table-striped">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between">
+                        <form id="frmCustomerFilter" asp-controller="CustomerRelation" asp-action="Index">
+                            <div class="input-group">
+                                <span class="input-group-text">Search: </span>
+                                <input class="form-control" type="text" id="filter" name="Filter" value="@ViewBag.Filter" />
+                                <button type="submit" class="btn btn-secondary input-group-text"><i class="fas fa-search"></i></button>
+                            </div>
+                        </form>
+
+                        <button id="btnAdd" class="btn btn-success" title="Add New Customer"
+                                data-bs-toggle="modal" data-bs-target="#staticModal">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="table-responsive">
+                        <div class="card-body">
+                            <!-- table striped -->
+                            <table class="table table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: left; width: 50%;">NAMA</th>
+                                        <th style="text-align: right; width: 50%;">ACTION</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null && Model.Count > 0)
+                                    {
+
+
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td class="text-bold-500" style="text-align: left;">@item.Name</td>
+                                                <td style="text-align: right;">
+                                                    <div class="btn-group" role="group">
+                                                        <button data-id="@item.Id" class="btn btn-primary" title="Edit..."
+                                                                data-bs-toggle="modal" data-bs-target="#staticModal">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button data-id="@item.Id" class="btn btn-danger" title="Delete..."
+                                                                data-bs-toggle="modal" data-bs-target="#staticModal">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="4" class="text-center">-- No Customer Relation Data --</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $("#btnAdd").click(function (e) {
+        $("#staticModalBody").html(spinner);
+        $("#staticModalBody").load("/CustomerRelation/Create/");
+    });
+
+    $(".btn-primary").click(function (e) {
+        $("#staticModalBody").html(spinner);
+        $("#staticModalBody").load("/CustomerRelation/Edit/" + $(this).data("id"));
+    });
+
+    $(".btn-danger").click(function (e) {
+        $("#staticModalBody").html(spinner);
+        $("#staticModalBody").load("/CustomerRelation/Delete/" + $(this).data("id"));
+    });
+</script>

@@ -28,7 +28,7 @@ namespace HealthCare340B.DataAccess
             {
                 response.Data = (
                     from cr in _db.MCustomerRelations
-                    where cr.Name.Contains(filter)
+                    where cr.Name.Contains(filter) && cr.IsDelete == false
                     select new VMMCustomerRelation
                     {
                         Id = cr.Id,

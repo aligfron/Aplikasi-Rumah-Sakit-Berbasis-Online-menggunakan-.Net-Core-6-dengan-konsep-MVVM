@@ -38,12 +38,12 @@
             <!-- Footer -->
             <partial name="_Footer" />
             <!--Modal-->
-            <partial name ="_Modal"/>
+            <partial name="_Modal" />
         </div>
     </div>
 
 
-     @*<script src="~/js/site.js" asp-append-version="true"></script>*@
+    @*<script src="~/js/site.js" asp-append-version="true"></script>*@
 
     <!-- Mazer -->
     <script src="~/lib/mazer/static/js/components/dark.js"></script>
@@ -53,6 +53,14 @@
     <!-- Need: Apexcharts -->
     @*<script src="~/lib/mazer/extensions/apexcharts/apexcharts.min.js"></script>
         <script src="~/lib/mazer/static/js/pages/dashboard.js"></script>*@
+
+    <script>
+        let spinner = "<div class='d-flex justify-content-center'>" +
+            "<div class='spinner-border' role='status'>" +
+            "<span class='visually-hidden'>Loading...</span>" +
+            "</div>" +
+            "</div>"
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
