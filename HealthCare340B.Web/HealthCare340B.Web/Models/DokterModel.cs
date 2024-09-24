@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System.Net;
 using HealthCare340B.ViewModel;
+using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace HealthCare340B.Web.Models
 {
@@ -16,31 +18,29 @@ namespace HealthCare340B.Web.Models
             apiUrl = _config["ApiUrl"];
         }
 
-
-        public async Task<List<VMMDoctor>?> GetByName(string nama)
+        public async Task<List<VMMDoctor>?> GetByFilter(VMMDoctor data)
         {
-            List<VMMDoctor>? data = null;
+            List<VMMDoctor>? resultData = null;
+            VMResponse<List<VMMDoctor>>? apiResponse = null;
 
             try
             {
-                VMResponse<List<VMMDoctor>>? apiResponse =
-                JsonConvert.DeserializeObject<VMResponse<List<VMMDoctor>>?>(
-                await httpClient.GetStringAsync(
-                (string.IsNullOrEmpty(nama))
-                ? $"{apiUrl}Category"
-                : $"{apiUrl}Category/GetBy/{nama}"
-                    )
-                );
+                jsonData = JsonConvert.SerializeObject(data);
+                content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                apiResponse = JsonConvert.DeserializeObject<VMResponse<List<VMMDoctor>>?>(
+                    await (await httpClient.SendAsync(new HttpRequestMessage(
+                        HttpMethod.Get, $"{apiUrl}Doctor") { Content = content})).Content.ReadAsStringAsync());
 
                 if (apiResponse != null)
                 {
-                    if (apiResponse.statusCode == HttpStatusCode.OK)
+                    if (apiResponse.StatusCode == HttpStatusCode.OK)
                     {
-                        data = apiResponse.data;
+                        resultData = apiResponse.Data;
                     }
                     else
                     {
-                        throw new Exception(apiResponse.message);
+                        throw new Exception(apiResponse.Message);
                     }
                 }
                 else
@@ -48,11 +48,12 @@ namespace HealthCare340B.Web.Models
                     throw new Exception("Dokter API could not be reached!");
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new Exception($"DokterModel.GetByFilter: {e.Message}");
             }
-            return data;
+
+            return resultData;
         }
     }
 }

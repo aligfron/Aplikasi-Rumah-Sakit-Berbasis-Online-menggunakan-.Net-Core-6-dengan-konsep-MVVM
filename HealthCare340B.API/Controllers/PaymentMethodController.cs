@@ -23,13 +23,13 @@ namespace HealthCare340B.API.Controllers
             try
             {
                 VMResponse<List<VMMPaymentMethod>?> response = await Task.Run(() => paymentMethod.GetByFilter(""));
-                if (response.data != null && response.data.Count > 0)
+                if (response.Data != null && response.Data.Count > 0)
                 {
                     return Ok(response);
                 }
                 else
                 {
-                    Console.WriteLine(response.message);
+                    Console.WriteLine(response.Message);
                     return NoContent();
                 }
             }
@@ -48,13 +48,13 @@ namespace HealthCare340B.API.Controllers
             try
             {
                 VMResponse<List<VMMPaymentMethod>?> response = await Task.Run(() => paymentMethod.GetByFilter(filter));
-                if (response.data != null && response.data.Count > 0)
+                if (response.Data != null && response.Data.Count > 0)
                 {
                     return Ok(response);
                 }
                 else
                 {
-                    Console.WriteLine(response.message);
+                    Console.WriteLine(response.Message);
                     return NoContent();
                 }
             }
@@ -75,13 +75,13 @@ namespace HealthCare340B.API.Controllers
             try
             {
                 VMResponse<VMMPaymentMethod?> response = await Task.Run(() => paymentMethod.GetById((long)id));
-                if (response.data != null)
+                if (response.Data != null)
                 {
                     return Ok(response);
                 }
                 else
                 {
-                    Console.WriteLine(response.message);
+                    Console.WriteLine(response.Message);
                     return NoContent();
                 }
             }
@@ -116,13 +116,13 @@ namespace HealthCare340B.API.Controllers
             try
             {
                 VMResponse<VMMPaymentMethod> response = await Task.Run(() => paymentMethod.Update(data));
-                if (response.data != null)
+                if (response.Data != null)
                 {
                     return Ok(response);
                 }
                 else
                 {
-                    Console.WriteLine(response.message);
+                    Console.WriteLine(response.Message);
                     return NoContent();
                 }
             }
@@ -142,13 +142,13 @@ namespace HealthCare340B.API.Controllers
             try
             {
                 VMResponse<VMMPaymentMethod> response = await Task.Run(() => paymentMethod.Delete((long)id, (long)deletedBy));
-                if (response.data != null)
+                if (response.Data != null)
                 {
                     return Ok(response);
                 }
                 else
                 {
-                    Console.WriteLine(response.message);
+                    Console.WriteLine(response.Message);
                     return NoContent();
                 }
             }

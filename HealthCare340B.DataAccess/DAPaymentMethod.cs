@@ -24,7 +24,7 @@ namespace HealthCare340B.DataAccess
             VMResponse<List<VMMPaymentMethod>?> response = new VMResponse<List<VMMPaymentMethod>?>();
             try
             {
-                response.data = (
+                response.Data = (
                     from pm in db.MPaymentMethods
                     where pm.IsDelete == false && pm.Name != null && pm.Name.Contains(filter!)
                     select new VMMPaymentMethod
@@ -41,17 +41,17 @@ namespace HealthCare340B.DataAccess
                     }
                 ).ToList();
 
-                response.message = (response.data.Count > 0)
-                    ? $"{HttpStatusCode.OK} - {response.data.Count} Payment Method data(s) successfully fetched"
+                response.Message = (response.Data.Count > 0)
+                    ? $"{HttpStatusCode.OK} - {response.Data.Count} Payment Method data(s) successfully fetched"
                     : $"{HttpStatusCode.NoContent} - No data is found within Payment Method";
 
-                response.statusCode = (response.data.Count > 0)
+                response.StatusCode = (response.Data.Count > 0)
                     ? HttpStatusCode.OK
                     : HttpStatusCode.NoContent;
             }
             catch (Exception e)
             {
-                response.message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
+                response.Message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
             }
             return response;
         }
@@ -61,7 +61,7 @@ namespace HealthCare340B.DataAccess
             VMResponse<VMMPaymentMethod?> response = new VMResponse<VMMPaymentMethod?>();
             try
             {
-                response.data = (
+                response.Data = (
                     from pm in db.MPaymentMethods
                     where pm.IsDelete == false && pm.Id == id
                     select new VMMPaymentMethod
@@ -78,20 +78,20 @@ namespace HealthCare340B.DataAccess
                     }
                 ).FirstOrDefault();
 
-                if (response.data != null)
+                if (response.Data != null)
                 {
-                    response.statusCode = HttpStatusCode.OK;
-                    response.message = $"{HttpStatusCode.OK} - Payment Method successfully fetch!";
+                    response.StatusCode = HttpStatusCode.OK;
+                    response.Message = $"{HttpStatusCode.OK} - Payment Method successfully fetch!";
                 }
                 else
                 {
-                    response.statusCode = HttpStatusCode.NoContent;
-                    response.message = $"{HttpStatusCode.NoContent} - Payment Method does not exist!";
+                    response.StatusCode = HttpStatusCode.NoContent;
+                    response.Message = $"{HttpStatusCode.NoContent} - Payment Method does not exist!";
                 }
             }
             catch (Exception e)
             {
-                response.message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
+                response.Message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
             }
             return response;
         }
@@ -113,7 +113,7 @@ namespace HealthCare340B.DataAccess
 
                     dbTran.Commit();
 
-                    response.data = new VMMPaymentMethod
+                    response.Data = new VMMPaymentMethod
                     {
                         Id = newData.Id,
                         Name = newData.Name,
@@ -126,13 +126,13 @@ namespace HealthCare340B.DataAccess
                         IsDelete = newData.IsDelete,
                     };
 
-                    response.statusCode = HttpStatusCode.Created;
-                    response.message = $"{HttpStatusCode.Created} - New Payment Method has been successfully created!";
+                    response.StatusCode = HttpStatusCode.Created;
+                    response.Message = $"{HttpStatusCode.Created} - New Payment Method has been successfully created!";
                 }
                 catch (Exception e)
                 {
                     dbTran.Rollback();
-                    response.message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
+                    response.Message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
                 }
 
                 return response;
@@ -146,7 +146,7 @@ namespace HealthCare340B.DataAccess
             {
                 try
                 {
-                    VMMPaymentMethod? existingData = GetById(data.Id).data;
+                    VMMPaymentMethod? existingData = GetById(data.Id).Data;
                     if (existingData != null)
                     {
                         MPaymentMethod updatedData = new MPaymentMethod
@@ -167,7 +167,7 @@ namespace HealthCare340B.DataAccess
 
                         dbTran.Commit();
 
-                        response.data = new VMMPaymentMethod
+                        response.Data = new VMMPaymentMethod
                         {
                             Id = updatedData.Id,
                             Name = updatedData.Name,
@@ -180,20 +180,20 @@ namespace HealthCare340B.DataAccess
                             IsDelete = updatedData.IsDelete
                         };
 
-                        response.statusCode = HttpStatusCode.OK;
-                        response.message = $"{HttpStatusCode.OK} - The payment method has been successfully updated";
+                        response.StatusCode = HttpStatusCode.OK;
+                        response.Message = $"{HttpStatusCode.OK} - The payment method has been successfully updated";
                     }
                     else
                     {
-                        response.statusCode = HttpStatusCode.NotFound;
-                        response.message = $"{HttpStatusCode.NotFound} - Payment Method does not exist";
+                        response.StatusCode = HttpStatusCode.NotFound;
+                        response.Message = $"{HttpStatusCode.NotFound} - Payment Method does not exist";
                     }
 
                 }
                 catch (Exception e)
                 {
                     dbTran.Rollback();
-                    response.message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
+                    response.Message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
                 }
                 return response;
             }
@@ -206,7 +206,7 @@ namespace HealthCare340B.DataAccess
             {
                 try
                 {
-                    VMMPaymentMethod? existingData = GetById(id).data;
+                    VMMPaymentMethod? existingData = GetById(id).Data;
                     if (existingData != null)
                     {
                         MPaymentMethod updatedData = new MPaymentMethod
@@ -227,7 +227,7 @@ namespace HealthCare340B.DataAccess
 
                         dbTran.Commit();
 
-                        response.data = new VMMPaymentMethod
+                        response.Data = new VMMPaymentMethod
                         {
                             Id = updatedData.Id,
                             Name = updatedData.Name,
@@ -240,20 +240,20 @@ namespace HealthCare340B.DataAccess
                             IsDelete = updatedData.IsDelete
                         };
 
-                        response.statusCode = HttpStatusCode.OK;
-                        response.message = $"{HttpStatusCode.OK} - The payment method has been successfully deleted";
+                        response.StatusCode = HttpStatusCode.OK;
+                        response.Message = $"{HttpStatusCode.OK} - The payment method has been successfully deleted";
                     }
                     else
                     {
-                        response.statusCode = HttpStatusCode.NotFound;
-                        response.message = $"{HttpStatusCode.NotFound} - Payment Method does not exist";
+                        response.StatusCode = HttpStatusCode.NotFound;
+                        response.Message = $"{HttpStatusCode.NotFound} - Payment Method does not exist";
                     }
 
                 }
                 catch (Exception e)
                 {
                     dbTran.Rollback();
-                    response.message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
+                    response.Message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
                 }
                 return response;
             }

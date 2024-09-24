@@ -5,11 +5,11 @@ using HealthCare340B.ViewModel;
 
 namespace HealthCare340B.Web.Controllers
 {
-    public class DokterController : Controller
+    public class DoctorController : Controller
     {
         private readonly DokterModel dokter;
 
-        public DokterController(IConfiguration _config)
+        public DoctorController(IConfiguration _config)
         {
             dokter = new DokterModel(_config);
         }
@@ -19,8 +19,9 @@ namespace HealthCare340B.Web.Controllers
         }
 
 
-        public IActionResult CariDokter()
+        public async Task<IActionResult> CariDokter(VMMDoctor dataFilter)
         {
+            List<VMMDoctor>? data = await dokter.GetByFilter(dataFilter);
             ViewBag.Title = "Cari Dokter";
             return View();
         }
@@ -30,6 +31,7 @@ namespace HealthCare340B.Web.Controllers
             ViewBag.Title = "Hasil Cari Dokter";
             return View();
         }
+
 
     }
 }

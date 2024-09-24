@@ -18,5 +18,9 @@ namespace HealthCare340B.ViewModel
         public long? DeletedBy { get; set; }
         public DateTime? DeletedOn { get; set; }
         public bool IsDelete { get; set; }
+        public string? Fullname { get; set; }
+        public string? Specialization { get; set; }
+        public string? FullAddress { get; set; }
+        public string? Treatment { get; set; }
     }
 }
