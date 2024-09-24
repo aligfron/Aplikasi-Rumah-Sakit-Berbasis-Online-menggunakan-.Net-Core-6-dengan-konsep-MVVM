@@ -36,7 +36,7 @@ namespace HealthCare340B.Web.Models
                         apiResponse = JsonConvert.DeserializeObject<VMResponse<List<VMMPaymentMethod>>?>
                             (apiResponseMsg.Content.ReadAsStringAsync().Result);
 
-                        data = apiResponse!.data;
+                        data = apiResponse!.Data;
                     }
                     else
                     {
@@ -75,7 +75,7 @@ namespace HealthCare340B.Web.Models
                         apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMPaymentMethod>?>
                             (apiResponseMsg.Content.ReadAsStringAsync().Result);
 
-                        data = apiResponse!.data;
+                        data = apiResponse!.Data;
                     }
                     else
                     {
@@ -120,9 +120,9 @@ namespace HealthCare340B.Web.Models
 
                 if (apiResponse != null)
                 {
-                    if (apiResponse.statusCode != HttpStatusCode.Created)
+                    if (apiResponse.StatusCode != HttpStatusCode.Created)
                     {
-                        throw new Exception(apiResponse.message);
+                        throw new Exception(apiResponse.Message);
                     }
                 }
                 else
@@ -162,9 +162,9 @@ namespace HealthCare340B.Web.Models
 
                 if (apiResponse != null)
                 {
-                    if (apiResponse.statusCode != HttpStatusCode.OK)
+                    if (apiResponse.StatusCode != HttpStatusCode.OK)
                     {
-                        throw new Exception(apiResponse.message);
+                        throw new Exception(apiResponse.Message);
                     }
                 }
                 else
@@ -196,9 +196,9 @@ namespace HealthCare340B.Web.Models
 
                 if (apiResponse != null)
                 {
-                    if (apiResponse.statusCode != HttpStatusCode.OK)
+                    if (apiResponse.StatusCode != HttpStatusCode.OK)
                     {
-                        throw new Exception(apiResponse.message);
+                        throw new Exception(apiResponse.Message);
                     }
                 }
                 else
