@@ -4,14 +4,16 @@
 @{
     Layout = null;
 }
+
 <div class="card">
-    <div class="card-body" >
-        <form id="frmCariDokter">
-            <div class="card-title row mb-1">
-                <label class="col-6 col-form-label ">Lokasi</label>
-                <div class="row mb-1">
+    <div class="card-body">
+        <form id="frmSearchDoctor">
+            <!-- Lokasi -->
+            <div class="row mb-3">
+                <label class="col-12 col-form-label">Lokasi</label>
+                <div class="col-12">
                     <select id="MedFacilityId" name="MedicalFacilityName" class="form-select">
-                        <option value="">--Select Medical Facility--</option>
+                        <option value="Location">--Select Medical Facility--</option>
                         @if (ViewBag.MedicalFacility != null)
                         {
                             foreach (VMMMedicalFacility medFac in ViewBag.MedicalFacility)
@@ -22,19 +24,21 @@
                     </select>
                 </div>
             </div>
-            <div class="row mb-1">
-                <label class="col-6 col-form-label ">Nama Dokter</label>
-                <div class="row mb-1">
-                    <div class="col-12">
-                        <input class="form-control" type="text" name="DoctorName" />
-                    </div>
+
+            <!-- Nama Dokter -->
+            <div class="row mb-3">
+                <label class="col-12 col-form-label">Nama Dokter</label>
+                <div class="col-12">
+                    <input class="form-control" type="text" name="FullName" />
                 </div>
             </div>
-            <div class="row mb-1">
-                <label class="col-10 col-form-label">Spesialisasi/Sub-spesialisasi <span class="text-danger">*</span></label>
-                <div class="row mb-1">
+
+            <!-- Spesialisasi/Sub-spesialisasi -->
+            <div class="row mb-3">
+                <label class="col-12 col-form-label">Spesialisasi/Sub-spesialisasi <span class="text-danger">*</span></label>
+                <div class="col-12">
                     <select id="SpecialityId" name="Specialization" class="form-select">
-                        <option value="">--Select Specialization / Sub-Specialicity--</option>
+                        <option value="Specialization">--Select Specialization / Sub-Specialicity--</option>
                         @if (ViewBag.Specialization != null)
                         {
                             foreach (VMMSpecialization spec in ViewBag.Specialization)
@@ -45,11 +49,13 @@
                     </select>
                 </div>
             </div>
-            <div class="row mb-1">
-                <label class="col-6 col-form-label ">Tindakan Medis</label>
-                <div class="row mb-1">
+
+            <!-- Tindakan Medis -->
+            <div class="row mb-3">
+                <label class="col-12 col-form-label">Tindakan Medis</label>
+                <div class="col-12">
                     <select id="treatmentId" name="Treatment" class="form-select">
-                        <option value="">--Select Treatment--</option>
+                        <option value="Treatment">--Select Treatment--</option>
                         @if (ViewBag.DoctorTreatment != null)
                         {
                             foreach (VMTDoctorTreatment treatment in ViewBag.DoctorTreatment)
@@ -60,12 +66,15 @@
                     </select>
                 </div>
             </div>
+
             <input type="hidden" name="CreateBy" value="1" />
+
+            <!-- Buttons -->
+            <div class="d-flex justify-content-between mt-5">
+                <button type="reset" id="btnAturUlang" class="btn btn-success">Atur Ulang</button>
+                <button type="button" id="btnSearch" class="btn btn-primary">Search</button>
+            </div>
         </form>
-    </div>
-    <div class="card-footer d-flex justify-content-between">
-        <button type="button" id="btnAturUlang" class="btn btn-success">Atur Ulang</button>
-        <button type="reset" id="btnSearch" class="btn btn-primary">Search</button>
     </div>
 </div>
 
@@ -73,4 +82,45 @@
     $(document).ready(() => {
         $("#staticModalLabel").text("@ViewBag.Title");
     });
+
+    $("#frmSearchDoctor").validate({
+        rules: {
+            FullName : {
+                maxlength: 100,
+                minlength: 3
+            },
+            Specialization: "required"
+        }
+    });
+
+    $("#btnSearch").click(() => {
+        $("#frmSearchDoctor").submit();
+    });
+
+
+    $("#frmSearchDoctor").submit(function (e) {
+        e.preventDefault()
+        let formData = new FormData($("#frmSearchDoctor")[0])
+        console.log("formData", formData);
+        if ($(this).valid()) {
+            $.ajax({
+                url: "/Doctor/ResultSearchDoctor",
+                type: "get",
+                data: formData,
+                processData: false,
+                contentType: false,
+                beforeSend: () => { },
+                success: function (res) {
+                    alert(res.message)
+                    if (res.statusCode == 201 || res.statusCode == 200) {
+                        location.reload()
+                    }
+                },
+                error: function (errRes) {
+                    console.error(errRes)
+                    debugger
+                }
+            })
+        } else { return false }
+    })
 </script>

@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using HealthCare340B.ViewModel;
 using HealthCare340B.DataModel;
-using Microsoft.CodeAnalysis;
-
 
 namespace HealthCare340B.Web.Controllers
 {
@@ -21,54 +19,48 @@ namespace HealthCare340B.Web.Controllers
             specialization = new SpecializationModel(_config);
             doctorTreatment = new DoctorTreatmentModel(_config);
         }
+
+        
         public IActionResult Index()
         {
             return View();
         }
 
-
+        
         public async Task<IActionResult> SearchDoctor()
         {
             ViewBag.Title = "Cari Dokter";
+
+            
             var medFac = await medicalFacility.GetAll();
-            if (medFac != null && medFac.Any())
-            {
-                ViewBag.MedicalFacility = medFac;
-            }
-            else
-            {
-                ViewBag.Doctor = new List<VMMDoctor>();
-            }
+            ViewBag.MedicalFacility = medFac ?? new List<VMMMedicalFacility>();
 
+            
             var spec = await specialization.GetAll();
-            if (spec != null && spec.Any())
-            {
-                ViewBag.Specialization = spec;
-            }
-            else
-            {
-                ViewBag.Specialization = new List<VMMSpecialization>();
-            }
+            ViewBag.Specialization = spec ?? new List<VMMSpecialization>();
 
+            
             var treatment = await doctorTreatment.GetAll();
-            if (treatment != null && treatment.Any())
-            {
-                ViewBag.DoctorTreatment = treatment;
-            }
-            else
-            {
-                ViewBag.DoctorTreatment = new List<VMTDoctorTreatment>();
-            }
+            ViewBag.DoctorTreatment = treatment ?? new List<VMTDoctorTreatment>();
+
             return View();
         }
 
-        public async Task<IActionResult> ResultSearchDoctor(string? location, string? doctorName, string? specialization, string? treatment)
+        [HttpPost]
+        public async Task<IActionResult> ResultSearchDoctor(VMMDoctor dataFilter)
         {
-            List<VMMDoctor>? data = await doctor.GetByFilter(location, doctorName, specialization, treatment);
-            ViewBag.Title = "Hasil Cari Dokter";
-            return View();
+            List<VMMDoctor>? data = await doctor.GetByFilter(dataFilter.MedicalFacilityName, dataFilter.Fullname, dataFilter.Specialization, dataFilter.Treatment);
+
+            ViewBag.Location = dataFilter.MedicalFacilityName ?? "Semua Lokasi";  
+            ViewBag.Specialization = dataFilter.Specialization ?? "Semua Spesialisasi";  
+
+            if (data == null || !data.Any())
+            {
+                ViewBag.Message = "Tidak ada dokter ditemukan berdasarkan pencarian Anda.";
+                data = new List<VMMDoctor>(); 
+            }
+            
+            return View("ResultSearchDoctor", data);
         }
-
-
     }
 }
