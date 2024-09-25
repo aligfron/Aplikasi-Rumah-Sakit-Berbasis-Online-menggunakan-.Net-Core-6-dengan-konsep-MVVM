@@ -84,18 +84,13 @@ namespace HealthCare340B.DataAccess
                         }
                     ).FirstOrDefault();
 
-                    if (response.Data != null)
-                    {
-                        response.Message =
-                            $"{HttpStatusCode.OK} - Customer relation data successfully fetched";
-                        response.StatusCode = HttpStatusCode.OK;
-                    }
-                    else
-                    {
-                        response.Message =
-                            $"{HttpStatusCode.NoContent} - Customer relation not found";
-                        response.StatusCode = HttpStatusCode.NoContent;
-                    }
+                    response.Message =
+                        (response.Data != null)
+                            ? $"{HttpStatusCode.OK} - Customer relation data successfully fetched"
+                            : $"{HttpStatusCode.NoContent} - Customer relation not found";
+
+                    response.StatusCode =
+                        (response.Data != null) ? HttpStatusCode.OK : HttpStatusCode.NoContent;
                 }
                 else
                 {
@@ -134,7 +129,8 @@ namespace HealthCare340B.DataAccess
                         _db.SaveChanges();
                         dbTran.Commit();
 
-                        response.Data = new VMMCustomerRelation {
+                        response.Data = new VMMCustomerRelation
+                        {
                             Id = cr.Id,
                             Name = cr.Name,
                             CreatedBy = cr.CreatedBy,

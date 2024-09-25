@@ -11,7 +11,21 @@ namespace HealthCare340B.ViewModel
         public long Id { get; set; }
         public long? ParentBiodataId { get; set; }
         public long? CustomerId { get; set; }
+
+        public string? Fullname { get; set; }
+        public DateTime? Dob { get; set; }
+        public string? Gender { get; set; }
+        public long? BloodGroupId { get; set; }
+        public string? RhesusType { get; set; }
+        public decimal? Height { get; set; }
+        public decimal? Weight { get; set; }
+
         public long? CustomerRelationId { get; set; }
+        public string? CustomerRelationName { get; set; }
+
+        public int? TotalChat { get; set; }
+        public int? TotalAppointment { get; set; }
+
         public long CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
         public long? ModifiedBy { get; set; }

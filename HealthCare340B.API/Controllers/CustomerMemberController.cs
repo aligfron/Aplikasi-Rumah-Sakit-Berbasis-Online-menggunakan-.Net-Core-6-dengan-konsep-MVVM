@@ -8,13 +8,13 @@ namespace HealthCare340B.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerRelationController : ControllerBase
+    public class CustomerMemberController : ControllerBase
     {
-        private DACustomerRelation _customerRelation;
+        private DACustomerMember _customerMember;
 
-        public CustomerRelationController(HealthCare340BContext db)
+        public CustomerMemberController(HealthCare340BContext db)
         {
-            _customerRelation = new DACustomerRelation(db);
+            _customerMember = new DACustomerMember(db);
         }
 
         [HttpGet]
@@ -22,7 +22,7 @@ namespace HealthCare340B.API.Controllers
         {
             try
             {
-                VMResponse<List<VMMCustomerRelation>> response = await Task.Run(() => _customerRelation.GetByFilter(""));
+                VMResponse<List<VMMCustomerMember>> response = await Task.Run(() => _customerMember.GetByFilter(""));
 
                 if (response.Data != null && response.Data.Count > 0)
                 {
@@ -30,14 +30,14 @@ namespace HealthCare340B.API.Controllers
                 }
                 else
                 {
-                    Console.WriteLine("CustomerRelationController.GetAll: " + response.Message);
+                    Console.WriteLine("CustomerMemberController.GetAll: " + response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
                 // Console Logging
-                Console.WriteLine("CustomerRelationController.GetAll: " + e.Message);
+                Console.WriteLine("CustomerMemberController.GetAll: " + e.Message);
 
                 return BadRequest(e.Message);
             }
@@ -48,7 +48,7 @@ namespace HealthCare340B.API.Controllers
         {
             try
             {
-                VMResponse<VMMCustomerRelation> response = await Task.Run(() => _customerRelation.GetById(id));
+                VMResponse<VMMCustomerMember> response = await Task.Run(() => _customerMember.GetById(id));
 
                 if (response.Data != null)
                 {
@@ -56,14 +56,14 @@ namespace HealthCare340B.API.Controllers
                 }
                 else
                 {
-                    Console.WriteLine("CustomerRelationController.GetById: " + response.Message);
+                    Console.WriteLine("CustomerMemberController.GetById: " + response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
                 // Console Logging
-                Console.WriteLine("CustomerRelationController.GetById: " + e.Message);
+                Console.WriteLine("CustomerMemberController.GetById: " + e.Message);
 
                 return BadRequest(e.Message);
             }
@@ -74,7 +74,7 @@ namespace HealthCare340B.API.Controllers
         {
             try
             {
-                VMResponse<List<VMMCustomerRelation>> response = await Task.Run(() => _customerRelation.GetByFilter(filter));
+                VMResponse<List<VMMCustomerMember>> response = await Task.Run(() => _customerMember.GetByFilter(filter));
 
                 if (response.Data != null && response.Data.Count > 0)
                 {
@@ -82,25 +82,25 @@ namespace HealthCare340B.API.Controllers
                 }
                 else
                 {
-                    Console.WriteLine("CustomerRelationController.GetByFilter: " + response.Message);
+                    Console.WriteLine("CustomerMemberController.GetByFilter: " + response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
                 // Console Logging
-                Console.WriteLine("CustomerRelationController.GetByFilter: " + e.Message);
+                Console.WriteLine("CustomerMemberController.GetByFilter: " + e.Message);
 
                 return BadRequest(e.Message);
             }
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(VMMCustomerRelation model)
+        public async Task<ActionResult> Create(VMMCustomerMember model)
         {
             try
             {
-                VMResponse<VMMCustomerRelation> response = await Task.Run(() => _customerRelation.Create(model));
+                VMResponse<VMMCustomerMember> response = await Task.Run(() => _customerMember.Create(model));
 
                 if (response.Data != null)
                 {
@@ -108,25 +108,25 @@ namespace HealthCare340B.API.Controllers
                 }
                 else
                 {
-                    Console.WriteLine("CustomerRelationController.Insert: " + response.Message);
+                    Console.WriteLine("CustomerMemberController.Create: " + response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
                 // Console Logging
-                Console.WriteLine("CustomerRelationController.Insert: " + e.Message);
+                Console.WriteLine("CustomerMemberController.Create: " + e.Message);
 
                 return BadRequest(e.Message);
             }
         }
 
         [HttpPut]
-        public async Task<ActionResult> Update(VMMCustomerRelation model)
+        public async Task<ActionResult> Update(VMMCustomerMember model)
         {
             try
             {
-                VMResponse<VMMCustomerRelation> response = await Task.Run(() => _customerRelation.Update(model));
+                VMResponse<VMMCustomerMember> response = await Task.Run(() => _customerMember.Update(model));
 
                 if (response.Data != null)
                 {
@@ -134,14 +134,14 @@ namespace HealthCare340B.API.Controllers
                 }
                 else
                 {
-                    Console.WriteLine("CustomerRelationController.Update: " + response.Message);
+                    Console.WriteLine("CustomerMemberController.Update: " + response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
                 // Console Logging
-                Console.WriteLine("CustomerRelationController.Update: " + e.Message);
+                Console.WriteLine("CustomerMemberController.Update: " + e.Message);
 
                 return BadRequest(e.Message);
             }
@@ -152,7 +152,7 @@ namespace HealthCare340B.API.Controllers
         {
             try
             {
-                VMResponse<VMMCustomerRelation> response = await Task.Run(() => _customerRelation.Delete(id, userId));
+                VMResponse<VMMCustomerMember> response = await Task.Run(() => _customerMember.Delete(id, userId));
 
                 if (response.Data != null)
                 {
@@ -160,14 +160,14 @@ namespace HealthCare340B.API.Controllers
                 }
                 else
                 {
-                    Console.WriteLine("CustomerRelationController.Delete: " + response.Message);
+                    Console.WriteLine("CustomerMemberController.Delete: " + response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
                 // Console Logging
-                Console.WriteLine("CustomerRelationController.Delete: " + e.Message);
+                Console.WriteLine("CustomerMemberController.Delete: " + e.Message);
 
                 return BadRequest(e.Message);
             }
