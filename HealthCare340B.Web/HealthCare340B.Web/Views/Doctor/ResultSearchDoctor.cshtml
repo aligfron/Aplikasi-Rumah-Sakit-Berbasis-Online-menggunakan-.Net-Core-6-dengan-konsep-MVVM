@@ -3,10 +3,12 @@
 *@
 @using HealthCare340B.Web
 @model List<VMMDoctor>
+
 @{
     Layout = "_HasilDokterView";
 }
-<div class="container mt-2">
+
+<div class="container mt-3">
     <!-- Breadcrumb -->
     <div class="p-2 rounded" style="background-color: #F5F8FF;">
         <nav aria-label="breadcrumb">
@@ -24,51 +26,102 @@
     </div>
 
     <!-- Header Summary -->
-    <div class="container">
+    <div class="container mt-4">
         <div class="row mb-4">
             <div class="col-md-8">
-                <h4>Hasil Pencarian berdasarkan kata kunci:</h4>
-                <p>Lokasi: @ViewBag.Location, Spesialisasi/Sub-spesialisasi: @ViewBag.Specialization</p>
+                <h5 class="text-secondary">
+                    Hasil Pencarian berdasarkan kata kunci:
+                </h5>
+                <p class="text-muted" style="font-size:20px;">
+                    @if (!string.IsNullOrEmpty(ViewBag.Location))
+                    {
+                        <span>Lokasi: @ViewBag.Location</span>
+                        <br />
+                    }
+                    @if (!string.IsNullOrEmpty(ViewBag.DoctorName))
+                    {
+                        <span>Nama Dokter: @ViewBag.DoctorName</span>
+                        <br />
+                    }
+                    @if (!string.IsNullOrEmpty(ViewBag.Specialization))
+                    {
+                        <span>Spesialisasi: @ViewBag.Specialization</span>
+                        <br />
+                    }
+                    @if (!string.IsNullOrEmpty(ViewBag.Treatment))
+                    {
+                        <span>Perawatan: @ViewBag.Treatment</span>
+                        <br />
+                    }
+                </p>
             </div>
             <div class="col-md-4 text-end">
-                <a href="@Url.Action("SearchDoctor", "Doctor")" class="btn btn-outline-primary mt-2">Ulangi Pencarian</a> <!-- Added a link to reset the search -->
+                <button class="btn btn-outline-primary mt-2" id="researchBtn" data-bs-toggle="modal" data-bs-target="#staticModal">Ulangi Pencarian</button>
             </div>
         </div>
     </div>
 
     <!-- Cards for Doctor Information -->
-    @if (Model != null && Model.Any())
+    @if (Model != null)
     {
-        <div class="row pb-4">
-            @foreach (var doctor in Model)
-            {
-                <div class="col-md-6 mb-4">
-                    <div class="card h-100">
-                        <div class="card-body d-flex">
-                            <div class="flex-grow-1">
-                                <h5 class="card-title">@doctor.Fullname</h5> <!-- Display doctor name -->
-                                <p>@doctor.Specialization</p> <!-- Display doctor specialization -->
-                                <p>5 Tahun Pengalaman</p> <!-- Display experience -->
-                                <p><i class="fas fa-hospital"></i> @doctor.MedicalFacilityName</p> <!-- Display hospital information -->
-                                <button class="btn btn-outline-info mt-2">Lihat info lebih banyak</button>
-                            </div>
-                            <div class="text-center ml-3">
-                                <i class="fas fa-user-circle fa-5x"></i>
-                                <p class="mt-2 text-muted">aktif</p> <!-- Display online/offline status -->
-                                <button class="btn btn-primary">Chat</button>
-                                <button class="btn btn-success mt-2">Buat Janji</button>
+        <p>Jumlah dokter ditemukan: @Model.Count</p>
+        @if (Model.Any())
+        {
+            <div class="row pb-4">
+                @foreach (var doctor in Model)
+                {
+                    <div class="col-md-6 mb-4">
+                        <div class="card border-info h-100">
+                            <div class="card-body">
+                                <div class="row">
+                                    <!-- Left side for doctor information -->
+                                    <div class="col-md-8">
+                                        <h5 class="card-title">@doctor.Fullname</h5>
+                                        <p class="text-secondary">@doctor.Specialization</p>
+                                        <p class="text-danger">Pengalaman: @doctor.ExperienceYears tahun</p>
+                                        <p><i class="fas fa-hospital"></i> @doctor.MedicalFacilityName</p>
+                                        <button class="btn btn-outline-info mt-2">Lihat info lebih banyak</button>
+                                    </div>
+                                    <!-- Right side for doctor actions -->
+                                    <div class="col-md-4 text-center">
+                                        @if (!string.IsNullOrEmpty(doctor.ImagePath))
+                                        {
+                                            <!-- Display doctor's profile image if ImagePath is not null -->
+                                            <img src=" @doctor.ImagePath ?? ~/images/images_doctor.jpeg" alt="Doctor Profile" class="img-fluid rounded-circle" style="width: 100px; height: 100px;" />
+                                        }
+                                        <p class="mt-2 text-muted">Aktif</p>
+@*                                         <div class="d-grid gap-2">
+                                            @if (doctor.IsOnline)
+                                            {
+                                                <button class="btn btn-primary">Chat</button>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Offline</span>
+                                            }
+                                            <button class="btn btn-success mt-2">Buat Janji</button>
+                                        </div> *@
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            }
-        </div>
+                }
+            </div>
+        }
     }
     else
     {
         <div class="alert alert-warning" role="alert">
-            <p>Tidak ada dokter ditemukan berdasarkan pencarian Anda.</p> <!-- Message when no results are found -->
+            <p>Tidak ada dokter ditemukan berdasarkan pencarian Anda.</p>
         </div>
     }
+
 </div>
 
+<script>
+    $("#researchBtn").click(function (e) {
+        $("#staticModalBody").html("")
+        $("#staticModalBody").load("/Doctor/SearchDoctor")
+    });
+</script>

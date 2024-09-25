@@ -31,3 +31,8 @@ body {
     font-weight: 500;
     color: #007bff; /* Make the active breadcrumb text blue */
 }
+
+.no-border {
+    border: 0;
+    box-shadow: none;
+}

@@ -43,6 +43,24 @@ namespace HealthCare340B.ViewModel
         
         public List<VMTAppointment>? Appointment { get; set; }
 
+        public DateTime StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+
+        public int ExperienceYears
+        {
+            get
+            {
+                var endDate = EndDate ?? DateTime.Now;
+                int years = endDate.Year - StartDate.Year;
+                if (endDate.Month < StartDate.Month ||
+                    (endDate.Month == StartDate.Month && endDate.Day < StartDate.Day))
+                {
+                    years--;
+                }
+
+                return years;
+            }
+        }
 
     }
 }

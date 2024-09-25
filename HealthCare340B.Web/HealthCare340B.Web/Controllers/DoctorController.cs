@@ -11,16 +11,28 @@ namespace HealthCare340B.Web.Controllers
         private readonly MedicalFacilityModel medicalFacility;
         private readonly SpecializationModel specialization;
         private readonly DoctorTreatmentModel doctorTreatment;
+        private readonly string imageFolder;
+        private int? doctorId = null;
 
-        public DoctorController(IConfiguration _config)
+        public DoctorController(IConfiguration _config, IWebHostEnvironment _webHostEnv)
         {
-            doctor = new DoctorModel(_config);
+            doctor = new DoctorModel(_config, _webHostEnv);
             medicalFacility = new MedicalFacilityModel(_config);
             specialization = new SpecializationModel(_config);
             doctorTreatment = new DoctorTreatmentModel(_config);
+            imageFolder = _config["ImageFolder"];
         }
 
-        
+        private bool isDoctorInSession()
+        {
+            doctorId = HttpContext.Session.GetInt32("doctorId");
+            if (doctorId == null)
+            {
+                return false;
+            }
+            return true;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -30,16 +42,13 @@ namespace HealthCare340B.Web.Controllers
         public async Task<IActionResult> SearchDoctor()
         {
             ViewBag.Title = "Cari Dokter";
-
             
             var medFac = await medicalFacility.GetAll();
             ViewBag.MedicalFacility = medFac ?? new List<VMMMedicalFacility>();
-
-            
+       
             var spec = await specialization.GetAll();
             ViewBag.Specialization = spec ?? new List<VMMSpecialization>();
-
-            
+           
             var treatment = await doctorTreatment.GetAll();
             ViewBag.DoctorTreatment = treatment ?? new List<VMTDoctorTreatment>();
 
@@ -49,18 +58,37 @@ namespace HealthCare340B.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ResultSearchDoctor(VMMDoctor dataFilter)
         {
-            List<VMMDoctor>? data = await doctor.GetByFilter(dataFilter.MedicalFacilityName, dataFilter.Fullname, dataFilter.Specialization, dataFilter.Treatment);
+            List<VMMDoctor> data = await doctor.GetByFilter(
+                dataFilter.MedicalFacilityName?.Trim(),
+                dataFilter.Fullname?.Trim(),
+                dataFilter.Specialization?.Trim(),
+                dataFilter.Treatment?.Trim()
+            );
 
-            ViewBag.Location = dataFilter.MedicalFacilityName ?? "Semua Lokasi";  
-            ViewBag.Specialization = dataFilter.Specialization ?? "Semua Spesialisasi";  
+            if (data != null)
+            {
+                // Log or Debug the received data
+                foreach (var doc in data)
+                {
+                    Console.WriteLine($"Doctor: {doc.Fullname}, Specialization: {doc.Specialization}, Medical Facility: {doc.MedicalFacilityName}");
+                }
+            }
+
+            ViewBag.Location = dataFilter.MedicalFacilityName;
+            ViewBag.Specialization = dataFilter.Specialization;
+            ViewBag.DoctorName = dataFilter.Fullname;
+            ViewBag.Treatment = dataFilter.Treatment;
+            ViewBag.ImgFolder = imageFolder;
 
             if (data == null || !data.Any())
             {
                 ViewBag.Message = "Tidak ada dokter ditemukan berdasarkan pencarian Anda.";
-                data = new List<VMMDoctor>(); 
+                data = new List<VMMDoctor>();
             }
-            
+
             return View("ResultSearchDoctor", data);
         }
+
+
     }
 }

@@ -19,8 +19,8 @@ namespace HealthCare340B.Web.Controllers
             // Mengirim role ke view
             ViewBag.Title = "Profil";
             ViewBag.imgFolder = imageFolder;
-            ViewBag.Role = "ROLE_DOKTER";
-            //ViewBag.Role = "ROLE_PASIEN";
+            //ViewBag.Role = "ROLE_DOKTER";
+            ViewBag.Role = "ROLE_PASIEN";
 
             ViewBag.Breadcrumb = new List<BreadcrumbItem>
             {
@@ -41,5 +41,17 @@ namespace HealthCare340B.Web.Controllers
         {
             return (await profile.UpdateAsync(data));
         }
+        public async Task<IActionResult> DeleteAlamat()
+        {
+            ViewBag.Title = "Hapus Alamat";
+            return View();
+        }
+
+        public async Task<IActionResult> CreateAlamat()
+        {
+            ViewBag.Title = "Tambah Alamat";
+            return View();
+        }
+
     }
 }

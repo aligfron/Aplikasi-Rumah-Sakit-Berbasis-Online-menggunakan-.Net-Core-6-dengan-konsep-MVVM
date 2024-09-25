@@ -1,0 +1,77 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = null;
+}
+
+<div class="card">
+    <div class="card-body">
+        <form id="frmCreateAlamat">
+            <!-- Label Alamat -->
+            <div class="row mb-3">
+                <label class="col-12 col-form-label">Label Alamat<span class="text-danger">*</span></label>
+                <div class="col-12">
+                    <input class="form-control" type="text" name="FullName" />
+                </div>
+            </div>
+
+            <!-- Nama Penerima -->
+            <div class="row mb-3">
+                <label class="col-12 col-form-label">Nama Penerima<span class="text-danger">*</span></label>
+                <div class="col-12">
+                    <input class="form-control" type="text" name="FullName" />
+                </div>
+            </div>
+
+            <!-- Nomor HP Penerima -->
+            <div class="row mb-3">
+                <label class="col-12 col-form-label">Nomor HP Penerima<span class="text-danger">*</span></label>
+                <div class="col-12">
+                    <input class="form-control" type="text" name="FullName" />
+                </div>
+            </div>
+
+            <!-- Kecamatan / Kota -->
+            <div class="row mb-3">
+                <label class="col-12 col-form-label">Kecamatan / Kota</label>
+                <div class="col-12">
+                    <select id="treatmentId" name="Treatment" class="form-select">
+                        <option value="">--Select Kecamatan / Kota--</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Kode Pos -->
+            <div class="row mb-3">
+                <label class="col-12 col-form-label">Kode Pos</label>
+                <div class="col-12">
+                    <input class="form-control" type="text" name="FullName" />
+                </div>
+            </div>
+
+            <!-- Alamat -->
+            <div class="row mb-3">
+                <label class="col-12 col-form-label">Alamat</label>
+                <div class="col-12">
+                    <div class="form-floating">
+                        <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+                        <label class="text-muted" for="floatingTextarea2">Masukkan Alamat</label>
+                    </div>
+                </div>
+            </div>
+
+            <input type="hidden" name="CreateBy" value="1" />
+
+            <!-- Buttons -->
+            <div class="d-flex justify-content-between mt-5">
+                <button class="btn btn-outline-info">Sebelumnya</button>
+                <button class="btn btn-info">Selanjutnya</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $("#staticModalLabel").text("@ViewBag.Title");
+</script>

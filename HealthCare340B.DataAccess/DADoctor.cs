@@ -82,10 +82,12 @@ namespace HealthCare340B.DataAccess
                                 Fullname = b.Fullname,
                                 Specialization = s.Name,
                                 MedicalFacilityName = f.Name,
-                                Treatment = t.Name
+                                Treatment = t.Name,
+                                StartDate = o.StartDate,
+                                EndDate = o.EndDate,
                             };
 
-                var result = query.ToList();
+                List<VMMDoctor> result = query.ToList();
                 Console.WriteLine($"Query returned {result.Count} doctors");
 
                 response.Data = result;

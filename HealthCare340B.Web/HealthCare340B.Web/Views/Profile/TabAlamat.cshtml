@@ -1,0 +1,86 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div class="container my-3">
+    <div class="row mb-3">
+        <div class="col">
+            <input type="text" class="form-control" placeholder="Cari alamat atau nama penerima">
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary">Urutkan</button>
+        </div>
+        <div class="col-auto">
+            <select class="form-select">
+                <option selected>Label Alamat</option>
+                <option value="1">Rumah</option>
+                <option value="2">Kantor</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex">
+                <a href="#" id="btnDelete" class="btn btn-link text-decoration-none ms-2" data-bs-toggle="modal" data-bs-target="#staticModal"><i class="fas fa-trash"></i> Hapus</a>
+            </div>
+            <div class="d-flex">
+                <a href="#" class="btn btn-link text-decoration-none me-2">A-Z</a>
+                <input type="number" name="filter" value="@ViewBag.Filter">
+                <a href="#" id="btnAdd" class="btn btn-link text-decoration-none ms-2" data-bs-toggle="modal" data-bs-target="#staticModal"><i class="fas fa-plus"></i>Tambah</a>
+            </div>
+        </div>
+    </div>
+
+
+    <ul class="list-group">
+        <li class="list-group-item">
+            <input type="checkbox" class="form-check-input me-2">
+            <span>Rumah</span>
+            <p class="mb-1">Bik Yam, +62834567182</p>
+            <p class="mb-1">Victoria Park Residence 1A-03, Babakan Madang, Kab. Bogor</p>
+            <a href="#" class="btn btn-link">Ubah</a>
+            <a href="#" class="btn btn-link text-danger">Hapus</a>
+        </li>
+        <li class="list-group-item">
+            <input type="checkbox" class="form-check-input me-2">
+            <span>Xsis Academy</span>
+            <p class="mb-1">Imam, +6284526271</p>
+            <p class="mb-1">Jl Langsat III no 5, Kebayoran Baru, Jakarta Selatan</p>
+            <a href="#" class="btn btn-link">Ubah</a>
+            <a href="#" class="btn btn-link text-danger">Hapus</a>
+        </li>
+        <li class="list-group-item">
+            <input type="checkbox" class="form-check-input me-2">
+            <span>Zia’s Office</span>
+            <p class="mb-1">Zia, +62894823234</p>
+            <p class="mb-1">Jl Kebagusan Raya no 3, Pasar Minggu, Jakarta Selatan</p>
+            <a href="#" class="btn btn-link">Ubah</a>
+            <a href="#" class="btn btn-link text-danger">Hapus</a>
+        </li>
+    </ul>
+
+    <div class="row mt-3">
+        <div class="col">
+            <button class="btn btn-secondary">Sebelumnya</button>
+            <button class="btn btn-secondary">Selanjutnya</button>
+        </div>
+        <div class="col text-end">
+            <span>Menampilkan 1 - 3 dari 3</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#btnDelete").click(function (e) {
+        $("#staticModalBody").html("")
+        $("#staticModalBody").load("/Profile/DeleteAlamat")
+    });
+
+    $("#btnAdd").click(function (e) {
+        $("#staticModalBody").html("")
+        $("#staticModalBody").load("/Profile/CreateAlamat")
+    });
+</script>

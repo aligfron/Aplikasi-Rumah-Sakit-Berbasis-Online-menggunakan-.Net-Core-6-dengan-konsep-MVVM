@@ -7,18 +7,18 @@
 
 <div class="card">
     <div class="card-body">
-        <form id="frmSearchDoctor">
+        <form id="frmSearchDoctor" method="post" action="/Doctor/ResultSearchDoctor">
             <!-- Lokasi -->
             <div class="row mb-3">
                 <label class="col-12 col-form-label">Lokasi</label>
                 <div class="col-12">
                     <select id="MedFacilityId" name="MedicalFacilityName" class="form-select">
-                        <option value="Location">--Select Medical Facility--</option>
+                        <option value="">--Select Medical Facility--</option>
                         @if (ViewBag.MedicalFacility != null)
                         {
                             foreach (VMMMedicalFacility medFac in ViewBag.MedicalFacility)
                             {
-                                <option value="@medFac.Id">@medFac.Name</option>
+                                <option value="@medFac.Name">@medFac.Name</option>
                             }
                         }
                     </select>
@@ -37,13 +37,13 @@
             <div class="row mb-3">
                 <label class="col-12 col-form-label">Spesialisasi/Sub-spesialisasi <span class="text-danger">*</span></label>
                 <div class="col-12">
-                    <select id="SpecialityId" name="Specialization" class="form-select">
-                        <option value="Specialization">--Select Specialization / Sub-Specialicity--</option>
+                    <select id="SpecialityId" name="Specialization" class="form-select" required>
+                        <option value="">--Select Specialization / Sub-Specialicity--</option>
                         @if (ViewBag.Specialization != null)
                         {
                             foreach (VMMSpecialization spec in ViewBag.Specialization)
                             {
-                                <option value="@spec.Id">@spec.Name</option>
+                                <option value="@spec.Name">@spec.Name</option>
                             }
                         }
                     </select>
@@ -55,12 +55,12 @@
                 <label class="col-12 col-form-label">Tindakan Medis</label>
                 <div class="col-12">
                     <select id="treatmentId" name="Treatment" class="form-select">
-                        <option value="Treatment">--Select Treatment--</option>
+                        <option value="">--Select Treatment--</option>
                         @if (ViewBag.DoctorTreatment != null)
                         {
                             foreach (VMTDoctorTreatment treatment in ViewBag.DoctorTreatment)
                             {
-                                <option value="@treatment.Id">@treatment.Name</option>
+                                <option value="@treatment.Name">@treatment.Name</option>
                             }
                         }
                     </select>
@@ -85,42 +85,31 @@
 
     $("#frmSearchDoctor").validate({
         rules: {
-            FullName : {
+            FullName: {
                 maxlength: 100,
                 minlength: 3
             },
-            Specialization: "required"
+            Specialization: {
+                required: true
+            }
+        },
+        messages: {
+            Specialization: {
+                required: "Silakan pilih Spesialisasi"
+            }
         }
     });
 
+
+    // Submit form with POST instead of AJAX
     $("#btnSearch").click(() => {
-        $("#frmSearchDoctor").submit();
+        if ($("#frmSearchDoctor").valid()) {
+            $("#frmSearchDoctor").attr("method", "POST");
+            $("#frmSearchDoctor").attr("action", "/Doctor/ResultSearchDoctor");
+            $("#frmSearchDoctor").submit();
+        } else {
+            return false;
+        }
     });
-
-
-    $("#frmSearchDoctor").submit(function (e) {
-        e.preventDefault()
-        let formData = new FormData($("#frmSearchDoctor")[0])
-        console.log("formData", formData);
-        if ($(this).valid()) {
-            $.ajax({
-                url: "/Doctor/ResultSearchDoctor",
-                type: "get",
-                data: formData,
-                processData: false,
-                contentType: false,
-                beforeSend: () => { },
-                success: function (res) {
-                    alert(res.message)
-                    if (res.statusCode == 201 || res.statusCode == 200) {
-                        location.reload()
-                    }
-                },
-                error: function (errRes) {
-                    console.error(errRes)
-                    debugger
-                }
-            })
-        } else { return false }
-    })
 </script>
+

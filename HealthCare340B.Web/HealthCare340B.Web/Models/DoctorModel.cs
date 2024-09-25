@@ -12,12 +12,31 @@ namespace HealthCare340B.Web.Models
     {
         private readonly HttpClient httpClient = new HttpClient();
         private readonly string apiUrl;
-        HttpContent content;
-        private string jsonData;
+        private readonly IWebHostEnvironment webHostEnv;
+        private readonly string imageFolder;
 
-        public DoctorModel(IConfiguration _config)
+
+        public DoctorModel(IConfiguration _config, IWebHostEnvironment _webHostEnv)
         {
             apiUrl = _config["ApiUrl"];
+            webHostEnv = _webHostEnv;
+            imageFolder = _config["ImageFolder"];
+        }
+
+        private string UploadFile(IFormFile? imageFile)
+        {
+            string uniqueFileName = string.Empty;
+            if (imageFile != null)
+            {
+                uniqueFileName = $"{Guid.NewGuid()}-{imageFile.FileName}";
+                using (FileStream fileStream = new FileStream(
+                    $"{webHostEnv.WebRootPath}\\{imageFolder}\\{uniqueFileName}", FileMode.CreateNew
+                    ))
+                {
+                    imageFile.CopyTo(fileStream);
+                }
+            }
+            return uniqueFileName;
         }
 
         public async Task<List<VMMDoctor>?> GetAll()
@@ -32,11 +51,11 @@ namespace HealthCare340B.Web.Models
                     if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
                     {
                         apiResponse = JsonConvert.DeserializeObject<VMResponse<List<VMMDoctor>>?>(await apiResponseMsg.Content.ReadAsStringAsync());
+                        return apiResponse?.Data;
                     }
                     else
                     {
-                        apiResponse.StatusCode = apiResponseMsg.StatusCode;
-                        apiResponse.Message = await apiResponseMsg.Content.ReadAsStringAsync();
+                        throw new Exception($"Error: {apiResponseMsg.StatusCode}, {await apiResponseMsg.Content.ReadAsStringAsync()}");
                     }
                 }
                 else
@@ -46,21 +65,17 @@ namespace HealthCare340B.Web.Models
             }
             catch (Exception e)
             {
-                throw new Exception($"DokterModel.GetByFilter: {e.Message}");
+                throw new Exception($"DokterModel.GetAll: {e.Message}");
             }
-
-            return apiResponse.Data;
-
         }
 
         public async Task<List<VMMDoctor>?> GetByFilter(string? location, string? doctorName, string? specialization, string? treatment)
         {
             List<VMMDoctor>? resultData = null;
-            VMResponse<List<VMMDoctor>>? apiResponse = null;
+            VMResponse<List<VMMDoctor>>? apiResponse = new VMResponse<List<VMMDoctor>>(); // Initialize apiResponse
 
             try
             {
-
                 HttpResponseMessage apiResponseMsg = await httpClient.GetAsync($"{apiUrl}Doctor/GetByFilter?location={location}&doctorName={doctorName}&specialization={specialization}&treatment={treatment}");
 
                 if (apiResponseMsg != null)
@@ -85,7 +100,8 @@ namespace HealthCare340B.Web.Models
                 throw new Exception($"DokterModel.GetByFilter: {e.Message}");
             }
 
-            return resultData;
+            return apiResponse?.Data ?? resultData;
         }
+
     }
 }
