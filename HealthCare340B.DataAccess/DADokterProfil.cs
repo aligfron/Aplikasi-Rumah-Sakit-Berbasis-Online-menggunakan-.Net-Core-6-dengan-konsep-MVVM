@@ -27,15 +27,6 @@ namespace HealthCare340B.DataAccess
                     response.Data = (
 
                         from doktor in db.MDoctors join biodata in db.MBiodata on doktor.BiodataId equals biodata.Id
-                        
-                        join Cspesialisation in db.TCurrentDoctorSpecializations on doktor.Id equals Cspesialisation.DoctorId
-                            join s in db.MSpecializations on Cspesialisation.SpecializationId equals s.Id // untuk ngambil nama spesialisasi
-
-
-
-                        /*
-                        */
-
                         where doktor.IsDelete == false
                         && (doktor.Id == id)
                         select new VMMDoctor
@@ -43,7 +34,17 @@ namespace HealthCare340B.DataAccess
                             Id = doktor.Id,
                             BiodataId = biodata.Id,
                             Fullname = biodata.Fullname,
-                            Specialization = s.Name,
+                            SpecializationName = (
+                                from Cspesialisation in db.TCurrentDoctorSpecializations 
+                                join s in db.MSpecializations on Cspesialisation.SpecializationId equals s.Id // untuk ngambil nama spesialisasi
+                                where  doktor.Id == Cspesialisation.DoctorId &&
+                                doktor.IsDelete == false
+                                select new VMTCurrentDoctorSpecialization
+                                {
+                                    Id = Cspesialisation.Id,
+                                    Specialization = s.Name
+                                }
+                            ).ToList(),
 
                             // untuk ngambil nama tindakan medis
                             TreatmentName = (
@@ -82,6 +83,15 @@ namespace HealthCare340B.DataAccess
                                     InstitutionName = pendidikan.InstitutionName,
                                     Major = pendidikan.Major,
                                     EndYear = pendidikan.EndYear
+                                }
+                            ).ToList(),
+                            Appointment =(
+                                from janji in db.TAppointments
+                                join doff in db.TDoctorOffices on janji.DoctorOfficeId equals doff.Id
+                                where janji.IsDelete == false && doktor.Id == doff.DoctorId
+                                select new VMTAppointment
+                                {
+                                    Id = janji.Id
                                 }
                             ).ToList()
 

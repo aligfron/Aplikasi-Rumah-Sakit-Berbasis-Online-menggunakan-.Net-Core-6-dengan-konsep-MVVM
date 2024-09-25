@@ -30,13 +30,18 @@ namespace HealthCare340B.ViewModel
         //biodata
         public byte[]? Image { get; set; }
         public string? ImagePath { get; set; }
-        //tindakan medis
+
         public List<VMTDoctorTreatment>? TreatmentName { get; set; }
+        //tindakan medis
+        public List<VMTCurrentDoctorSpecialization>? SpecializationName { get; set; }
         //Riwayat Praktek
         public List<VMTDoctorOffice>? DoctorOffice { get; set; }
         
         //pendidikan
         public List<VMMDoctorEducation>? InstitutionName { get; set; }
+        //janji
+        
+        public List<VMTAppointment>? Appointment { get; set; }
 
 
     }

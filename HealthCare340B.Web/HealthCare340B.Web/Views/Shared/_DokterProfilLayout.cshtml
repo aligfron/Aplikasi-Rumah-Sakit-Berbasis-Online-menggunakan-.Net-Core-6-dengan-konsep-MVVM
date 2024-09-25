@@ -42,7 +42,10 @@
 
 
                             <h3 class="mt-1">@Model.Fullname</h3>
-                            <p class="text-small">@Model.Specialization</p>
+                            @foreach (VMTCurrentDoctorSpecialization Specialization in Model.SpecializationName)
+                            {
+                                <p class="text-small">@Specialization.Specialization</p>
+                            }
                             <i class="bi bi-star-fill text-warning"></i>
                             <br />
 
@@ -50,7 +53,16 @@
                             <ul class="nav nav-tabs flex-column mt-3 w-100" id="myTab1" role="tablist">
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link w-100 text-start d-flex justify-content-between align-items-center" id="Janji-tab" data-bs-toggle="tab" data-bs-target="#Janji" type="button" role="tab" aria-controls="Janji" aria-selected="true">
-                                        Janji <span class="badge bg-primary ms-2">3</span>
+                                        Janji <span class="badge bg-primary ms-2">
+                                            @{
+                                                int appointmentCount = 0;
+                                                foreach (VMTAppointment janji in Model.Appointment)
+                                                {
+                                                    appointmentCount++;
+                                                }
+                                                @appointmentCount
+                                            }
+                                        </span>
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">

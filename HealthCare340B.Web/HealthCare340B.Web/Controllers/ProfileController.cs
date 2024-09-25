@@ -9,16 +9,16 @@ namespace HealthCare340B.Web.Controllers
     {
         private readonly string imageFolder;
         private ProfileModel profile;
-        public ProfileController(IConfiguration _config)
+        public ProfileController(IConfiguration _config, IWebHostEnvironment _webHostEnv)
         {
-            profile = new ProfileModel(_config);
+            profile = new ProfileModel(_config, _webHostEnv);
             imageFolder = _config["ImageFolder"];
         }
         public async Task<IActionResult> Index()
         {
             // Mengirim role ke view
             ViewBag.Title = "Profil";
-
+            ViewBag.imgFolder = imageFolder;
             ViewBag.Role = "ROLE_DOKTER";
             //ViewBag.Role = "ROLE_PASIEN";
 
