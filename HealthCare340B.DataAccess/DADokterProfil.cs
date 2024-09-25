@@ -17,21 +17,76 @@ namespace HealthCare340B.DataAccess
         {
             db = _db;
         }
-        public VMResponse<VMTCurrentDoctorSpecialization?> GetBySpesialisasiDokter(int id)
+        public VMResponse<VMMDoctor?> GetByDokterProfil(int id)
         {
-            VMResponse<VMTCurrentDoctorSpecialization?> response = new VMResponse<VMTCurrentDoctorSpecialization?>();
+            VMResponse<VMMDoctor?> response = new VMResponse<VMMDoctor?>();
             try
             {
                 if (id > 0)
                 {
                     response.Data = (
 
-                        from c in db.TCurrentDoctorSpecializations join d in db.MDoctors on c.DoctorId equals d.Id
-                        join e in db.MBiodata on d.BiodataId equals e.Id
-                        join s in db.MSpecializations on c.SpecializationId equals s.Id
-                        where c.IsDelete == false
-                        && (c.Id == id)
-                        select new VMTCurrentDoctorSpecialization(c,d,e,s)
+                        from doktor in db.MDoctors join biodata in db.MBiodata on doktor.BiodataId equals biodata.Id
+                        
+                        join Cspesialisation in db.TCurrentDoctorSpecializations on doktor.Id equals Cspesialisation.DoctorId
+                            join s in db.MSpecializations on Cspesialisation.SpecializationId equals s.Id // untuk ngambil nama spesialisasi
+
+
+
+                        /*
+                        */
+
+                        where doktor.IsDelete == false
+                        && (doktor.Id == id)
+                        select new VMMDoctor
+                        {
+                            Id = doktor.Id,
+                            BiodataId = biodata.Id,
+                            Fullname = biodata.Fullname,
+                            Specialization = s.Name,
+
+                            // untuk ngambil nama tindakan medis
+                            TreatmentName = (
+                                from tindakanmedis in db.TDoctorTreatments 
+                                where doktor.Id == tindakanmedis.DoctorId &&
+                                doktor.IsDelete == false
+                                select new VMTDoctorTreatment
+                                {
+                                    Id = tindakanmedis.Id,
+                                    Name = tindakanmedis.Name
+                                }
+                            ).ToList(),
+
+                            DoctorOffice = (
+                                    from riwayarpraktek in db.TDoctorOffices 
+                                    join d in db.MMedicalFacilities on riwayarpraktek.MedicalFacilityId equals d.Id
+                                    join e in db.MLocations on d.LocationId equals e.Id // untuk ngambil nama lokasi rumah sakit dan spesialisasi
+                                    where doktor.Id == riwayarpraktek.DoctorId &&
+                                doktor.IsDelete == false
+                                select new VMTDoctorOffice
+                                {
+                                    LocationName = e.Name,
+                                    Specialization = riwayarpraktek.Specialization,
+                                    StartDate = riwayarpraktek.StartDate,
+                                    EndDate = riwayarpraktek.EndDate
+                                }
+                            ).ToList(),
+
+                            InstitutionName = (
+                                from pendidikan in db.MDoctorEducations 
+                                where doktor.Id == pendidikan.DoctorId &&
+                                doktor.IsDelete == false
+                                select new VMMDoctorEducation
+                                {
+                                    Id = pendidikan.Id,
+                                    InstitutionName = pendidikan.InstitutionName,
+                                    Major = pendidikan.Major,
+                                    EndYear = pendidikan.EndYear
+                                }
+                            ).ToList()
+
+                        }                         
+  
                     ).FirstOrDefault();
 
                     if (response.Data != null)
@@ -58,47 +113,6 @@ namespace HealthCare340B.DataAccess
             }
             return response;
         }
-        public VMResponse<VMTCurrentDoctorSpecialization?> GetByTindakanMedisDokter(int id)
-        {
-            VMResponse<VMTCurrentDoctorSpecialization?> response = new VMResponse<VMTCurrentDoctorSpecialization?>();
-            try
-            {
-                if (id > 0)
-                {
-                    response.Data = (
-
-                        from c in db.TCurrentDoctorSpecializations
-                        join d in db.MDoctors on c.DoctorId equals d.Id
-                        join e in db.MBiodata on d.BiodataId equals e.Id
-                        join s in db.MSpecializations on c.SpecializationId equals s.Id
-                        where c.IsDelete == false
-                        && (c.Id == id)
-                        select new VMTCurrentDoctorSpecialization(c, d, e, s)
-                    ).FirstOrDefault();
-
-                    if (response.Data != null)
-                    {
-                        response.StatusCode = HttpStatusCode.OK;
-                        response.Message = $"{HttpStatusCode.OK} - Spesialisasi Sukses Full";
-                    }
-                    else
-                    {
-                        response.StatusCode = HttpStatusCode.NoContent;
-                        response.Message = $"{HttpStatusCode.NoContent} - Spesialisasi does not exis";
-                    }
-                }
-                else
-                {
-                    response.StatusCode = HttpStatusCode.BadRequest;
-                    response.Message = $"{HttpStatusCode.BadRequest} - please input Spesialisasi";
-                }
-            }
-            catch (Exception e)
-            {
-
-                response.Message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
-            }
-            return response;
-        }
+        
     }
 }

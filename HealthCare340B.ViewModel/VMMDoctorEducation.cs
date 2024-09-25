@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HealthCare340B.DataModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,5 +24,26 @@ namespace HealthCare340B.ViewModel
         public long? DeletedBy { get; set; }
         public DateTime? DeletedOn { get; set; }
         public bool IsDelete { get; set; }
+
+        public VMMDoctorEducation() { }
+
+        public VMMDoctorEducation(MDoctorEducation mDoctorEducation) 
+        {
+            Id = mDoctorEducation.Id;
+            DoctorId = mDoctorEducation.DoctorId;
+            EducationLevelId = mDoctorEducation?.EducationLevelId;
+            InstitutionName = mDoctorEducation?.InstitutionName;
+            Major = mDoctorEducation?.Major;
+            StartYear = mDoctorEducation?.StartYear;
+            EndYear = mDoctorEducation?.EndYear;
+            IsLastEducation = mDoctorEducation?.IsLastEducation;
+            CreatedBy = mDoctorEducation.CreatedBy;
+            CreatedOn = mDoctorEducation.CreatedOn;
+            ModifiedBy = mDoctorEducation.ModifiedBy;
+            ModifiedOn = mDoctorEducation.ModifiedOn;
+            DeletedBy = mDoctorEducation.DeletedBy;
+            DeletedOn = mDoctorEducation.DeletedOn;
+            IsDelete = mDoctorEducation.IsDelete;
+        }
     }
 }

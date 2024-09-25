@@ -11,8 +11,6 @@ namespace HealthCare340B.ViewModel
     {
         public long Id { get; set; }
         public long? DoctorId { get; set; }
-        public long? BiodataId { get; set; }
-        public string? DoctorName { get; set; }
         public long? SpecializationId { get; set; }
         public string? SpecializationName { get; set; }
         public long CreatedBy { get; set; }
@@ -23,12 +21,11 @@ namespace HealthCare340B.ViewModel
         public DateTime? DeletedOn { get; set; }
         public bool IsDelete { get; set; }
         public VMTCurrentDoctorSpecialization() { }
-        public VMTCurrentDoctorSpecialization(TCurrentDoctorSpecialization currentDoctorSpecialization, MDoctor mDoctor, MBiodatum mBiodatum, MSpecialization mSpecialization)
+        public VMTCurrentDoctorSpecialization(TCurrentDoctorSpecialization currentDoctorSpecialization, MSpecialization mSpecialization)
         {
             
             Id = currentDoctorSpecialization.Id;
-            DoctorId = mDoctor.BiodataId;
-            DoctorName = mBiodatum.Fullname;
+            DoctorId = currentDoctorSpecialization.DoctorId;
             SpecializationId = currentDoctorSpecialization.SpecializationId;
             SpecializationName = mSpecialization.Name;
             CreatedBy = currentDoctorSpecialization.CreatedBy;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HealthCare340B.DataModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace HealthCare340B.ViewModel
     {
         public long Id { get; set; }
         public long? DoctorId { get; set; }
+        public string? DoctorName { get; set; }
         public string? Name { get; set; }
         public long CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
@@ -18,5 +20,22 @@ namespace HealthCare340B.ViewModel
         public long? DeletedBy { get; set; }
         public DateTime? DeletedOn { get; set; }
         public bool IsDelete { get; set; }
+
+        public VMTDoctorTreatment() { }
+
+        public VMTDoctorTreatment(TDoctorTreatment doctorTreatment, MDoctor mDoctor, MBiodatum mBiodatum)
+        {
+            Id = doctorTreatment.Id;
+            DoctorId = doctorTreatment.DoctorId;
+            DoctorName = mBiodatum.Fullname;
+            Name = doctorTreatment.Name;
+            CreatedBy = doctorTreatment.CreatedBy;
+            CreatedOn = doctorTreatment.CreatedOn;
+            ModifiedBy = doctorTreatment.ModifiedBy;
+            ModifiedOn = doctorTreatment.ModifiedOn;
+            DeletedBy = doctorTreatment.DeletedBy;
+            DeletedOn = doctorTreatment.DeletedOn;
+            IsDelete = doctorTreatment.IsDelete;
+        }
     }
 }

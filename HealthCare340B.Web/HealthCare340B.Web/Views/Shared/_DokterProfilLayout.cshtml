@@ -1,4 +1,5 @@
-﻿@{
+﻿
+@{
     Layout = "_Layout";
 }
 
@@ -40,8 +41,8 @@
                             </div>
 
 
-                            <h3 class="mt-1">John Doe</h3>
-                            <p class="text-small">Junior Software Engineer</p>
+                            <h3 class="mt-1">@Model.Fullname</h3>
+                            <p class="text-small">@Model.Specialization</p>
                             <i class="bi bi-star-fill text-warning"></i>
                             <br />
 
@@ -64,16 +65,47 @@
                         <h3 class="card-title text-primary">Tentang Saya</h3> <!-- Menambahkan judul card -->
                         <div>
                             <h5 class="mt-1">Tindakan Medis</h5>
-                            <p class="text-small">Junior Software Engineer</p>
-                            <i class="bi bi-star-fill text-warning"></i>
+                            @foreach (VMTDoctorTreatment tindakanmedis in Model.TreatmentName)
+                            {
+                                <p class="fs-6 text-small mb-0 ps-3">- @tindakanmedis.Name</p>
+                            }
                             <br />
                             <h5 class="mt-1">Riwayat Praktek</h5>
-                            <p class="text-small">Junior Software Engineer</p>
-                            <i class="bi bi-star-fill text-warning"></i>
+                            @foreach (VMTDoctorOffice riwayarpraktek in Model.DoctorOffice)
+                            {
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <p class="mb-0">@riwayarpraktek.LocationName</p>
+                                        <p class="text-muted small mb-0">@riwayarpraktek.Specialization</p>
+                                    </div>
+                                    <div>
+                                        <p class="small text-muted">
+                                            @riwayarpraktek.StartDate.Year
+                                            -
+                                            @(riwayarpraktek.EndDate.HasValue && riwayarpraktek.EndDate.Value.Year == DateTime.Now.Year
+                                                ? "Sekarang"
+                                                : riwayarpraktek.EndDate.HasValue ? riwayarpraktek.EndDate.Value.Year.ToString() : "")
+                                        </p>
+                                    </div>
+                                </div>
+                            }
                             <br />
                             <h5 class="mt-1">Pendidikan</h5>
-                            <p class="text-small">Junior Software Engineer</p>
-                            <i class="bi bi-star-fill text-warning"></i>
+                            @foreach (VMMDoctorEducation pendidikan in Model.InstitutionName)
+                            {
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <p class="mb-0">@pendidikan.InstitutionName</p>
+                                        <p class="text-muted small mb-0">- @pendidikan.Major</p>
+                                    </div>
+                                    <div>
+                                        <p class="small text-muted">
+                                            @pendidikan.EndYear
+                                        </p>
+                                    </div>
+                                </div>
+                                <br />
+                            }
                             <br />
                         </div>
                     </div>

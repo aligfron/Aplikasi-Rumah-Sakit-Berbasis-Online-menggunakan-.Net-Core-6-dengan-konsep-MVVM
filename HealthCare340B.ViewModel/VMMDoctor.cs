@@ -18,9 +18,26 @@ namespace HealthCare340B.ViewModel
         public long? DeletedBy { get; set; }
         public DateTime? DeletedOn { get; set; }
         public bool IsDelete { get; set; }
+        //biodata
         public string? Fullname { get; set; }
+        //spesialisasi
         public string? Specialization { get; set; }
         public string? MedicalFacilityName { get; set; }
         public string? Treatment { get; set; }
+
+
+        //tambahan ali buat profil doktor
+        //biodata
+        public byte[]? Image { get; set; }
+        public string? ImagePath { get; set; }
+        //tindakan medis
+        public List<VMTDoctorTreatment>? TreatmentName { get; set; }
+        //Riwayat Praktek
+        public List<VMTDoctorOffice>? DoctorOffice { get; set; }
+        
+        //pendidikan
+        public List<VMMDoctorEducation>? InstitutionName { get; set; }
+
+
     }
 }
