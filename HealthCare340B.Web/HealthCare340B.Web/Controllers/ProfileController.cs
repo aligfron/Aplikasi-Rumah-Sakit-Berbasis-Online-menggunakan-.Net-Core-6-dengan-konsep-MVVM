@@ -36,5 +36,10 @@ namespace HealthCare340B.Web.Controllers
 
             return View();
         }
+        [HttpPost]
+        public async Task<VMResponse<VMMBiodatum>> EditAsync(VMMBiodatum data)
+        {
+            return (await profile.UpdateAsync(data));
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using HealthCare340B.DataModel;
 using HealthCare340B.ViewModel;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -124,6 +125,45 @@ namespace HealthCare340B.DataAccess
             }
             return response;
         }
-        
+        public VMResponse<VMMBiodatum?> Update(VMMBiodatum data)
+        {
+            var response = new VMResponse<VMMBiodatum?>();
+            using (IDbContextTransaction dbTrans = db.Database.BeginTransaction())
+            {
+                try
+                {
+
+                    var existingData = db.MBiodata
+                                         .FirstOrDefault(c => c.Id == data.Id && !c.IsDelete);
+
+                    if (existingData == null)
+                    {
+                        response.StatusCode = HttpStatusCode.NotFound;
+                        response.Message = $"{HttpStatusCode.NotFound} - Biodata Not Found";
+                        return response;
+                    }
+                    existingData.ImagePath = data.ImagePath;
+                    existingData.ModifiedBy = data.ModifiedBy;
+                    existingData.ModifiedOn = DateTime.Now;
+
+                    db.Update(existingData);
+                    db.SaveChanges();
+                    dbTrans.Commit();
+
+
+                    response.Data = new VMMBiodatum(existingData);
+                    response.StatusCode = HttpStatusCode.OK;
+                    response.Message = $"{HttpStatusCode.OK} - Biodata Has Been Updated";
+                }
+                catch (Exception ex)
+                {
+                    dbTrans.Rollback();
+                    response.StatusCode = HttpStatusCode.InternalServerError;
+                    response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+                }
+            }
+            return response;
+        }
+
     }
 }

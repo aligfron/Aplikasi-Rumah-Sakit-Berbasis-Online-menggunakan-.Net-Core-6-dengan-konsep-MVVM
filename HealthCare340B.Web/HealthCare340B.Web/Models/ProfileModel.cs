@@ -1,6 +1,7 @@
 ﻿using HealthCare340B.ViewModel;
 using Newtonsoft.Json;
 using System.Net;
+using System.Text;
 
 namespace HealthCare340B.Web.Models
 {
@@ -63,6 +64,75 @@ namespace HealthCare340B.Web.Models
                 Console.WriteLine($"DokterProfilModel.GetAll : {ex.Message}");
             }
             return data;
+        }
+        private bool DeleteOldImage(string oldImageFileName)
+        {
+            try
+            {
+                oldImageFileName = $"{webHostEnv.WebRootPath}\\{imageFolder}\\{oldImageFileName}";
+                if (File.Exists(oldImageFileName))
+                {
+                    File.Delete(oldImageFileName);
+                }
+                else
+                {
+                    throw new ArgumentException("Product Api could");
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+        }
+        internal async Task<VMResponse<VMMBiodatum>> UpdateAsync(VMMBiodatum data)
+        {
+            VMResponse<VMMBiodatum>? apiResponse = new VMResponse<VMMBiodatum>();
+            try
+            {
+                if (data.ImageFile != null)
+                {
+                    if (data.ImagePath != null)
+                    {
+                        DeleteOldImage(data.ImagePath);
+                    }
+                    data.ImagePath = UploadFile(data.ImageFile);
+                    data.ImageFile = null;
+
+                    //manggil api update proses
+                    jsonData = JsonConvert.SerializeObject(data);
+                    content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+                    apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMBiodatum>?>(
+                        await httpClient.PutAsync($"{apiUrl}DokterProfil", content).Result.Content.ReadAsStringAsync()
+                        );
+                }
+                else
+                {
+                    jsonData = JsonConvert.SerializeObject(data);
+                    content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+                    apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMBiodatum>?>(
+                        await httpClient.PutAsync($"{apiUrl}DokterProfil", content).Result.Content.ReadAsStringAsync()
+                        );
+                }
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+
+                }
+                else
+                {
+                    throw new Exception("Photo api could not be reached");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Photo.GetbyId: {ex.Message}");
+            }
+            return apiResponse;
         }
     }
 }

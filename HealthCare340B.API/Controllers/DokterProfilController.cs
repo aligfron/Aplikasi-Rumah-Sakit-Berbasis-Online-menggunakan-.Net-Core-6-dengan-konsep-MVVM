@@ -38,5 +38,29 @@ namespace HealthCare340B.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPut]
+        public async Task<ActionResult> Update(VMMBiodatum data)
+        {
+            try
+            {
+                VMResponse<VMMBiodatum?> response = await Task.Run(() => dokterProfil.Update(data));
+                if (response.Data != null)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    Console.WriteLine(response.Message);
+                    return NoContent();
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Photo.Update " + ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

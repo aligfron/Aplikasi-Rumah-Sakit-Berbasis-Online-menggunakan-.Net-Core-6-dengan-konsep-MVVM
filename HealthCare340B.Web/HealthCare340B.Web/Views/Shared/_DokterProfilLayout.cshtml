@@ -27,19 +27,22 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-center align-items-center flex-column">
                             <!-- Avatar dengan Icon Edit -->
+                            <form id="frmFoto" enctype="multipart/form-data">
                             <div class="avatar avatar-2xl position-relative">
-                                <!-- Gambar Avatar -->
                                 <img id="profileImage" src="~/@ViewBag.imgFolder/@(Model.ImagePath ?? "blank-profile-picture.png")" alt="Avatar" class="rounded-circle">
 
-                                <!-- Tombol Pensil untuk Edit Gambar tanpa background dan tidak mepet -->
                                 <label for="imageUpload" class="position-absolute" style="top: 0px; right: -20px; cursor: pointer;">
                                     <i class="bi bi-pencil-fill" style="font-size: 1rem;"></i>
                                 </label>
+                                    <input type="file" id="imageUpload" name="ImageFile" class="d-none" accept="image/*" onchange="previewImage(event)">
+                                    <input type="hidden" name="ImagePath" value="@Model.ImagePath" />
+                                    <input type="hidden" name="Id" value="@Model.BiodataId" />
+                                    <input type="hidden" name="ModifiedBy" value="@Model.BiodataId" />
+                            </div>                            
+                            </form>
 
-                                <!-- Input File Gambar (Tersembunyi) -->
-                                <input type="file" id="imageUpload" class="d-none" accept="image/*" onchange="previewImage(event)">
-                            </div>
-
+                            <button type="button" id="saveImageBtn" class="btn btn-primary mt-3 d-none">Simpan Gambar</button>
+                            <button type="button" id="cancelImageBtn" class="btn btn-danger mt-3 d-none">Cancel</button>
 
                             <h3 class="mt-1">@Model.Fullname</h3>
                             @foreach (VMTCurrentDoctorSpecialization Specialization in Model.SpecializationName)
@@ -150,7 +153,7 @@
 </div>
 
 <script>
-    function previewImage(event) {
+        function previewImage(event) {
         const reader = new FileReader();
         const file = event.target.files[0];
 
@@ -161,7 +164,16 @@
 
         if (file) {
             reader.readAsDataURL(file); // Mulai membaca file gambar
+
+            // Tampilkan tombol "Simpan Gambar" setelah gambar berhasil diunggah
+            document.getElementById('saveImageBtn').classList.remove('d-none');
+            document.getElementById('cancelImageBtn').classList.remove('d-none');
         }
+    }
+
+    function saveImage() {
+        
+
     }
 
     $(document).ready(function () {
@@ -200,4 +212,43 @@
             $('#breadcrumbProfile').attr('href', '@Url.Action("Index", "Profile")')
         });
     });
+
+
+
+    $("#saveImageBtn").click((e) => $("#frmFoto").submit())
+    $("#frmFoto").submit(function (e) {
+        e.preventDefault()
+        let formData = new FormData($("#frmFoto")[0])
+        if ($(this).valid()) {
+            $.ajax({
+                url: "/Profile/Edit",
+                type: "post",
+                data: formData,
+                processData: false,
+                contentType: false,
+                beforeSend: () => { },
+                success: function (res) {
+                    if (res.statusCode == 201 || res.statusCode == 200) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Foto Berhasil Di Edit',
+                            showConfirmButton: false,
+                            timer: 3000 // Show the alert for 2 seconds
+                        }).then(() => {
+                            location.reload(); // Reload page after alert
+                        });
+                    }
+                },
+                error: function (errRes) {
+                    console.error(errRes)
+                    debugger
+                }
+            })
+        } else { return false }
+    });
+    $("#cancelImageBtn").click((e) => {
+        e.preventDefault(); // Mencegah aksi default tombol jika ada
+        location.reload();  // Reload halaman
+    });
+
 </script>
