@@ -14,6 +14,7 @@ namespace HealthCare340B.ViewModel
 
         public string? Fullname { get; set; }
         public DateTime? Dob { get; set; }
+        public int? Age { get; set; }
         public string? Gender { get; set; }
         public long? BloodGroupId { get; set; }
         public string? RhesusType { get; set; }

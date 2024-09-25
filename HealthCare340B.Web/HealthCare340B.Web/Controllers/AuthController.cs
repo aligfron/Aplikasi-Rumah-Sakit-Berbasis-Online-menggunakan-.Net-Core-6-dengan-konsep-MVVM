@@ -50,6 +50,7 @@ namespace HealthCare340B.Web.Controllers
                         HttpContext.Session.SetString("userName", dataApi.Name!);
                         HttpContext.Session.SetInt32("userRoleId", (int)dataApi.RoleId!);
                         HttpContext.Session.SetString("userRole", dataApi.RoleName!);
+                        HttpContext.Session.SetString("userSince", dataApi.CreatedOn.ToString("yyyy"));
 
                         return RedirectToAction("Index", "Home");
                     }
