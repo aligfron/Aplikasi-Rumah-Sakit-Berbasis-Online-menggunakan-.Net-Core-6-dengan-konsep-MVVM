@@ -9,8 +9,8 @@ namespace HealthCare340B.Web.Controllers
     public class WalletDefaultNominalController : Controller
     {
         private WalletDefaultNominalModel walletDefaultNominal;
-        private string? custId;
-        private int? roleId;
+        private string? userId;
+        private string? roleName;
 
         public WalletDefaultNominalController(IConfiguration _config)
         {
@@ -18,9 +18,9 @@ namespace HealthCare340B.Web.Controllers
         }
         private bool isInSession()
         {
-            custId = HttpContext.Session.GetString("userId");
+            userId = HttpContext.Session.GetString("userId");
 
-            if (custId == null)
+            if (userId == null)
             {
                 HttpContext.Session.SetString("warnMsg", "Please Login First!");
                 return false;
@@ -30,9 +30,9 @@ namespace HealthCare340B.Web.Controllers
 
         private bool isAdmin()
         {
-            roleId = HttpContext.Session.GetInt32("userRoleId");
+            roleName = HttpContext.Session.GetString("userRole");
 
-            if (roleId != 1)
+            if (roleName != "Role Admin")
             {
                 HttpContext.Session.SetString("errMsg", "You Are Not Authorized!");
                 return false;
@@ -84,7 +84,7 @@ namespace HealthCare340B.Web.Controllers
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
 
-            data.CreatedBy = long.Parse(HttpContext.Session.GetString("userId")!);
+            data.CreatedBy = long.Parse(userId!);
             return await walletDefaultNominal.Create(data);
         }
 
@@ -114,7 +114,7 @@ namespace HealthCare340B.Web.Controllers
                     StatusCode = HttpStatusCode.Forbidden,
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
-            data.ModifiedBy = long.Parse(HttpContext.Session.GetString("userId")!);
+            data.ModifiedBy = long.Parse(userId!);
             return await walletDefaultNominal.Update(data);
         }
 
@@ -144,7 +144,7 @@ namespace HealthCare340B.Web.Controllers
                     StatusCode = HttpStatusCode.Forbidden,
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
-            return await walletDefaultNominal.Delete(id, long.Parse(HttpContext.Session.GetString("userId")!));
+            return await walletDefaultNominal.Delete(id, long.Parse(userId!));
         }
     }
 }

@@ -105,7 +105,7 @@ namespace HealthCare340B.Web.Controllers
                     StatusCode = HttpStatusCode.Forbidden,
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
-            data.CreatedBy = (long)HttpContext.Session.GetInt32("userId")!;
+            data.CreatedBy = long.Parse(userId!);
             return await paymentMethod.Create(data);
         }
 
@@ -136,7 +136,7 @@ namespace HealthCare340B.Web.Controllers
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
 
-            data.ModifiedBy = (long)HttpContext.Session.GetInt32("userId")!;
+            data.ModifiedBy = long.Parse(userId!);
             return await paymentMethod.Update(data);
         }
 
@@ -167,8 +167,7 @@ namespace HealthCare340B.Web.Controllers
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
 
-            long userId = (long)HttpContext.Session.GetInt32("userId")!;
-            return await paymentMethod.Delete(id, userId);
+            return await paymentMethod.Delete(id, long.Parse(userId!));
         }
     }
 }
