@@ -14,7 +14,7 @@ namespace HealthCare340B.Web.Models
 
         public ProfileModel(IConfiguration _config)
         {
-            apiUrl = _config["apiUrl"];
+            apiUrl = _config["ApiUrl"];
         }
         //aaa
         public async Task<VMMDoctor?> GetByIdProfilDokter(int id)

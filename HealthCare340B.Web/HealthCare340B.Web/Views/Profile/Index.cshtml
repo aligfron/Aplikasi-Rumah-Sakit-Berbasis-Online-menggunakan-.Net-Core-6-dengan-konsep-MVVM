@@ -1,5 +1,4 @@
-﻿@model VMMDoctor?
-@{
+﻿@{
     Layout = (string)ViewBag.Role != "ROLE_DOKTER" ? "_ProfilLayout" : "_DokterProfilLayout";
 
     if ((string)ViewBag.Role == "ROLE_PASIEN")
@@ -8,6 +7,7 @@
     }
     else if ((string)ViewBag.Role == "ROLE_DOKTER")
     {
+        @model VMMDoctor?
         <partial name="TabDokter" />
     }
     else if ((string)ViewBag.Role == "ROLE_ADMIN")

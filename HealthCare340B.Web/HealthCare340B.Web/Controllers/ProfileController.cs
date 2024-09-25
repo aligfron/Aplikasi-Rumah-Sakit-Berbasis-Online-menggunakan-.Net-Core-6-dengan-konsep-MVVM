@@ -27,8 +27,14 @@ namespace HealthCare340B.Web.Controllers
                 new BreadcrumbItem { Name = "Beranda", Controller = "Home", Action = "Index" },
                 new BreadcrumbItem { Name = "Profile", IsActive = true }
             };
-            VMMDoctor? data = await profile.GetByIdProfilDokter(1);
-            return View(data);
+
+            if (ViewBag.Role == "ROLE_DOKTER")
+            {
+                VMMDoctor? data = await profile.GetByIdProfilDokter(1);
+                return View(data);
+            }
+
+            return View();
         }
     }
 }
