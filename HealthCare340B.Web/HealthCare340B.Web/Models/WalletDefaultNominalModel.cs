@@ -52,7 +52,7 @@ namespace HealthCare340B.Web.Models
             {
                 //Logging
                 Console.WriteLine("Wallet Default NominalModel.GetByFilter: " + e.Message);
-                //throw new Exception("Wallet Default Nominal.GetByFilter: " + e.Message);
+                throw new Exception("Wallet Default Nominal.GetByFilter: " + e.Message);
             }
             return data;
         }
@@ -90,7 +90,7 @@ namespace HealthCare340B.Web.Models
             {
                 //Logging
                 Console.WriteLine("WalletDefaultNominalModel.GetById: " + e.Message);
-                //throw new Exception("CategoryModel.GetByFilter: " + e.Message);
+                throw new Exception("WalletDefaultNominalModel.GetById: " + e.Message);
             }
             return data;
         }
@@ -132,6 +132,7 @@ namespace HealthCare340B.Web.Models
             {
                 //Logging
                 Console.WriteLine("WalletDefaultNominal.Create: " + e.Message);
+                throw new Exception("WalletDefaultNominal.Create: " + e.Message);
             }
             return apiResponse;
         }
@@ -173,6 +174,7 @@ namespace HealthCare340B.Web.Models
             {
                 //Logging
                 Console.WriteLine("WalletDefaultNominal.Update: " + e.Message);
+                throw new Exception("WalletDefaultNominal.Update: " + e.Message);
             }
 
             return apiResponse;
@@ -207,6 +209,7 @@ namespace HealthCare340B.Web.Models
             {
                 //Logging
                 Console.WriteLine("WalletDefaultNominal.Delete: " + e.Message);
+                throw new Exception("WalletDefaultNominal.Delete: " + e.Message);
             }
 
             return apiResponse;

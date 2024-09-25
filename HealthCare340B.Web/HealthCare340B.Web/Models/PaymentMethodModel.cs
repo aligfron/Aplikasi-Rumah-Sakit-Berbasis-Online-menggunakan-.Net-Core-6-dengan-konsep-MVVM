@@ -52,7 +52,7 @@ namespace HealthCare340B.Web.Models
             {
                 //Logging
                 Console.WriteLine("PaymentMethodModel.GetByFilter: " + e.Message);
-                //throw new Exception("CategoryModel.GetByFilter: " + e.Message);
+                throw new Exception("PaymentMethodModel.GetByFilter: " + e.Message);
             }
 
             return data;
@@ -91,7 +91,7 @@ namespace HealthCare340B.Web.Models
             {
                 //Logging
                 Console.WriteLine("PaymentMethodModel.GetById: " + e.Message);
-                //throw new Exception("CategoryModel.GetByFilter: " + e.Message);
+                throw new Exception("PaymentMethodModel.GetById: " + e.Message);
             }
 
             return data;
@@ -134,6 +134,7 @@ namespace HealthCare340B.Web.Models
             {
                 //Logging
                 Console.WriteLine("PaymentMethodModel.Create: " + e.Message);
+                throw new Exception("PaymentMethodModel.Create: " + e.Message);
             }
 
             return apiResponse;
@@ -176,6 +177,7 @@ namespace HealthCare340B.Web.Models
             {
                 //Logging
                 Console.WriteLine("PaymentMethodModel.Update: " + e.Message);
+                throw new Exception("PaymentMethodModel.Update: " + e.Message);
             }
 
             return apiResponse;
@@ -210,6 +212,7 @@ namespace HealthCare340B.Web.Models
             {
                 //Logging
                 Console.WriteLine("PaymentMethodModel.Delete: " + e.Message);
+                throw new Exception("PaymentMethodModel.Delete: " + e.Message);
             }
 
             return apiResponse;

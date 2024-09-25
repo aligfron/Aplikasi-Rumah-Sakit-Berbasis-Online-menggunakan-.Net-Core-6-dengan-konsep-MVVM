@@ -58,7 +58,16 @@ namespace HealthCare340B.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            List<VMMPaymentMethod>? data = await paymentMethod.GetByFilter(filter);
+            List<VMMPaymentMethod>? data = new List<VMMPaymentMethod>();
+
+            try
+            {
+                data = await paymentMethod.GetByFilter(filter);
+            }
+            catch (Exception e)
+            {
+                HttpContext.Session.SetString("errMsg", e.Message);
+            }
 
             switch (orderBy)
             {
@@ -106,7 +115,9 @@ namespace HealthCare340B.Web.Controllers
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
             data.CreatedBy = long.Parse(userId!);
-            return await paymentMethod.Create(data);
+            VMResponse<VMMPaymentMethod>? dataApi = await paymentMethod.Create(data);
+            HttpContext.Session.SetString("successMsg", "Data Successfully Created!");
+            return dataApi;
         }
 
         public async Task<IActionResult> Edit(long id)
@@ -137,7 +148,9 @@ namespace HealthCare340B.Web.Controllers
                 };
 
             data.ModifiedBy = long.Parse(userId!);
-            return await paymentMethod.Update(data);
+            VMResponse<VMMPaymentMethod>? dataApi = await paymentMethod.Update(data);
+            HttpContext.Session.SetString("successMsg", "Data Successfully Edited!");
+            return dataApi;
         }
 
         public async Task<IActionResult> Delete(long id)
@@ -166,8 +179,9 @@ namespace HealthCare340B.Web.Controllers
                     StatusCode = HttpStatusCode.Forbidden,
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
-
-            return await paymentMethod.Delete(id, long.Parse(userId!));
+            VMResponse<VMMPaymentMethod>? dataApi = await paymentMethod.Delete(id, long.Parse(userId!));
+            HttpContext.Session.SetString("successMsg", "Data Successfully Deleted!");
+            return dataApi;
         }
     }
 }

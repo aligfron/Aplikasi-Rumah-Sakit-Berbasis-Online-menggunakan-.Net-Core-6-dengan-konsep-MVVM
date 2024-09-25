@@ -51,8 +51,16 @@ namespace HealthCare340B.Web.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
+            List<VMMWalletDefaultNominal>? data = new List<VMMWalletDefaultNominal>();
+            try
+            {
+                data = await walletDefaultNominal.GetByFilter(nominal);
+            }
+            catch (Exception e)
+            {
+                HttpContext.Session.SetString("errMsg", e.Message);
+            }
 
-            List<VMMWalletDefaultNominal>? data = await walletDefaultNominal.GetByFilter(nominal);
             ViewBag.Title = "Wallet Default Nominal";
             ViewBag.Filter = nominal;
             return View(data);
@@ -85,7 +93,9 @@ namespace HealthCare340B.Web.Controllers
                 };
 
             data.CreatedBy = long.Parse(userId!);
-            return await walletDefaultNominal.Create(data);
+            VMResponse<VMMWalletDefaultNominal>? dataApi = await walletDefaultNominal.Create(data);
+            HttpContext.Session.SetString("successMsg", "Data Successfully Created!");
+            return dataApi;
         }
 
         public async Task<IActionResult> Edit(long id)
@@ -115,7 +125,9 @@ namespace HealthCare340B.Web.Controllers
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
             data.ModifiedBy = long.Parse(userId!);
-            return await walletDefaultNominal.Update(data);
+            VMResponse<VMMWalletDefaultNominal>? dataApi = await walletDefaultNominal.Update(data);
+            HttpContext.Session.SetString("successMsg", "Data Successfully Edited!");
+            return dataApi;
         }
 
         public async Task<IActionResult> Delete(long id)
@@ -144,7 +156,9 @@ namespace HealthCare340B.Web.Controllers
                     StatusCode = HttpStatusCode.Forbidden,
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
-            return await walletDefaultNominal.Delete(id, long.Parse(userId!));
+            VMResponse<VMMWalletDefaultNominal>? dataApi = await walletDefaultNominal.Delete(id, long.Parse(userId!));
+            HttpContext.Session.SetString("successMsg", "Data Successfully Deleted!");
+            return dataApi;
         }
     }
 }

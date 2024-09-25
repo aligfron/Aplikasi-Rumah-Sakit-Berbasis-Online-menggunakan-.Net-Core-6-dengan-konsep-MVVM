@@ -62,12 +62,12 @@
                             location.reload();
                         }
                         else {
-                            alert(response.message);
+                            toastAlert(response.message, "error");
                         }
                     },
                     error: function (errResponse) {
                         console.error(errResponse);
-                        alert(errResponse);
+                        toastAlert(errResponse.message, "error");
                     }
                 });
             }

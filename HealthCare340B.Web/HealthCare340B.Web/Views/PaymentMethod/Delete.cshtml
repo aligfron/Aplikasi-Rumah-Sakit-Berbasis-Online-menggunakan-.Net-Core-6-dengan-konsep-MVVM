@@ -32,15 +32,17 @@
             dataType: "json",
             beforeSend: () => { },
             success: function (response) {
-                alert(response.message);
                 //delay(5000);
                 if (response.statusCode == 200) {
                     location.reload();
                 }
+                else { 
+                    toastAlert(response.message, "error");
+                }
             },
             error: function (errResponse) {
-                console.error("Payment Method deletion failed", errResponse);
-                debugger;
+                console.error(errResponse);
+                toastAlert(errResponse, "error");
             }
         });
     });
