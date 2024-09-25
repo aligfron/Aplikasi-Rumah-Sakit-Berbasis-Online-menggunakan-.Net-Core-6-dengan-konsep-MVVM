@@ -29,7 +29,7 @@
                             <!-- Avatar dengan Icon Edit -->
                             <div class="avatar avatar-2xl position-relative">
                                 <!-- Gambar Avatar -->
-                                <img id="profileImage" src="~/lib/mazer/compiled/jpg/2.jpg" alt="Avatar" class="rounded-circle">
+                                <img id="profileImage" src="~/@ViewBag.imgFolder/@(Model.ImagePath ?? "blank-profile-picture.png")" alt="Avatar" class="rounded-circle">
 
                                 <!-- Tombol Pensil untuk Edit Gambar tanpa background dan tidak mepet -->
                                 <label for="imageUpload" class="position-absolute" style="top: 0px; right: -20px; cursor: pointer;">

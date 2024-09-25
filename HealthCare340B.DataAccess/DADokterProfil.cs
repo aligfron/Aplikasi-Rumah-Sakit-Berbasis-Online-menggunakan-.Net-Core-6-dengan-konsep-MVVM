@@ -32,6 +32,7 @@ namespace HealthCare340B.DataAccess
                         select new VMMDoctor
                         {
                             Id = doktor.Id,
+                            ImagePath = biodata.ImagePath,
                             BiodataId = biodata.Id,
                             Fullname = biodata.Fullname,
                             SpecializationName = (
