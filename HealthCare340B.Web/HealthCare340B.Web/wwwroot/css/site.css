@@ -36,3 +36,39 @@ body {
     border: 0;
     box-shadow: none;
 }
+
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 15px;
+    border: 1px solid #e3e3e3;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.list-group-item input[type="checkbox"] {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.list-group-item p {
+    margin: 0;
+    color: #6c757d;
+}
+
+.list-group-item .btn-link {
+    color: #007bff;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.list-group-item .btn-link.text-danger {
+    color: #dc3545;
+}
+
+.list-group-item .fw-bold {
+    font-weight: bold;
+    color: #333;
+}
+

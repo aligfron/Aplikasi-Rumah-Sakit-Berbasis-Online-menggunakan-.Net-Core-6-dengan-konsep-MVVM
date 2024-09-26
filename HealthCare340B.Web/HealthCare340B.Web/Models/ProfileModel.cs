@@ -227,5 +227,182 @@ namespace HealthCare340B.Web.Models
             }
             return apiResponse;
         }
+
+
+        public async Task<List<VMMBiodataAddress>?> GetAllBioAddress()
+        {
+            VMResponse<List<VMMBiodataAddress>>? apiResponse = null;
+            try
+            {
+                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync($"{apiUrl}TabAlamat/GetAll");
+
+                if (apiResponseMsg != null)
+                {
+                    if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
+                    {
+                        apiResponse = JsonConvert.DeserializeObject<VMResponse<List<VMMBiodataAddress>>?>(await apiResponseMsg.Content.ReadAsStringAsync());
+                        return apiResponse?.Data;
+                    }
+                    else
+                    {
+                        throw new Exception($"Error: {apiResponseMsg.StatusCode}, {await apiResponseMsg.Content.ReadAsStringAsync()}");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Tab Alamat API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"ProfilModel.GetAllBioAddress: {e.Message}");
+            }
+        }
+
+        public async Task<List<VMMLocation>?> GetAllLocation()
+        {
+            VMResponse<List<VMMLocation>>? apiResponse = null;
+            try
+            {
+                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync($"{apiUrl}TabAlamat/GetAllLocation");
+
+                if (apiResponseMsg != null)
+                {
+                    if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
+                    {
+                        apiResponse = JsonConvert.DeserializeObject<VMResponse<List<VMMLocation>>?>(await apiResponseMsg.Content.ReadAsStringAsync());
+                    }
+                    else
+                    {
+                        apiResponse!.StatusCode = apiResponseMsg.StatusCode;
+                        apiResponse.Message = await apiResponseMsg.Content.ReadAsStringAsync();
+                    }
+                }
+                else
+                {
+                    throw new Exception("Tab Alamat (GetAllLocation) API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Profile.GetAllLocation: {e.Message}");
+            }
+
+            return apiResponse!.Data;
+
+        }
+
+        public async Task<VMResponse<VMMBiodataAddress>?> CreateAsync(VMMBiodataAddress data)
+        {
+            VMResponse<VMMBiodataAddress>? apiResponse = new VMResponse<VMMBiodataAddress>();
+
+            try
+            {
+                jsonData = JsonConvert.SerializeObject(data);
+                content = new StringContent(
+                    jsonData,
+                    Encoding.UTF8,
+                    "application/json"
+                );
+
+                apiResponse =
+                    JsonConvert.DeserializeObject<VMResponse<VMMBiodataAddress>?>(
+                        await httpClient.PostAsync($"{apiUrl}TabAlamat", content)
+                            .Result
+                            .Content
+                            .ReadAsStringAsync()
+                    );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode != HttpStatusCode.Created)
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("TabAlamat API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"ProfileModel.CreateAsync: {e.Message}");
+            }
+
+            return apiResponse;
+        }
+
+        public async Task<VMMBiodataAddress?> GetByIdAlamat(int id)
+        {
+            VMMBiodataAddress? data = null;
+
+            try
+            {
+                VMResponse<VMMBiodataAddress>? apiResponse =
+                    JsonConvert.DeserializeObject<VMResponse<VMMBiodataAddress>?>(
+                        await httpClient.GetStringAsync($"{apiUrl}TabAlamat/GetById/{id}")
+                    );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode == HttpStatusCode.OK)
+                        data = apiResponse.Data;
+                    else
+                        throw new Exception(apiResponse.Message);
+                }
+                else
+                {
+                    throw new Exception("TabAlamat API cannot be reached!");
+                }
+
+            }
+            catch (Exception e)
+            {
+                //Logging
+                throw new Exception($"ProfileModel.GetByIdAlamat: {e.Message}");
+            }
+
+            return data;
+        }
+
+        public async Task<VMResponse<VMMBiodataAddress>?> UpdateAsync(VMMBiodataAddress data)
+        {
+            VMResponse<VMMBiodataAddress>? apiResponse = new VMResponse<VMMBiodataAddress>();
+            try
+            {
+                jsonData = JsonConvert.SerializeObject(data);
+                content = new StringContent(
+                    jsonData,
+                    Encoding.UTF8,
+                    "application/json");
+
+                apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMBiodataAddress>?>(
+                    await httpClient.PutAsync($"{apiUrl}Variant", content)
+                    .Result
+                        .Content
+                        .ReadAsStringAsync()
+
+                );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("TabAlamat API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"ProfileModel.UpdateAsync: {e.Message}");
+
+            }
+            return apiResponse;
+        }
     }
 }

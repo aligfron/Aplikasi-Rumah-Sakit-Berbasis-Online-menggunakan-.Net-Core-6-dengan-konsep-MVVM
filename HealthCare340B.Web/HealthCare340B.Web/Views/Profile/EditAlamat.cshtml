@@ -1,6 +1,7 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+@model VMMBiodataAddress
 @{
     Layout = null;
 }
@@ -12,7 +13,7 @@
             <div class="row mb-3">
                 <label class="col-12 col-form-label">Label Alamat<span class="text-danger">*</span></label>
                 <div class="col-12">
-                    <input class="form-control" type="text" name="Label" />
+                    <input class="form-control" type="text" name="Label" value="@Model.Label"/>
                 </div>
             </div>
 
@@ -20,7 +21,7 @@
             <div class="row mb-3">
                 <label class="col-12 col-form-label">Nama Penerima<span class="text-danger">*</span></label>
                 <div class="col-12">
-                    <input class="form-control" type="text" name="Recipient" />
+                    <input class="form-control" type="text" name="Recipient" value="@Model.Recipient" />
                 </div>
             </div>
 
@@ -28,7 +29,7 @@
             <div class="row mb-3">
                 <label class="col-12 col-form-label">Nomor HP Penerima<span class="text-danger">*</span></label>
                 <div class="col-12">
-                    <input class="form-control" type="text" name="RecipientPhoneNumber" />
+                    <input class="form-control" type="text" name="RecipientPhoneNumber" value="@Model.RecipientPhoneNumber" />
                 </div>
             </div>
 
@@ -42,7 +43,14 @@
                         {
                             foreach (VMMLocation location in ViewBag.Location)
                             {
-                                <option value="@location.Id">@location.Name</option>
+                                if (location.Id == Model.LocationId)
+                                {
+                                    <option value="@location.Id" selected>@location.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@location.Id">@location.Name</option>
+                                }
                             }
                         }
                     </select>
@@ -53,7 +61,7 @@
             <div class="row mb-3">
                 <label class="col-12 col-form-label">Kode Pos</label>
                 <div class="col-12">
-                    <input class="form-control" type="text" name="PostalCode" />
+                    <input class="form-control" type="text" name="PostalCode" value="@Model.PostalCode" />
                 </div>
             </div>
 
@@ -61,18 +69,26 @@
             <div class="row mb-3">
                 <label class="col-12 col-form-label">Alamat</label>
                 <div class="col-12">
-                    <div class="form-floating">
-                        <textarea Name="Address" class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
-                        <label class="text-muted" for="floatingTextarea2">Masukkan Alamat</label>
+                    <div class="form-floating">                        
+                        @if (Model.Address != null)
+                        {
+                            <input Name="Address" class="form-control text-area" value="@Model.Address" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></input>
+                        }
+                        else
+                        {
+                            <input Name="Address" class="form-control text-area" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></input>
+                            <label class="text-muted" for="floatingTextarea2">Masukkan Alamat</label>
+                        }
+                        
                     </div>
                 </div>
             </div>
 
-            <input type="hidden" name="CreatedBy" value="1" />
+            <input type="hidden" name="ModifiedBy" value="1" />
 
             <!-- Buttons -->
             <div class="d-flex justify-content-between mt-5">
-                <button  type="reset" id="btnReset" class="btn btn-outline-info">Reset</button>
+                <button type="reset" id="btnReset" class="btn btn-outline-info">Reset</button>
                 <button type="button" id="btnSave" class="btn btn-info">Save</button>
             </div>
         </form>
@@ -82,12 +98,12 @@
 <script>
     $("#staticModalLabel").text("@ViewBag.Title");
 
-    $("#frmCreateAlamat").validate({
+    $("#frmUpdateAlamat").validate({
         rules: {
             Label: {
                 maxlength: 100,
                 minlength: 3,
-                required : true
+                required: true
             },
             Recipient: {
                 required: true
@@ -118,11 +134,11 @@
 
     $("#btnSave").click(function (e) {
         // debugger;
-        if ($("#frmCreateAlamat").valid()) {
+        if ($("#frmUpdateAlamat").valid()) {
             $.ajax({
-                url: "/Profile/Create",
-                type: "post",
-                data: $("#frmCreateAlamat").serialize(),
+                url: "/Profile/Edit",
+                type: "put",
+                data: $("#frmUpdateAlamat").serialize(),
                 dataType: "json",
                 beforeSend: () => { },
                 success: function (response) {
@@ -148,9 +164,9 @@
         return false;
     });
 
-    $("#frmCreateAlamat").submit(function (e) {
+    $("#frmUpdateAlamat").submit(function (e) {
         e.preventDefault();
     });
 
-    $("#btnReset").click(() => { $("#frmCreateAlamat")[0].reset(); });
+    $("#btnReset").click(() => { $("#frmUpdateAlamat")[0].reset(); });
 </script>

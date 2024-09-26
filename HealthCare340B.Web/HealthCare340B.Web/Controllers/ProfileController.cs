@@ -2,6 +2,9 @@
 using HealthCare340B.Web.AddOns;
 using HealthCare340B.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Net.Http;
+using System.Net;
 
 namespace HealthCare340B.Web.Controllers
 {
@@ -98,10 +101,56 @@ namespace HealthCare340B.Web.Controllers
 
         public async Task<IActionResult> CreateAlamat()
         {
+
             ViewBag.Title = "Tambah Alamat";
+            var location = await profile.GetAllLocation();
+            ViewBag.Location = location ?? new List<VMMLocation>();
+
             return View();
         }
-        
+        [HttpPost]
+        public async Task<VMResponse<VMMBiodataAddress>?> CreateAsync(VMMBiodataAddress data)
+           => await profile.CreateAsync(data);
+
+        public async Task<IActionResult> EditAlamat(int id)
+        {
+            VMMBiodataAddress? data = await profile.GetByIdAlamat(id);
+
+            ViewBag.Location = await profile.GetAllLocation() ?? new List<VMMLocation>();
+            ViewBag.Title = "Edit Alamat";
+
+            return View(data);
+        }
+
+        [HttpPost]
+        public async Task<VMResponse<VMMBiodataAddress>?> EditAsync(VMMBiodataAddress data)
+            => (await profile.UpdateAsync(data));
+
+        public async Task<IActionResult> TabAlamat()
+        {
+            ViewBag.Title = "Daftar Alamat";
+
+            var bioAddress = new List<VMMBiodataAddress>();
+            try
+            {
+                bioAddress = await profile.GetAllBioAddress();
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+
+            if (bioAddress == null || !bioAddress.Any())
+            {
+                ViewBag.Message = "Tidak ada Biodata Address ditemukan berdasarkan pencarian Anda.";
+                bioAddress = new List<VMMBiodataAddress>();
+            }
+
+            return View(bioAddress);
+        }
+
+
+
         public async Task<IActionResult> CreateSpeDoctor(int id)
         {
             ViewBag.Specialization = await specialization.getByFilter("");

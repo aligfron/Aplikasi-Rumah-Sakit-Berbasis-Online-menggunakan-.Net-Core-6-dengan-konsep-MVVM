@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HealthCare340B.DataModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,5 +24,31 @@ namespace HealthCare340B.ViewModel
         public long? DeletedBy { get; set; }
         public DateTime? DeletedOn { get; set; }
         public bool IsDelete { get; set; }
+
+        public string? Location { get; set; }
+
+        public VMMBiodataAddress()
+        {
+        }
+
+        public VMMBiodataAddress(MBiodataAddress bioAddress, MLocation location)
+        {
+            Id = bioAddress.Id;
+            BiodataId = bioAddress.BiodataId;
+            Label = bioAddress.Label;
+            Recipient = bioAddress.Recipient;
+            RecipientPhoneNumber = bioAddress.RecipientPhoneNumber;
+            LocationId = bioAddress.LocationId;
+            PostalCode = bioAddress.PostalCode;
+            Address = bioAddress.Address;
+            CreatedBy = bioAddress.CreatedBy;
+            ModifiedBy = bioAddress.ModifiedBy;
+            ModifiedOn = bioAddress.ModifiedOn;
+            DeletedBy = bioAddress.DeletedBy;
+            DeletedOn = bioAddress.DeletedOn;
+            IsDelete = bioAddress.IsDelete;
+            Location = location.Name;
+        }
+
     }
 }
