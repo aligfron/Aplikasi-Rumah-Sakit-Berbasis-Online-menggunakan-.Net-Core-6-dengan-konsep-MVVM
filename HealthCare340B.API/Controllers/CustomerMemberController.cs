@@ -95,6 +95,32 @@ namespace HealthCare340B.API.Controllers
             }
         }
 
+        [HttpGet("[action]/{userId?}")]
+        public async Task<ActionResult> GetByUserId(long? userId)
+        {
+            try
+            {
+                if (userId == null)
+                    throw new ArgumentNullException();
+                VMResponse<List<VMMCustomerMember>?> response = await Task.Run(() => _customerMember.GetByUserId((long)userId));
+                if (response.Data != null && response.Data.Count > 0)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    Console.WriteLine("CustomerMemberController.GetByUserId: " + response.Message);
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception e) 
+            {
+                Console.WriteLine("CustomerMemberController.GetByUserId: " + e.Message);
+
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult> Create(VMMCustomerMember model)
         {

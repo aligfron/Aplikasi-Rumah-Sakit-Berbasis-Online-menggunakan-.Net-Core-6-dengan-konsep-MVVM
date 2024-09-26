@@ -153,6 +153,63 @@ namespace HealthCare340B.DataAccess
             return response;
         }
 
+        public VMResponse<List<VMMCustomerMember>?> GetByUserId(long id)
+        {
+            VMResponse<List<VMMCustomerMember>?> response = new VMResponse<List<VMMCustomerMember>?>();
+
+            try
+            {
+                response.Data = (
+                    from cm in _db.MCustomerMembers
+                    join c in _db.MCustomers on cm.CustomerId equals c.Id
+                    join cr in _db.MCustomerRelations on cm.CustomerRelationId equals cr.Id
+                    join b in _db.MBiodata on cm.ParentBiodataId equals b.Id
+                    join u in _db.MUsers on b.Id equals u.BiodataId
+                    where cm.IsDelete == false && u.Id == id
+                    select new VMMCustomerMember
+                    {
+                        Id = cm.Id,
+                        ParentBiodataId = cm.ParentBiodataId,
+                        CustomerId = c.Id,
+                        Fullname = b.Fullname,
+                        Dob = c.Dob,
+                        Age = (int)((DateTime.Now - c.Dob!.Value).TotalDays / 365.242199),
+                        Gender = c.Gender,
+                        BloodGroupId = c.BloodGroupId,
+                        RhesusType = c.RhesusType,
+                        Height = c.Height,
+                        Weight = c.Weight,
+                        CustomerRelationId = cr.Id,
+                        CustomerRelationName = cr.Name,
+                        TotalChat = 0,
+                        TotalAppointment = 0,
+                        CreatedBy = cm.CreatedBy,
+                        CreatedOn = cm.CreatedOn,
+                        ModifiedBy = cm.ModifiedBy,
+                        ModifiedOn = cm.ModifiedOn,
+                        DeletedBy = cm.DeletedBy,
+                        DeletedOn = cm.DeletedOn,
+                        IsDelete = cm.IsDelete,
+                    }
+                    ).ToList();
+
+                foreach (VMMCustomerMember member in response.Data)
+                {
+                    member.TotalChat = _db.TCustomerChats.Count(x => x.CustomerId == member.CustomerId);
+                    member.TotalAppointment = _db.TAppointments.Count(x => x.CustomerId == member.CustomerId);
+                }
+
+                response.Message = (response.Data.Count > 0) ? $"{HttpStatusCode.OK} - {response.Data.Count} customer member data(s) successfully fetched" : $"{HttpStatusCode.NoContent} - No customer member data found";
+                response.StatusCode = (response.Data.Count > 0) ? HttpStatusCode.OK : HttpStatusCode.NoContent;
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+            }
+
+            return response;
+        }
+
         public VMResponse<VMMCustomerMember> Create(VMMCustomerMember model)
         {
             VMResponse<VMMCustomerMember> response = new VMResponse<VMMCustomerMember>();

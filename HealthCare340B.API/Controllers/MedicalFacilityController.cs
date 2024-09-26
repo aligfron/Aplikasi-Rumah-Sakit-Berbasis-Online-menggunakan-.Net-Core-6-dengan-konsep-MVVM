@@ -40,5 +40,32 @@ namespace HealthCare340B.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("[action]/{idDoctor?}")]
+        public async Task<ActionResult> GetByDoctorId(long? idDoctor)
+        {
+            try
+            {
+                if (idDoctor == null)
+                    throw new ArgumentNullException();
+                VMResponse<List<VMMMedicalFacility>?> response = await Task.Run(() => medFac.GetByDoctorId((long)idDoctor));
+                if (response.Data != null && response.Data.Count > 0)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    Console.WriteLine(response.Message);
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Console Logging
+                Console.WriteLine("MedicalFacilityController.GetAll: " + ex.Message);
+
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

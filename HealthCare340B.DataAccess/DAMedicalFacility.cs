@@ -63,5 +63,53 @@ namespace HealthCare340B.DataAccess
             return response;
         }
 
+        public VMResponse<List<VMMMedicalFacility>?> GetByDoctorId(long idDoctorOffice)
+        {
+            VMResponse<List<VMMMedicalFacility>?> response = new VMResponse<List<VMMMedicalFacility>?>();
+
+            try
+            {
+                response.Data = (
+                    from mf in db.MMedicalFacilities
+                    join dof in db.TDoctorOffices on mf.Id equals dof.MedicalFacilityId
+                    where mf.IsDelete == false && dof.DoctorId == idDoctorOffice
+                    select new VMMMedicalFacility
+                    {
+                        Id = mf.Id,
+                        Name = mf.Name,
+                        MedicalFacilityCategoryId = mf.MedicalFacilityCategoryId,
+                        LocationId = mf.LocationId,
+                        FullAddress = mf.FullAddress,
+                        Email = mf.Email,
+                        PhoneCode = mf.PhoneCode,
+                        Phone = mf.Phone,
+                        Fax = mf.Fax,
+                        CreatedBy = mf.CreatedBy,
+                        CreatedOn = mf.CreatedOn,
+                        ModifiedBy = mf.ModifiedBy,
+                        ModifiedOn = mf.ModifiedOn,
+                        DeletedBy = mf.DeletedBy,
+                        DeletedOn = mf.DeletedOn,
+                        IsDelete = mf.IsDelete
+                    }
+                    ).ToList();
+
+                response.Message = (response.Data.Count > 0)
+                   ? $"{HttpStatusCode.OK} - {response.Data.Count} medical facility(s) successfully fetched"
+                   : $"{HttpStatusCode.NoContent} - No medical facility is found";
+
+                response.StatusCode = (response.Data.Count > 0)
+                    ? HttpStatusCode.OK
+                    : HttpStatusCode.NoContent;
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+                response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+
+            return response;
+        }
+
     }
 }
