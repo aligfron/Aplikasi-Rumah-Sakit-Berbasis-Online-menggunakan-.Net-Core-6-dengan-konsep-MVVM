@@ -1,6 +1,8 @@
 ﻿using HealthCare340B.ViewModel;
 using Newtonsoft.Json;
 using System.Net;
+using System.Net.Http;
+using System.Text;
 
 namespace HealthCare340B.Web.Models
 {
@@ -51,5 +53,37 @@ namespace HealthCare340B.Web.Models
             }
             return data;
         }
+        public async Task<VMResponse<VMMUser>> LoginAsync(VMMUser data) 
+        {
+            VMMUser dataUsing = await GetByEmail(data.Email);
+            VMResponse<VMMUser> apiResponse = new VMResponse<VMMUser>();
+            try 
+            {
+                jsonData = JsonConvert.SerializeObject(dataUsing);
+                content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+                apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMUser>?>(
+                              await httpClient
+                              .PutAsync($"{apiUrl}User/Login2", content)
+                              .Result.Content.ReadAsStringAsync()
+                );
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("User API cannot be reached!");
+                }
+            }
+            catch (Exception ex) 
+            {
+                Console.WriteLine($"User API cannot be reached! {ex.Message}");
+                throw new Exception($"User API cannot be reached! {ex.Message}");
+            }
+            return apiResponse;
+        } 
     }
 }

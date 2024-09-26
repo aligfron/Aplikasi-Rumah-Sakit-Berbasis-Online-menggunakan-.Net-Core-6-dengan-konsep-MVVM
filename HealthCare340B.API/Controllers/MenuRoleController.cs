@@ -7,15 +7,15 @@ namespace HealthCare340B.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class MenuController : ControllerBase
+    public class MenuRoleController : ControllerBase
     {
-        private DAMenu menu;
+        private DAMenuRole menuRole;
         private object db;
 
-        public MenuController(HealthCare340BContext _db)
+        public MenuRoleController(HealthCare340BContext _db)
         {
 
-            menu = new DAMenu(_db);
+            menuRole = new DAMenuRole(_db);
             db = _db;
         }
         [HttpGet]
@@ -23,7 +23,7 @@ namespace HealthCare340B.API.Controllers
         {
             try
             {
-                VMResponse<List<VMMMenu?>> response = await Task.Run(() => menu.GetByFilter(""));
+                VMResponse<List<VMMMenuRole?>> response = await Task.Run(() => menuRole.GetByFilter(""));
                 if (response.Data!.Count > 0 && response.Data != null)
                 {
                     return Ok(response);
@@ -39,12 +39,12 @@ namespace HealthCare340B.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("[action]/{filter?}")]
+        [HttpGet("action/{filter?}")]
         public async Task<ActionResult> GetByFilter(string filter)
         {
             try
             {
-                VMResponse<List<VMMMenu?>> response = await Task.Run(() => menu.GetByFilter(filter));
+                VMResponse<List<VMMMenuRole?>> response = await Task.Run(() => menuRole.GetByFilter(filter));
                 if (string.IsNullOrEmpty(filter)) throw new ArgumentNullException("No filter provived");
 
                 return Ok(response);
@@ -55,28 +55,7 @@ namespace HealthCare340B.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("[action]/{Id?}")]
-        public async Task<ActionResult> GetById(int Id) 
-        {
-            try 
-            {
-                VMResponse<VMMMenu> response = await Task.Run(() => menu.GetById(Id));
-                if (response.Data != null)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    Console.WriteLine("MenuController.GetById: " + response.Message);
-                    return BadRequest(response);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("MenuController.GetById: " + ex.Message);
-                return BadRequest(ex.Message);
-            }
-        }
+         
     }
+
 }

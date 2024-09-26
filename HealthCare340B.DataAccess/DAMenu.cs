@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace HealthCare340B.DataAccess
 {
@@ -18,32 +19,67 @@ namespace HealthCare340B.DataAccess
             db = _db;
         }
 
-        public VMResponse<VMMMenuRole?> GetById(int id)
+        public VMResponse<List<VMMMenu>> GetByFilter(string filter) 
         {
-            VMResponse<VMMMenuRole?> response = new VMResponse<VMMMenuRole?>();
+            VMResponse<List<VMMMenu?>> response = new VMResponse<List<VMMMenu?>>();
+            try 
+            {
+                response.Data = (
+                    from m in db.MMenus
+                    where m.IsDelete == false && m.Name!.Contains(filter)
+                    select new VMMMenu()
+                    {
+                        Id = m.Id,
+                        Name = m.Name,
+                        Url = m.Url,
+                        ParentId = m.ParentId,
+                        BigIcon = m.BigIcon,
+                        SmallIcon = m.SmallIcon,
+                        CreatedBy = m.CreatedBy,
+                        CreatedOn = m.CreatedOn,
+                        ModifiedBy = m.ModifiedBy,
+                        ModifiedOn = m.ModifiedOn,
+                        DeletedBy = m.DeletedBy,
+                        DeletedOn = m.DeletedOn,
+                        IsDelete = m.IsDelete,
+                    }).ToList();
+                response.StatusCode = (response.Data != null) ?
+                    HttpStatusCode.OK :
+                    HttpStatusCode.NotFound;
+                response.Message = (response.Data != null) ?
+                    $"{HttpStatusCode.OK} - Menu succesfully fetched!"
+                    : $"{HttpStatusCode.NotFound} - Menu does not exist!";
+            }
+            catch (Exception ex) 
+            {
+                response.Message = $"{HttpStatusCode.NoContent} - {ex.Message}";
+            }
+            return response;
+        }
+
+        public VMResponse<VMMMenu?> GetById(int id)
+        {
+            VMResponse<VMMMenu?> response = new VMResponse<VMMMenu?>();
             try
             {
                 response.Data = (
-                    from mr in db.MMenuRoles
-                    join m in db.MMenus on mr.MenuId equals m.Id
-                    where mr.IsDelete == false && mr.Id == id
-                    select new VMMMenuRole()
+                    from m in db.MMenus
+                    where m.IsDelete == false && m.Id == id
+                    select new VMMMenu()
                     {
-                        Id = mr.Id,
+                        Id = m.Id,
                         Name = m.Name,
-                        MenuId = mr.MenuId,
-                        RoleId = mr.RoleId,
-                        ParentId = m.ParentId,
                         Url = m.Url,
-                        SmallIcon = m.SmallIcon,
+                        ParentId = m.ParentId,
                         BigIcon = m.BigIcon,
-                        CreatedBy = mr.CreatedBy,
-                        CreatedOn = mr.CreatedOn,
-                        ModifiedBy = mr.ModifiedBy,
-                        ModifiedOn = mr.ModifiedOn,
-                        DeletedBy = mr.DeletedBy,
-                        DeletedOn = mr.DeletedOn,
-                        IsDelete = false,
+                        SmallIcon = m.SmallIcon,
+                        CreatedBy = m.CreatedBy,
+                        CreatedOn = m.CreatedOn,
+                        ModifiedBy = m.ModifiedBy,
+                        ModifiedOn = m.ModifiedOn,
+                        DeletedBy = m.DeletedBy,
+                        DeletedOn = m.DeletedOn,
+                        IsDelete = m.IsDelete,
                     }
                     ).FirstOrDefault();
                 response.StatusCode = (response.Data != null) ?
@@ -60,47 +96,5 @@ namespace HealthCare340B.DataAccess
 
             return response;
         }
-        public VMResponse<List<VMMMenuRole?>> GetByFilter(string filter)
-        {
-            VMResponse<List<VMMMenuRole?>> response = new VMResponse<List<VMMMenuRole?>>();
-            try
-            {
-                response.Data = (
-                    from mr in db.MMenuRoles
-                    join m in db.MMenus on mr.MenuId equals m.Id
-                    where mr.IsDelete == false && m.Name!.Contains(filter)
-                    select new VMMMenuRole()
-                    {
-                        Id = mr.Id,
-                        Name = m.Name,
-                        MenuId = mr.MenuId,
-                        RoleId = mr.RoleId,
-                        ParentId = m.ParentId,
-                        Url = m.Url,
-                        SmallIcon = m.SmallIcon,
-                        BigIcon = m.BigIcon,
-                        CreatedBy = mr.CreatedBy,
-                        CreatedOn = mr.CreatedOn,
-                        ModifiedBy = mr.ModifiedBy,
-                        ModifiedOn = mr.ModifiedOn,
-                        DeletedBy = mr.DeletedBy,
-                        DeletedOn = mr.DeletedOn,
-                        IsDelete = false,
-                    }
-                    ).ToList();
-                response.StatusCode = (response.Data != null) ?
-                    HttpStatusCode.OK :
-                    HttpStatusCode.NotFound;
-                response.Message = (response.Data != null) ?
-                    $"{HttpStatusCode.OK} - Menu succesfully fetched!"
-                    : $"{HttpStatusCode.NotFound} - Menu does not exist!";
-            }
-            catch (Exception ex)
-            {
-                response.Message = $"{HttpStatusCode.NoContent} - {ex.Message}";
-            }
-            return response;
-        }
-
     }
 }
