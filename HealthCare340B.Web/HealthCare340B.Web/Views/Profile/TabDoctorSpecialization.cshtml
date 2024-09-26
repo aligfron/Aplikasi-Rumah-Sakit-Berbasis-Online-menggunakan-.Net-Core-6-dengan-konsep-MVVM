@@ -1,0 +1,30 @@
+﻿@if (Model.SpecializationName != null)
+{
+    @foreach (VMTCurrentDoctorSpecialization Specialization in Model.SpecializationName)
+    {
+        <p class="text-small">Nama Spesialisasi : @Specialization.Specialization</p>
+    }
+    <button class="btn btn-success position-absolute" data-id="@spesialisasi.Id" style="bottom: 30px; right: 30px;" title="Edit" data-bs-toggle="modal" data-bs-target="#staticModal">
+        <i class="bi bi-pencil-fill"></i> Ubah Spesialisasi
+    </button>
+}
+else
+{
+    <h5>Anda Belum Menambahkan Spesialisasi</h5>
+    <p style="font-size: smaller;">*Silahkan isi spesialisasi pada tombol tambah</p>
+
+    <button class="btn btn-primary position-absolute" style="bottom: 30px; right: 30px;">
+        <i class="bi bi-plus-circle"></i> Tambah Spesialisasi
+    </button>
+}
+<script>
+    $("#btnAdd").click(function (e) {
+        $("#staticModalBody").html("");
+        $("#staticModalBody").load("/Profile/CreateSpecializationDoctor/");
+    });
+
+    $(".btn-primary").click(function (e) {
+        $("#staticModalBody").html("");
+        $("#staticModalBody").load("/Specialization/Edit/" + $(this).data("id"));
+    });
+</script>

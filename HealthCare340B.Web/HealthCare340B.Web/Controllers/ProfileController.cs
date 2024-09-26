@@ -37,7 +37,7 @@ namespace HealthCare340B.Web.Controllers
                     break;
 
                 case "ROLE_DOKTER":
-                    ViewBag.Url = "/Profile/TabDokter";
+                    ViewBag.Url = "/Profile/IndexDoctorProfile";
                     break;
 
                 case "ROLE_ADMIN":
@@ -52,7 +52,7 @@ namespace HealthCare340B.Web.Controllers
             return View();
         }
 
-        public async Task<IActionResult> TabDokter()
+        public async Task<IActionResult> IndexDoctorProfile()
         {
             ViewBag.Title = "Profil";
             ViewBag.imgFolder = imageFolder;
