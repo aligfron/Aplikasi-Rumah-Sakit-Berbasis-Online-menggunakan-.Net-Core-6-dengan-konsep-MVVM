@@ -31,12 +31,18 @@
             e.preventDefault();
         });
 
+        $.validator.addMethod("alphanumeric", function (value, element) {
+            //test user value with the regex
+            return this.optional(element) || /^[\w\s]+$/i.test(value);
+        }, "Only Alphanumeric and Space Characters are allowed!");
+
         $("#frmPaymentMethod").validate({
             rules: {
                 Name: {
                     required: true,
                     maxlength: 50,
-                    minlength: 3
+                    minlength: 3,
+                    alphanumeric: true
                 }
             },
             messages: {

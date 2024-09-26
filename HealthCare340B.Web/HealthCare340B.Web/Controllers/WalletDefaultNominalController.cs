@@ -40,7 +40,7 @@ namespace HealthCare340B.Web.Controllers
             return true;
         }
 
-        public async Task<IActionResult> Index(int? nominal = null)
+        public async Task<IActionResult> Index(int? filter = null)
         {
             if (!isInSession())
             {
@@ -54,7 +54,7 @@ namespace HealthCare340B.Web.Controllers
             List<VMMWalletDefaultNominal>? data = new List<VMMWalletDefaultNominal>();
             try
             {
-                data = await walletDefaultNominal.GetByFilter(nominal);
+                data = await walletDefaultNominal.GetByFilter(filter);
             }
             catch (Exception e)
             {
@@ -62,7 +62,7 @@ namespace HealthCare340B.Web.Controllers
             }
 
             ViewBag.Title = "Wallet Default Nominal";
-            ViewBag.Filter = nominal;
+            ViewBag.Filter = filter;
             return View(data);
         }
 
@@ -92,10 +92,38 @@ namespace HealthCare340B.Web.Controllers
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
 
+            List<VMMWalletDefaultNominal>? dataSearch = new List<VMMWalletDefaultNominal>();
+            try
+            {
+                dataSearch = await walletDefaultNominal.GetByFilter(data.Nominal);
+                if (dataSearch != null && dataSearch.Count > 0)
+                    throw new Exception("Duplicate Data!");
+            }
+            catch (Exception e)
+            {
+                if (dataSearch != null && dataSearch.Count > 0)
+                {
+                    VMResponse<VMMWalletDefaultNominal> response = new VMResponse<VMMWalletDefaultNominal>();
+                    response.StatusCode = HttpStatusCode.BadRequest;
+                    response.Message = $"{HttpStatusCode.BadRequest} - Duplicate Data!";
+                    return response;
+                }
+            }
+
             data.CreatedBy = long.Parse(userId!);
-            VMResponse<VMMWalletDefaultNominal>? dataApi = await walletDefaultNominal.Create(data);
+            VMResponse<VMMWalletDefaultNominal>? dataApi = new VMResponse<VMMWalletDefaultNominal>();
+            try
+            { 
+                dataApi = await walletDefaultNominal.Create(data);
+            }
+            catch (Exception e)
+            {
+                HttpContext.Session.SetString("errMsg", e.Message);
+                return dataApi;
+            }
             HttpContext.Session.SetString("successMsg", "Data Successfully Created!");
             return dataApi;
+
         }
 
         public async Task<IActionResult> Edit(long id)
@@ -125,7 +153,17 @@ namespace HealthCare340B.Web.Controllers
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
             data.ModifiedBy = long.Parse(userId!);
-            VMResponse<VMMWalletDefaultNominal>? dataApi = await walletDefaultNominal.Update(data);
+            VMResponse<VMMWalletDefaultNominal>? dataApi = new VMResponse<VMMWalletDefaultNominal>();
+            try
+            {
+                dataApi = await walletDefaultNominal.Update(data);
+
+            }
+            catch (Exception e)
+            {
+                HttpContext.Session.SetString("errMsg", e.Message);
+                return dataApi;
+            }
             HttpContext.Session.SetString("successMsg", "Data Successfully Edited!");
             return dataApi;
         }
@@ -156,7 +194,17 @@ namespace HealthCare340B.Web.Controllers
                     StatusCode = HttpStatusCode.Forbidden,
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
-            VMResponse<VMMWalletDefaultNominal>? dataApi = await walletDefaultNominal.Delete(id, long.Parse(userId!));
+
+            VMResponse<VMMWalletDefaultNominal>? dataApi = new VMResponse<VMMWalletDefaultNominal>();
+            try
+            {
+                dataApi = await walletDefaultNominal.Delete(id, long.Parse(userId!));
+            }
+            catch (Exception e)
+            {
+                HttpContext.Session.SetString("errMsg", e.Message);
+                return dataApi;
+            }
             HttpContext.Session.SetString("successMsg", "Data Successfully Deleted!");
             return dataApi;
         }

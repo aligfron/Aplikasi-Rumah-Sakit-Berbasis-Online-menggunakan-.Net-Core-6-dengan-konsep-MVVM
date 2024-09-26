@@ -42,7 +42,7 @@
             },
             error: function (errResponse) {
                 console.error("Wallet Default Nominal deletion failed", errResponse);
-                toastAlert(errResponse.message, "error");
+                toastAlert(errResponse, "error");
             }
         });
     });

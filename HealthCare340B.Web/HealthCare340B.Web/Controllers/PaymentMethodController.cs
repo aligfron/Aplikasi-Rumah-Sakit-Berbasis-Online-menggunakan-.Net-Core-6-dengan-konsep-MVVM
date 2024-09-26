@@ -114,8 +114,38 @@ namespace HealthCare340B.Web.Controllers
                     StatusCode = HttpStatusCode.Forbidden,
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
+
+
+            List<VMMPaymentMethod>? dataSearch = new List<VMMPaymentMethod>();
+
+            try
+            {
+                dataSearch = await paymentMethod.GetByFilter(data.Name);
+                if (dataSearch != null && dataSearch.Count > 0)
+                    throw new Exception("Duplicate Data!");
+            }
+            catch (Exception e)
+            {
+                if (dataSearch != null && dataSearch.Count > 0)
+                {
+                    VMResponse<VMMPaymentMethod> response = new VMResponse<VMMPaymentMethod>();
+                    response.StatusCode = HttpStatusCode.BadRequest;
+                    response.Message = $"{HttpStatusCode.BadRequest} - Duplicate Data!";
+                    return response;
+                }
+            }
+
             data.CreatedBy = long.Parse(userId!);
-            VMResponse<VMMPaymentMethod>? dataApi = await paymentMethod.Create(data);
+            VMResponse<VMMPaymentMethod>? dataApi = new VMResponse<VMMPaymentMethod>();
+            try
+            {
+                dataApi = await paymentMethod.Create(data);
+            }
+            catch (Exception e)
+            {
+                HttpContext.Session.SetString("errMsg", e.Message);
+                return dataApi;
+            }
             HttpContext.Session.SetString("successMsg", "Data Successfully Created!");
             return dataApi;
         }
@@ -148,7 +178,16 @@ namespace HealthCare340B.Web.Controllers
                 };
 
             data.ModifiedBy = long.Parse(userId!);
-            VMResponse<VMMPaymentMethod>? dataApi = await paymentMethod.Update(data);
+            VMResponse<VMMPaymentMethod>? dataApi = new VMResponse<VMMPaymentMethod>();
+            try
+            {
+                dataApi = await paymentMethod.Update(data);
+            }
+            catch (Exception e)
+            {
+                HttpContext.Session.SetString("errMsg", e.Message);
+                return dataApi;
+            }
             HttpContext.Session.SetString("successMsg", "Data Successfully Edited!");
             return dataApi;
         }
@@ -179,7 +218,16 @@ namespace HealthCare340B.Web.Controllers
                     StatusCode = HttpStatusCode.Forbidden,
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
-            VMResponse<VMMPaymentMethod>? dataApi = await paymentMethod.Delete(id, long.Parse(userId!));
+            VMResponse<VMMPaymentMethod>? dataApi = new VMResponse<VMMPaymentMethod>();
+            try
+            {
+                dataApi = await paymentMethod.Delete(id, long.Parse(userId!));
+            }
+            catch (Exception e)
+            {
+                HttpContext.Session.SetString("errMsg", e.Message);
+                return dataApi;
+            }
             HttpContext.Session.SetString("successMsg", "Data Successfully Deleted!");
             return dataApi;
         }

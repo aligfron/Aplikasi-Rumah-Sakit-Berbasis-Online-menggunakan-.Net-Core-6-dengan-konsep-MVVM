@@ -63,9 +63,9 @@
                             toastAlert(response.message, "error");
                         }
                     },
-                    error: function (errResponse) {
-                        console.error(errResponse);
-                        toastAlert(errResponse.message, "error");
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error(textStatus);
+                        toastAlert(textStatus, "error");
                     }
                 });
             }
