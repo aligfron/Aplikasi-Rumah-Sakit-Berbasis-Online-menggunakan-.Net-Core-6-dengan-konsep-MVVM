@@ -1,6 +1,7 @@
-﻿
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
 @{
-    Layout = "_Layout";
 }
 
 <div class="page-heading">
@@ -28,17 +29,17 @@
                         <div class="d-flex justify-content-center align-items-center flex-column">
                             <!-- Avatar dengan Icon Edit -->
                             <form id="frmFoto" enctype="multipart/form-data">
-                            <div class="avatar avatar-2xl position-relative">
-                                <img id="profileImage" src="~/@ViewBag.imgFolder/@(Model.ImagePath ?? "blank-profile-picture.png")" alt="Avatar" class="rounded-circle">
+                                <div class="avatar avatar-2xl position-relative">
+                                    <img id="profileImage" src="~/@ViewBag.imgFolder/@(Model.ImagePath ?? "blank-profile-picture.png")" alt="Avatar" class="rounded-circle">
 
-                                <label for="imageUpload" class="position-absolute" style="top: 0px; right: -20px; cursor: pointer;">
-                                    <i class="bi bi-pencil-fill" style="font-size: 1rem;"></i>
-                                </label>
+                                    <label for="imageUpload" class="position-absolute" style="top: 0px; right: -20px; cursor: pointer;">
+                                        <i class="bi bi-pencil-fill" style="font-size: 1rem;"></i>
+                                    </label>
                                     <input type="file" id="imageUpload" name="ImageFile" class="d-none" accept="image/*" onchange="previewImage(event)">
                                     <input type="hidden" name="ImagePath" value="@Model.ImagePath" />
                                     <input type="hidden" name="Id" value="@Model.BiodataId" />
                                     <input type="hidden" name="ModifiedBy" value="@Model.BiodataId" />
-                            </div>                            
+                                </div>
                             </form>
 
                             <button type="button" id="saveImageBtn" class="btn btn-primary mt-3 d-none">Simpan Gambar</button>
@@ -172,7 +173,7 @@
     }
 
     function saveImage() {
-        
+
 
     }
 

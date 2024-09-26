@@ -1,21 +1,12 @@
 ﻿@{
-    Layout = (string)ViewBag.Role != "ROLE_DOKTER" ? "_ProfilLayout" : "_DokterProfilLayout";
-
-    if ((string)ViewBag.Role == "ROLE_PASIEN")
-    {
-        <partial name="TabPasien" />
-    }
-    else if ((string)ViewBag.Role == "ROLE_DOKTER")
-    {
-        @model VMMDoctor?
-        <partial name="TabDokter" />
-    }
-    else if ((string)ViewBag.Role == "ROLE_ADMIN")
-    {
-        <p>Role Admin</p>
-    }
-    else
-    {
-        <p>Role tidak dikenali.</p>
-    }
 }
+
+<div id="ContentProfile">
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#ContentProfile').load('@ViewBag.Url');
+    });
+</script>

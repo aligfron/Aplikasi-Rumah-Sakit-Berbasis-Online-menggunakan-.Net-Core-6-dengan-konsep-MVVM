@@ -37,19 +37,23 @@
             // Navigasi klik tanpa refresh halaman
             $("#v-pills-pasien-tab").click(function (e) {
                 e.preventDefault();
-                location.href = '/Profile/Pasien';
+                //location.href = '/Profile/Pasien';
+                $("#ContentProfile").load('/Profile/Pasien');
             });
 
-            $("#v-pills-pembelianobat-tab").click(function () {
-                $("#cardBodyContent").html("<p>Belum ada data</p>");
+            $("#v-pills-pembelianobat-tab").click(function (e) {
+                e.preventDefault();
+                $("#ContentProfile").html("<p>Belum ada data</p>");
             });
 
-            $("#v-pills-rencanakedatangan-tab").click(function () {
-                $("#cardBodyContent").html("<p>Belum ada data</p>");
+            $("#v-pills-rencanakedatangan-tab").click(function (e) {
+                e.preventDefault();
+                $("#ContentProfile").html("<p>Belum ada data</p>");
             });
 
-            $("#v-pills-riwayatchatdokter-tab").click(function () {
-                $("#cardBodyContent").html("<p>Belum ada data</p>");
+            $("#v-pills-riwayatchatdokter-tab").click(function (e) {
+                e.preventDefault();
+                $("#ContentProfile").html("<p>Belum ada data</p>");
             });
         });
     </script>
