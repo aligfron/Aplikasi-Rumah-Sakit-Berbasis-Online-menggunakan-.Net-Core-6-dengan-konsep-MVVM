@@ -27,7 +27,7 @@ namespace HealthCare340B.Web.Controllers
             ViewBag.imgFolder = imageFolder;
 
             //string Role = "ROLE_DOKTER";
-            string role = "ROLE_DOKTER";
+            string role = "ROLE_PASIEN";
 
             ViewBag.Breadcrumb = new List<BreadcrumbItem>
             {
@@ -38,19 +38,12 @@ namespace HealthCare340B.Web.Controllers
             switch (role)
             {
                 case "ROLE_PASIEN":
-                    ViewBag.Url = "/Profile/IndexPasienProfile";
-                    break;
+                    return RedirectToAction("IndexCustomerProfile");
 
                 case "ROLE_DOKTER":
-                    ViewBag.Url = "/Profile/IndexDoctorProfile";
-                    break;
+                    return RedirectToAction("IndexDoctorProfile");
 
                 case "ROLE_ADMIN":
-                    ViewBag.Url = "/Profile/IndexAdminProfile";
-                    break;
-
-                default:
-                    ViewBag.Url = "#";
                     break;
             }
 
@@ -73,7 +66,7 @@ namespace HealthCare340B.Web.Controllers
             return View(data);
         }
 
-        public async Task<IActionResult> IndexPasienProfile()
+        public async Task<IActionResult> IndexCustomerProfile()
         {
             ViewBag.Title = "Profil";
             ViewBag.imgFolder = imageFolder;

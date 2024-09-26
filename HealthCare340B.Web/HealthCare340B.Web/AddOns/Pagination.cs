@@ -5,6 +5,8 @@
         public int PageIndex { get; private set; }
         public int TotalPages { get; private set; }
         public int TotalData { get; set; }
+        public int StartItem { get; private set; }
+        public int EndItem { get; private set; }
         public bool HasPreviousPage => PageIndex > 1;
         public bool HasNextPage => PageIndex < TotalPages;
         public Pagination(List<T> pageData, int totalData, int pageIndex, int pageSize)
@@ -12,6 +14,9 @@
             PageIndex = pageIndex;
             TotalPages = (int)Math.Ceiling(totalData / (double)pageSize);
             TotalData = totalData;
+
+            StartItem = ((pageIndex - 1) * pageSize) + 1;
+            EndItem = Math.Min(StartItem + pageData.Count - 1, totalData);
             AddRange(pageData);
         }
 

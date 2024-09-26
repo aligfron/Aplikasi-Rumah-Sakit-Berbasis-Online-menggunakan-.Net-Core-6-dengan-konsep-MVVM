@@ -76,6 +76,15 @@ namespace HealthCare340B.Web.Controllers
                 data.CreatedBy = long.Parse(HttpContext.Session.GetString("userId")!);
 
                 response = await _customerRelationModel.CreateAsync(data);
+
+                if (response.StatusCode == HttpStatusCode.Created)
+                {
+                    HttpContext.Session.SetString("successMsg", response.Message);
+                }
+                else
+                {
+                    HttpContext.Session.SetString("errMsg", response.Message);
+                }
             }
             catch (Exception ex)
             {
@@ -113,6 +122,15 @@ namespace HealthCare340B.Web.Controllers
                 data.ModifiedBy = long.Parse(HttpContext.Session.GetString("userId")!);
 
                 response = await _customerRelationModel.UpdateAsync(data);
+
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    HttpContext.Session.SetString("successMsg", response.Message);
+                }
+                else
+                {
+                    HttpContext.Session.SetString("errMsg", response.Message);
+                }
             }
             catch (Exception ex)
             {
@@ -150,6 +168,15 @@ namespace HealthCare340B.Web.Controllers
                 long userId = long.Parse(HttpContext.Session.GetString("userId")!);
 
                 response = await _customerRelationModel.DeleteAsync(id, userId);
+
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    HttpContext.Session.SetString("successMsg", response.Message);
+                }
+                else
+                {
+                    HttpContext.Session.SetString("errMsg", response.Message);
+                }
             }
             catch (Exception ex)
             {

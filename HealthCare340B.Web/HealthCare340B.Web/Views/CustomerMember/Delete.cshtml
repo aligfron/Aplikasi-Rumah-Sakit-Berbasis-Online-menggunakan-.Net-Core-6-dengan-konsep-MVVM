@@ -1,0 +1,53 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model VMMCustomerMember?;
+@{
+    Layout = null;
+}
+
+<div class="card mb-0">
+    <div class="card-body">
+        <p>Anda yakin ingin menghapus pasien </p>
+        <p>&ensp;<b>@Model.Fullname</b></p>
+        <p>Riwayat medis pasien akan tetap tersimpan, namun Anda tidak dapat lagi membuat janji dokter / chat online untuk pasien ini.</p>
+    </div>
+
+    <div class="card-footer d-flex justify-content-center">
+        <button class="btn btn-outline-secondary me-5" data-bs-dismiss="modal" aria-label="Close">Batal</button>
+        &nbsp;
+        <button id="btnDelete" class="btn btn-danger">Hapus</button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#staticModalLabel").text("@ViewBag.Title");
+        console.log("KATA");
+
+        $("#btnDelete").click(function (e) {
+            $.ajax({
+                url: "/Profile/Pasien/Delete",
+                type: "POST",
+                data: {
+                    "id": @Model.Id
+                },
+                dataType: "json",
+                beforeSend: () => {
+
+                },
+                success: function (response) {
+                    if (response.statusCode == 200) {
+                        location.reload();
+                    }
+                    else {
+                        alert(response.statusCode + " - " + response.message);
+                    }
+                },
+                error: function (errResponse) {
+                    console.error(errResponse);
+                }
+            });
+        });
+    });
+</script>

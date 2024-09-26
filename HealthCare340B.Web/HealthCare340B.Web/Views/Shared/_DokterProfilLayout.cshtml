@@ -2,7 +2,9 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
+    Layout = "_Layout";
 }
+
 
 <div class="page-heading">
     <div class="page-title">
@@ -68,7 +70,7 @@
                                 <p>Anda Belum Menambahkan Spesialisasi</p>
                             }
 
-                            
+
                             <i class="bi bi-star-fill text-warning mb-0"></i>
 
                             <!-- Navbar-like Tab Navigation -->
@@ -96,7 +98,7 @@
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        <h3 class="card-title text-primary">Tentang Saya</h3> 
+                        <h3 class="card-title text-primary">Tentang Saya</h3>
                         <div>
                             <h5 class="mt-1">Tindakan Medis</h5>
                             @if (Model.TreatmentName.Count > 0)

@@ -67,13 +67,21 @@ namespace HealthCare340B.DataAccess
 
                 foreach (var member in customerMembers)
                 {
-                    member.TotalChat = _db.TCustomerChats.Count(x => x.CustomerId == member.CustomerId);
-                    member.TotalAppointment = _db.TAppointments.Count(x => x.CustomerId == member.CustomerId);
+                    member.TotalChat = _db.TCustomerChats.Count(x =>
+                        x.CustomerId == member.CustomerId
+                    );
+                    member.TotalAppointment = _db.TAppointments.Count(x =>
+                        x.CustomerId == member.CustomerId
+                    );
                 }
 
                 response.Data = customerMembers;
-                response.Message = (response.Data.Count > 0) ? $"{HttpStatusCode.OK} - {response.Data.Count} customer member data(s) successfully fetched" : $"{HttpStatusCode.NoContent} - No customer member data found";
-                response.StatusCode = (response.Data.Count > 0) ? HttpStatusCode.OK : HttpStatusCode.NoContent;
+                response.Message =
+                    (response.Data.Count > 0)
+                        ? $"{HttpStatusCode.OK} - {response.Data.Count} customer member data(s) successfully fetched"
+                        : $"{HttpStatusCode.NoContent} - No customer member data found";
+                response.StatusCode =
+                    (response.Data.Count > 0) ? HttpStatusCode.OK : HttpStatusCode.NoContent;
             }
             catch (Exception ex)
             {
@@ -131,13 +139,21 @@ namespace HealthCare340B.DataAccess
 
                     if (customerMembers != null)
                     {
-                        customerMembers.TotalChat = _db.TCustomerChats.Count(x => x.CustomerId == customerMembers.CustomerId);
-                        customerMembers.TotalAppointment = _db.TAppointments.Count(x => x.CustomerId == customerMembers.CustomerId);
+                        customerMembers.TotalChat = _db.TCustomerChats.Count(x =>
+                            x.CustomerId == customerMembers.CustomerId
+                        );
+                        customerMembers.TotalAppointment = _db.TAppointments.Count(x =>
+                            x.CustomerId == customerMembers.CustomerId
+                        );
                     }
 
                     response.Data = customerMembers;
-                    response.Message = (response.Data != null) ? $"{HttpStatusCode.OK} - Customer member data successfully fetched" : $"{HttpStatusCode.NoContent} - No customer member data found";
-                    response.StatusCode = (response.Data != null) ? HttpStatusCode.OK : HttpStatusCode.NoContent;
+                    response.Message =
+                        (response.Data != null)
+                            ? $"{HttpStatusCode.OK} - Customer member data successfully fetched"
+                            : $"{HttpStatusCode.NoContent} - No customer member data found";
+                    response.StatusCode =
+                        (response.Data != null) ? HttpStatusCode.OK : HttpStatusCode.NoContent;
                 }
                 else
                 {
@@ -155,7 +171,8 @@ namespace HealthCare340B.DataAccess
 
         public VMResponse<List<VMMCustomerMember>?> GetByUserId(long id)
         {
-            VMResponse<List<VMMCustomerMember>?> response = new VMResponse<List<VMMCustomerMember>?>();
+            VMResponse<List<VMMCustomerMember>?> response =
+                new VMResponse<List<VMMCustomerMember>?>();
 
             try
             {
@@ -191,16 +208,24 @@ namespace HealthCare340B.DataAccess
                         DeletedOn = cm.DeletedOn,
                         IsDelete = cm.IsDelete,
                     }
-                    ).ToList();
+                ).ToList();
 
                 foreach (VMMCustomerMember member in response.Data)
                 {
-                    member.TotalChat = _db.TCustomerChats.Count(x => x.CustomerId == member.CustomerId);
-                    member.TotalAppointment = _db.TAppointments.Count(x => x.CustomerId == member.CustomerId);
+                    member.TotalChat = _db.TCustomerChats.Count(x =>
+                        x.CustomerId == member.CustomerId
+                    );
+                    member.TotalAppointment = _db.TAppointments.Count(x =>
+                        x.CustomerId == member.CustomerId
+                    );
                 }
 
-                response.Message = (response.Data.Count > 0) ? $"{HttpStatusCode.OK} - {response.Data.Count} customer member data(s) successfully fetched" : $"{HttpStatusCode.NoContent} - No customer member data found";
-                response.StatusCode = (response.Data.Count > 0) ? HttpStatusCode.OK : HttpStatusCode.NoContent;
+                response.Message =
+                    (response.Data.Count > 0)
+                        ? $"{HttpStatusCode.OK} - {response.Data.Count} customer member data(s) successfully fetched"
+                        : $"{HttpStatusCode.NoContent} - No customer member data found";
+                response.StatusCode =
+                    (response.Data.Count > 0) ? HttpStatusCode.OK : HttpStatusCode.NoContent;
             }
             catch (Exception ex)
             {
@@ -221,7 +246,13 @@ namespace HealthCare340B.DataAccess
                     if (model != null)
                     {
                         //Save biodata
-                        MBiodatum biodata = new MBiodatum { Fullname = model.Fullname };
+                        MBiodatum biodata = new MBiodatum
+                        {
+                            Fullname = model.Fullname,
+                            CreatedBy = model.CreatedBy,
+                            CreatedOn = DateTime.Now,
+                            IsDelete = false,
+                        };
 
                         _db.Add(biodata);
                         _db.SaveChanges();
@@ -236,6 +267,9 @@ namespace HealthCare340B.DataAccess
                             RhesusType = model.RhesusType,
                             Height = model.Height,
                             Weight = model.Weight,
+                            CreatedBy = model.CreatedBy,
+                            CreatedOn = DateTime.Now,
+                            IsDelete = false,
                         };
                         _db.Add(customer);
                         _db.SaveChanges();
@@ -261,7 +295,9 @@ namespace HealthCare340B.DataAccess
                             CustomerId = customerMember.Id,
                             Fullname = biodata.Fullname,
                             Dob = customer.Dob,
-                            Age = (int)((DateTime.Now - customer.Dob!.Value).TotalDays / 365.242199),
+                            Age = (int)(
+                                (DateTime.Now - customer.Dob!.Value).TotalDays / 365.242199
+                            ),
                             Gender = customer.Gender,
                             BloodGroupId = customer.BloodGroupId,
                             RhesusType = customer.RhesusType,
@@ -322,8 +358,7 @@ namespace HealthCare340B.DataAccess
                             _db.SaveChanges();
 
                             //Update customer
-                            MCustomer customer = _db.MCustomers.Find(model.CustomerId);
-
+                            MCustomer customer = _db.MCustomers.Find(customerMember.CustomerId);
                             if (customer != null)
                             {
                                 //Update customer
@@ -333,6 +368,8 @@ namespace HealthCare340B.DataAccess
                                 customer.RhesusType = model.RhesusType;
                                 customer.Height = model.Height;
                                 customer.Weight = model.Weight;
+                                customer.ModifiedBy = model.ModifiedBy;
+                                customer.ModifiedOn = DateTime.Now;
 
                                 _db.Update(customer);
                                 _db.SaveChanges();
@@ -342,6 +379,8 @@ namespace HealthCare340B.DataAccess
                                 if (biodata != null)
                                 {
                                     biodata.Fullname = model.Fullname;
+                                    biodata.ModifiedBy = model.ModifiedBy;
+                                    biodata.ModifiedOn = DateTime.Now;
                                     _db.Update(biodata);
                                     _db.SaveChanges();
                                 }
@@ -355,7 +394,9 @@ namespace HealthCare340B.DataAccess
                                     CustomerId = customerMember.Id,
                                     Fullname = biodata.Fullname,
                                     Dob = customer.Dob,
-                                    Age = (int)((DateTime.Now - customer.Dob!.Value).TotalDays / 365.242199),
+                                    Age = (int)(
+                                        (DateTime.Now - customer.Dob!.Value).TotalDays / 365.242199
+                                    ),
                                     Gender = customer.Gender,
                                     BloodGroupId = customer.BloodGroupId,
                                     RhesusType = customer.RhesusType,
@@ -446,7 +487,9 @@ namespace HealthCare340B.DataAccess
                                     CustomerId = customerMember.Id,
                                     Fullname = biodata.Fullname,
                                     Dob = customer.Dob,
-                                    Age = (int)((DateTime.Now - customer.Dob!.Value).TotalDays / 365.242199),
+                                    Age = (int)(
+                                        (DateTime.Now - customer.Dob!.Value).TotalDays / 365.242199
+                                    ),
                                     Gender = customer.Gender,
                                     BloodGroupId = customer.BloodGroupId,
                                     RhesusType = customer.RhesusType,

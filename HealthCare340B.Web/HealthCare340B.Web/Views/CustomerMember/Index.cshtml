@@ -1,6 +1,7 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+@model Pagination<VMMCustomerMember>?
 @{
     Layout = "_ProfilLayout";
 }
@@ -15,7 +16,7 @@
 </div>
 <section class="section">
     <div class="d-flex justify-content-between mb-5">
-        <form id="frmCustomerFilter" asp-controller="CustomerMember" asp-action="Index">
+        <form id="frmCustomerMemberFilter" asp-controller="CustomerMember" asp-action="Index">
             <div class="input-group">
                 <input class="form-control" type="text" id="filter" name="Filter" value="@ViewBag.Filter" placeholder="Cari nama pasien" />
                 <button type="submit" class="btn btn-secondary input-group-text"><i class="fas fa-search"></i></button>
@@ -25,29 +26,35 @@
             <div class="input-group">
                 <span class="input-group-text">Urutkan</span>
                 <select id="orderBy" name="OrderBy" class="form-select">
-                    <option data-orderby="@ViewBag.Nama">Nama</option>
+                    <option value="">--Pilih Urutan--</option>
+                    <option value="name">Nama</option>
+                    <option value="age">Umur</option>
                 </select>
             </div>
         </div>
     </div>
 
     <div class="d-flex justify-content-between mb-1">
-        <button class="btn icon icon-left btn-outline-danger" title="Hapus..." data-bs-toggle="modal" data-bs-target="#staticModal">
+        <button id="btnMultipleDelete" class="btn icon icon-left btn-outline-danger" title="Hapus..." data-bs-toggle="modal" data-bs-target="#staticModal">
             <i class="fas fa-trash"></i> Hapus
         </button>
 
-        <div class="d-flex align-items-center justify-content-center text-center">
-            <button class="btn">
-                A-Z
+        <div class="d-flex align-items-center justify-content-end text-center">
+            <button class="btn" id="sortButton">
+                @(ViewBag.OrderDirection == "asc" ? "A-Z" : "Z-A")
             </button>
             <p class="mx-1 my-0">|</p>
-            <p class="mx-1 my-0">10</p>
+            <div class="col-sm-2">
+                <form id="frmPageSize">
+                    <input class="form-control text-center" type="text" id="pageSize" name="currPageSize" value="@ViewBag.PageSize" />
+                </form>
+            </div>
             <p class="mx-1 my-0">|</p>
-            <button class="btn icon icon-left" title="Tambah..." data-bs-toggle="modal" data-bs-target="#staticModal">
+            <button id="btnAdd" class="btn icon icon-left" title="Tambah..." data-bs-toggle="modal" data-bs-target="#staticModal">
                 <i class="fas fa-plus"></i> Tambah
             </button>
+            </div>
         </div>
-    </div>
 
     <div class="table-responsive ">
         <table class="table table-hover">
@@ -77,10 +84,10 @@
                                 </div>
                             </td>
                             <td style="text-align: right;">
-                                <button class="btn icon icon-left" title="Tambah..." data-bs-toggle="modal" data-bs-target="#staticModal">
+                                <button data-id="@item.Id" class="btn btnEdit icon icon-left" title="Ubah.." data-bs-toggle="modal" data-bs-target="#staticModal">
                                     <i class="fas fa-pencil-alt"></i> Ubah
                                 </button>
-                                <button class="btn icon icon-left" title="Tambah..." data-bs-toggle="modal" data-bs-target="#staticModal">
+                                <button data-id="@item.Id" class="btn btnDelete icon icon-left" title="Hapus..." data-bs-toggle="modal" data-bs-target="#staticModal">
                                     <i class="fas fa-trash"></i> Hapus
                                 </button>
                             </td>
@@ -92,12 +99,72 @@
     </div>
 
     <div class="d-flex align-items-center justify-content-end text-end">
-        <p class="mx-5 my-0">Menampilkan 1 - 3 dari 3</p>
-        <button class="btn btn-outline-secondary mx-1 my-0" title="Tambah...">
+        <p class="mx-5 my-0">Menampilkan @Model.StartItem - @Model.EndItem dari @Model.TotalData</p>
+        <button id="btnPrev" class="btn btn-outline-secondary mx-1 my-0" @(!Model.HasPreviousPage ? "disabled" : "") title="Sebelumnya...">
             Sebelumnya
         </button>
-        <button class="btn btn-outline-secondary mx-1 my-0" title="Tambah...">
+        <button id="btnNext" class="btn btn-outline-secondary mx-1 my-0" @(!Model.HasNextPage ? "disabled" : "") title="Selanjutnya...">
             Selanjutnya
         </button>
     </div>
 </section>
+
+<script>
+
+    $("#orderBy").val("@ViewBag.OrderBy");
+
+    function RefreshPage(filter, pageNumber, currPageSize, orderBy, orderDirection) {
+        location.href = `/Profile/Pasien?filter=${filter}&pageNumber=${pageNumber}&currPageSize=${currPageSize}&orderBy=${orderBy}&orderDirection=${orderDirection}`;
+    }
+
+    $("#frmPageSize").submit(function (e) {
+        e.preventDefault();
+        RefreshPage("@ViewBag.Filter", "@Model.PageIndex", $("#pageSize").val(), "@ViewBag.OrderBy", "@ViewBag.OrderDirection");
+    });
+
+    $("#frmCustomerMemberFilter").submit(function (e) {
+        e.preventDefault();
+        RefreshPage($("#filter").val(), "@Model.PageIndex", "@ViewBag.PageSize", "@ViewBag.OrderBy", "@ViewBag.OrderDirection");
+    });
+
+    $("#btnPrev").click(function (e) {
+        RefreshPage("@ViewBag.Filter", "@(Model.PageIndex <= 1 ? Model.PageIndex : Model.PageIndex - 1)", "@ViewBag.PageSize", "@ViewBag.OrderBy", "@ViewBag.OrderDirection");
+    });
+
+    $("#btnNext").click(function (e) {
+        RefreshPage("@ViewBag.Filter", "@(Model.PageIndex >= Model.TotalPages ? Model.PageIndex : Model.PageIndex + 1)", "@ViewBag.PageSize", "@ViewBag.OrderBy", "@ViewBag.OrderDirection");
+    });
+
+    $("#orderBy").change(function () {
+        RefreshPage("@ViewBag.Filter", "@Model.PageIndex", "@ViewBag.PageSize", $(this).val(), "@ViewBag.OrderDirection");
+    });
+
+    $("#sortButton").click(function () {
+        var orderBy = $("#orderBy").val(); // Mendapatkan nilai dropdown
+        if (!orderBy) {
+            alert("Pilih kolom yang akan diurutkan");
+            return;
+        }
+
+        currentOrderDirection = "@ViewBag.OrderDirection" === 'asc' ? 'desc' : 'asc';
+
+        $(this).text(currentOrderDirection === 'asc' ? 'A-Z' : 'Z-A');
+
+        RefreshPage("@ViewBag.Filter", "@Model.PageIndex", "@ViewBag.PageSize", orderBy, currentOrderDirection);
+    });
+
+    $("#btnAdd").click(function (e) {
+        $("#staticModalBody").html(spinner);
+        $("#staticModalBody").load("/Profile/Pasien/Create/");
+    });
+
+    $(".btnEdit").click(function (e) {
+        $("#staticModalBody").html(spinner);
+        $("#staticModalBody").load("/Profile/Pasien/Edit/" + $(this).data("id"));
+    });
+
+    $(".btnDelete").click(function (e) {
+        $("#staticModalBody").html(spinner);
+        $("#staticModalBody").load("/Profile/Pasien/Delete/" + $(this).data("id"));
+    });
+</script>
