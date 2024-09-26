@@ -1,4 +1,5 @@
 ﻿using HealthCare340B.ViewModel;
+using HealthCare340B.Web.AddOns;
 using HealthCare340B.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -61,6 +62,11 @@ namespace HealthCare340B.Web.Controllers
                 HttpContext.Session.SetString("errMsg", e.Message);
             }
 
+            ViewBag.Breadcrumb = new List<BreadcrumbItem>
+            {
+                new BreadcrumbItem { Name = "Beranda", Controller = "Home", Action = "Index" },
+                new BreadcrumbItem { Name = "Wallet Default Nominal", IsActive = true }
+            };
             ViewBag.Title = "Wallet Default Nominal";
             ViewBag.Filter = filter;
             return View(data);
