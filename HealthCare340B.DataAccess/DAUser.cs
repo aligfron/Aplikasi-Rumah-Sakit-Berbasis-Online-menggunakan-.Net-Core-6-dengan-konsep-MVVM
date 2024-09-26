@@ -79,8 +79,10 @@ namespace HealthCare340B.DataAccess
                     {
                         Id = u.Id,
                         BiodataId = u.BiodataId,
+                        ImagePath = b.ImagePath,
                         Name = b.Fullname,
                         RoleName = r.Name,
+                        RoleCode = r.Code,
                         RoleId = u.RoleId,
                         Email = u.Email,
                         Password = u.Password,

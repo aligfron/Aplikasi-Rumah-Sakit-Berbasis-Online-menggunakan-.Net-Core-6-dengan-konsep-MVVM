@@ -14,6 +14,7 @@ namespace HealthCare340B.Web.Controllers
         private readonly CustomerRelationModel _customerRelationModel;
 
         private readonly int _pageSize;
+        private readonly string _imageFolder;
 
         public CustomerMemberController(IConfiguration configuration)
         {
@@ -22,6 +23,7 @@ namespace HealthCare340B.Web.Controllers
             _customerRelationModel = new CustomerRelationModel(configuration);
 
             _pageSize = int.Parse(configuration["PageSize"]);
+            _imageFolder = configuration["ImageFolder"];
         }
 
         [Route("")]
@@ -74,6 +76,7 @@ namespace HealthCare340B.Web.Controllers
             }
 
             ViewBag.Title = "Daftar Pasien";
+            ViewBag.imgFolder = _imageFolder;
             ViewBag.Role = "ROLE_PASIEN";
             ViewBag.Filter = filter;
             ViewBag.PageSize = currPageSize ?? _pageSize;

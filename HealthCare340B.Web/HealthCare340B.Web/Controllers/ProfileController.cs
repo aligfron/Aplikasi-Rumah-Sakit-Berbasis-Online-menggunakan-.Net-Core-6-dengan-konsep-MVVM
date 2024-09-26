@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net;
+using Microsoft.AspNetCore.Http;
 
 namespace HealthCare340B.Web.Controllers
 {
@@ -13,6 +14,7 @@ namespace HealthCare340B.Web.Controllers
         private readonly string imageFolder;
         private ProfileModel profile;
         private SpecializationModel specialization;
+
         public ProfileController(IConfiguration _config, IWebHostEnvironment _webHostEnv)
         {
             profile = new ProfileModel(_config, _webHostEnv);
@@ -27,7 +29,7 @@ namespace HealthCare340B.Web.Controllers
             ViewBag.imgFolder = imageFolder;
 
             //string Role = "ROLE_DOKTER";
-            string role = "ROLE_PASIEN";
+            string role = "ROLE_DOKTER";
 
             ViewBag.Breadcrumb = new List<BreadcrumbItem>
             {
@@ -84,7 +86,33 @@ namespace HealthCare340B.Web.Controllers
         [HttpPost]
         public async Task<VMResponse<VMMBiodatum>> EditAsync(VMMBiodatum data)
         {
-            return (await profile.UpdateAsync(data));
+            VMResponse<VMMBiodatum>? response = null;
+
+            try
+            {
+                data.Id = (long)HttpContext.Session.GetInt32("userBiodataId");
+                data.ModifiedBy = long.Parse(HttpContext.Session.GetString("userId")!);
+
+                response = await profile.UpdateAsync(data);
+
+                HttpContext.Session.SetString("userImagePath", response.Data.ImagePath);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    HttpContext.Session.SetString("successMsg", response.Message);
+                }
+                else
+                {
+                    HttpContext.Session.SetString("errMsg", response.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+
+            return response;
+
+            //return (await profile.UpdateAsync(data));
         }
         public async Task<IActionResult> DeleteAlamat()
         {
@@ -114,10 +142,6 @@ namespace HealthCare340B.Web.Controllers
 
             return View(data);
         }
-
-        [HttpPost]
-        public async Task<VMResponse<VMMBiodataAddress>?> EditAsync(VMMBiodataAddress data)
-            => (await profile.UpdateAsync(data));
 
         public async Task<IActionResult> TabAlamat()
         {

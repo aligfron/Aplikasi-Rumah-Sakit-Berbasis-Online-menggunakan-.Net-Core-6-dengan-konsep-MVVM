@@ -35,3 +35,9 @@ msbuild.wrn
 
 # Visual Studio 2015
 .vs/
+
+# Ignore all files in the images directory
+**/wwwroot/images/*
+
+# Except for blank-profile-picture.png
+!**/wwwroot/images/blank-profile-picture.png
