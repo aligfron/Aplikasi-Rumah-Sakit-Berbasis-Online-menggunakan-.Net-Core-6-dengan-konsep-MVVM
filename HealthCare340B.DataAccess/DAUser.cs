@@ -204,10 +204,10 @@ namespace HealthCare340B.DataAccess
             }
             return response;
         }
-        public VMResponse<VMMUser> Update(VMMUser data) 
+        public VMResponse<VMMUser> Update(VMMUser data)
         {
             VMResponse<VMMUser> response = new VMResponse<VMMUser>();
-            using (IDbContextTransaction dbTran = db.Database.BeginTransaction()) 
+            using (IDbContextTransaction dbTran = db.Database.BeginTransaction())
             {
                 try
                 {
@@ -240,12 +240,12 @@ namespace HealthCare340B.DataAccess
                                 ? $"{HttpStatusCode.OK} - User updated successfully"
                                 : $"{HttpStatusCode.NoContent} - User not updated";
                     }
-                    else 
+                    else
                     {
                         response.Message = $"{HttpStatusCode.NotFound} - User not found";
                     }
                 }
-                catch(Exception ex) 
+                catch (Exception ex)
                 {
                     dbTran.Rollback();
                     response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
@@ -268,7 +268,7 @@ namespace HealthCare340B.DataAccess
                         response.Message = $"{HttpStatusCode.NotFound} - User not found";
                         return response;
                     }
-                    if (existingData.IsLocked.HasValue)
+                    if (existingData.IsLocked==true)
                     {
                         response.StatusCode = HttpStatusCode.Locked;
                         response.Message = $"{HttpStatusCode.Forbidden} - Account is locked due to multiple failed login attempts.";
@@ -285,16 +285,16 @@ namespace HealthCare340B.DataAccess
                         MUser userLogin = new MUser()
                         {
                             Id = existingData.Id,
-                            BiodataId = data.BiodataId,
+                            BiodataId = existingData.BiodataId,
                             RoleId = existingData.RoleId,
                             Email = data.Email,
                             Password = existingData.Password,
                             LoginAttempt = existingData.LoginAttempt,
                             IsLocked = existingData.IsLocked,
                             LastLogin = existingData.LastLogin,
-                            CreatedBy = data.CreatedBy,
+                            CreatedBy = existingData.CreatedBy,
                             CreatedOn = DateTime.Now,
-                            ModifiedBy = data.ModifiedBy,
+                            ModifiedBy = existingData.ModifiedBy,
                             ModifiedOn = DateTime.Now,
                             DeletedBy = existingData.DeletedBy,
                             DeletedOn = existingData.DeletedOn,
@@ -305,10 +305,13 @@ namespace HealthCare340B.DataAccess
                         db.SaveChanges(); // Simpan perubahan
                         dbTran.Commit();
                         response.Data = GetByEmail(data.Email).Data;
-                        response.StatusCode=HttpStatusCode.Unauthorized;
-                        response.Message = $"{HttpStatusCode.Unauthorized}-Invalid Password";
+                        response.StatusCode = HttpStatusCode.OK;
+                        response.Message = $"{HttpStatusCode.OK}- successfully login";
                         return response;
                     }
+                    response.Data = GetByEmail(data.Email).Data;
+                    response.StatusCode = HttpStatusCode.OK;
+                    response.Message = $"{HttpStatusCode.Unauthorized}-Invalid Password";
                 }
                 catch (Exception ex) 
                 {

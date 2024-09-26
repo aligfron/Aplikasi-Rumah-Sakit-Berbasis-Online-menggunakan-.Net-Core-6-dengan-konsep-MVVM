@@ -18,7 +18,7 @@ namespace HealthCare340B.Web.Controllers
         private bool inSession()
         {
             _custId = HttpContext.Session.GetString("userId");
-            return string.IsNullOrEmpty(_custId);
+            return !string.IsNullOrEmpty(_custId);
         }
         public IActionResult Index()
         {
@@ -74,6 +74,42 @@ namespace HealthCare340B.Web.Controllers
         {
             HttpContext.Session.Clear();
             return RedirectToAction("Index", "Home");
+        }
+        [HttpPost]
+        public async Task<IActionResult> Login2(VMMUser data) 
+        {
+            try
+            {
+                VMResponse<VMMUser?> responseData = await user.LoginAsync(data);
+                VMMUser? dataApi = responseData.Data;
+                if (dataApi != null)
+                {
+                    if (data.Password == dataApi.Password)
+                    {
+                        long value = dataApi.Id;
+                        HttpContext.Session.SetString("userId", value.ToString());
+                        HttpContext.Session.SetString("userEmail", dataApi.Email!);
+                        HttpContext.Session.SetString("userName", dataApi.Name!);
+                        HttpContext.Session.SetInt32("userRoleId", (int)dataApi.RoleId!);
+                        HttpContext.Session.SetString("userRole", dataApi.RoleName!);
+                        HttpContext.Session.SetString("userSince", dataApi.CreatedOn.ToString("yyyy"));
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        throw new Exception("Invalid Password");
+                    }
+                }
+                else 
+                {
+                    throw new Exception("Email not registered!");
+                }
+            }
+            catch (Exception ex) 
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+            return RedirectToAction("Index","Home");
         }
     }
 }

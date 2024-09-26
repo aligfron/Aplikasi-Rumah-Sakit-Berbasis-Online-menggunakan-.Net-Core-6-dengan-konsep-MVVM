@@ -55,22 +55,26 @@ namespace HealthCare340B.Web.Models
         }
         public async Task<VMResponse<VMMUser>> LoginAsync(VMMUser data) 
         {
-            VMMUser dataUsing = await GetByEmail(data.Email);
             VMResponse<VMMUser> apiResponse = new VMResponse<VMMUser>();
             try 
             {
-                jsonData = JsonConvert.SerializeObject(dataUsing);
+                jsonData = JsonConvert.SerializeObject(data);
                 content = new StringContent(jsonData, Encoding.UTF8, "application/json");
                 apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMUser>?>(
                               await httpClient
-                              .PutAsync($"{apiUrl}User/Login2", content)
+                              .PutAsync($"{apiUrl}User/Login", content)
                               .Result.Content.ReadAsStringAsync()
                 );
                 if (apiResponse != null)
                 {
                     if (apiResponse.StatusCode != HttpStatusCode.OK)
                     {
+                        
                         throw new Exception(apiResponse.Message);
+                    }
+                    if (apiResponse.Data.IsLocked == true)
+                    {
+                        throw new Exception("Your Account is Locked");
                     }
                 }
                 else
