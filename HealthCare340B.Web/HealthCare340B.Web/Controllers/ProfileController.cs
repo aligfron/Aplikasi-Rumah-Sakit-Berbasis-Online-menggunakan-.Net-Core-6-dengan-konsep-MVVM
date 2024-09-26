@@ -9,9 +9,11 @@ namespace HealthCare340B.Web.Controllers
     {
         private readonly string imageFolder;
         private ProfileModel profile;
+        private SpecializationModel specialization;
         public ProfileController(IConfiguration _config, IWebHostEnvironment _webHostEnv)
         {
             profile = new ProfileModel(_config, _webHostEnv);
+            specialization = new SpecializationModel(_config);
             imageFolder = _config["ImageFolder"];
         }
 
@@ -99,6 +101,30 @@ namespace HealthCare340B.Web.Controllers
             ViewBag.Title = "Tambah Alamat";
             return View();
         }
-
+        
+        public async Task<IActionResult> CreateSpeDoctor(int id)
+        {
+            ViewBag.Specialization = await specialization.getByFilter("");
+            ViewBag.Title = "Tambah Spesialisasi Dokter";
+            ViewBag.Doctor = await profile.GetByIdProfilDokter(id);
+            return View();
+        }
+        [HttpPost]
+        public async Task<VMResponse<VMTCurrentDoctorSpecialization>?> CreateSpecializationDoctorAsync(VMTCurrentDoctorSpecialization data)
+        {
+            return (await profile.CreateSpecializationDoctorAsync(data));
+        }
+        public async Task<IActionResult> EditSpecializationDoctor(int id)
+        {
+            VMTCurrentDoctorSpecialization? data = await profile.GetByIdSpecializationDoctor(id);
+            ViewBag.Specialization = await specialization.getByFilter("");
+            ViewBag.Title = "Edit Spesialisasi Dokter";
+            return View(data);
+        }
+        [HttpPost]
+        public async Task<VMResponse<VMTCurrentDoctorSpecialization>?> EditSpecializationDoctorAsync(VMTCurrentDoctorSpecialization data)
+        {
+            return (await profile.EditSpecializationDoctorAsync(data));
+        }
     }
 }

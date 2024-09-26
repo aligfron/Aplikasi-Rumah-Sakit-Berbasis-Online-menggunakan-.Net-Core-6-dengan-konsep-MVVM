@@ -46,17 +46,29 @@
                             <button type="button" id="cancelImageBtn" class="btn btn-danger mt-3 d-none">Cancel</button>
 
                             <h3 class="mt-3 mb-0">@Model.Fullname</h3>
-                            @if (Model.SpecializationName != null)
+
+                            @if (Model.SpecializationName.Count > 0)
                             {
-                                @foreach (VMTCurrentDoctorSpecialization Specialization in Model.SpecializationName)
+
+                                @foreach (VMTCurrentDoctorSpecialization specialization in Model.SpecializationName)
                                 {
-                                    <p class="text-small mb-0">@Specialization.Specialization</p>
+                                    if (specialization.Specialization != null)
+                                    {
+                                        <p class="text-small mb-0">@specialization.Specialization</p>
+                                    }
+                                    else
+                                    {
+                                        <p>Anda Belum Menambahkan Spesialisasi</p>
+                                    }
                                 }
+
                             }
                             else
                             {
                                 <p>Anda Belum Menambahkan Spesialisasi</p>
                             }
+
+                            
                             <i class="bi bi-star-fill text-warning mb-0"></i>
 
                             <!-- Navbar-like Tab Navigation -->
@@ -87,7 +99,7 @@
                         <h3 class="card-title text-primary">Tentang Saya</h3> 
                         <div>
                             <h5 class="mt-1">Tindakan Medis</h5>
-                            @if (Model.TreatmentName != null)
+                            @if (Model.TreatmentName.Count > 0)
                             {
                                 @foreach (VMTDoctorTreatment tindakanmedis in Model.TreatmentName)
                                 {
@@ -101,7 +113,7 @@
 
                             <br />
                             <h5 class="mt-1">Riwayat Praktek</h5>
-                            @if (Model.DoctorOffice != null)
+                            @if (Model.DoctorOffice.Count > 0)
                             {
 
                                 @foreach (VMTDoctorOffice riwayarpraktek in Model.DoctorOffice)
@@ -129,7 +141,7 @@
                             }
                             <br />
                             <h5 class="mt-1">Pendidikan</h5>
-                            @if (Model.DoctorOffice != null)
+                            @if (Model.DoctorOffice.Count > 0)
                             {
 
                                 @foreach (VMMDoctorEducation pendidikan in Model.InstitutionName)

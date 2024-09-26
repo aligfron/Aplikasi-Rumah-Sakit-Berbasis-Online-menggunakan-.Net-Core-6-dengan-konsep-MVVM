@@ -134,5 +134,98 @@ namespace HealthCare340B.Web.Models
             }
             return apiResponse;
         }
+
+        // ali model spesialisasi doctor
+        public async Task<VMTCurrentDoctorSpecialization?> GetByIdSpecializationDoctor(int id)
+        {
+            VMTCurrentDoctorSpecialization? data = null;
+            try
+            {
+                VMResponse<VMTCurrentDoctorSpecialization>? apiResponse = JsonConvert.DeserializeObject<VMResponse<VMTCurrentDoctorSpecialization>>(
+
+                    await httpClient.GetStringAsync(apiUrl + "SpecializationDoctor/" + id));
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode == HttpStatusCode.OK)
+                    {
+                        data = apiResponse.Data;
+                    }
+                    else
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+            }
+            catch
+                (Exception ex)
+            {
+                Console.WriteLine($"SpecializationDoctorModel.GetAll : {ex.Message}");
+            }
+            return data;
+        }
+        public async Task<VMResponse<VMTCurrentDoctorSpecialization>?> CreateSpecializationDoctorAsync(VMTCurrentDoctorSpecialization data)
+        {
+            VMResponse<VMTCurrentDoctorSpecialization>? apiResponse = new VMResponse<VMTCurrentDoctorSpecialization>();
+            try
+            {
+                jsonData = JsonConvert.SerializeObject(data);
+                content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                apiResponse = JsonConvert.DeserializeObject<VMResponse<VMTCurrentDoctorSpecialization>?>(
+                    await httpClient.PostAsync($"{apiUrl}SpecializationDoctor", content).Result.Content.ReadAsStringAsync()
+                    );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode != HttpStatusCode.Created)
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+
+                }
+                else
+                {
+                    throw new Exception("Specialization api could not be reached");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"SpecializationModel.GetbyId: {ex.Message}");
+            }
+            return apiResponse;
+        }
+        public async Task<VMResponse<VMTCurrentDoctorSpecialization>?> EditSpecializationDoctorAsync(VMTCurrentDoctorSpecialization data)
+        {
+            VMResponse<VMTCurrentDoctorSpecialization>? apiResponse = new VMResponse<VMTCurrentDoctorSpecialization>();
+            try
+            {
+                //manggil api update proses
+                jsonData = JsonConvert.SerializeObject(data);
+                content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+                apiResponse = JsonConvert.DeserializeObject<VMResponse<VMTCurrentDoctorSpecialization>?>
+                    (await httpClient.PutAsync($"{apiUrl}SpecializationDoctor", content).Result.Content.ReadAsStringAsync());
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode != HttpStatusCode.OK)
+                    {
+
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Specialization api could not be reached");
+                }
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"SpecializationModel.GetbyId: {e.Message}");
+
+            }
+            return apiResponse;
+        }
     }
 }

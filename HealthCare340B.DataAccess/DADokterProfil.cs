@@ -44,7 +44,8 @@ namespace HealthCare340B.DataAccess
                                 select new VMTCurrentDoctorSpecialization
                                 {
                                     Id = Cspesialisation.Id,
-                                    Specialization = s.Name
+                                    Specialization = s.Name,
+                                    SpecializationId = Cspesialisation.SpecializationId
                                 }
                             ).ToList(),
 

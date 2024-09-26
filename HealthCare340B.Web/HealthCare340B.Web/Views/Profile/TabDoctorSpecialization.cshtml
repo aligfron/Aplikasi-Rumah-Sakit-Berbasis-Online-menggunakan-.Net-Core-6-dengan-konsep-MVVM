@@ -1,30 +1,38 @@
-﻿@if (Model.SpecializationName != null)
+﻿@if (Model.SpecializationName.Count > 0)
 {
-    @foreach (VMTCurrentDoctorSpecialization Specialization in Model.SpecializationName)
+    bool isFirst = true;
+
+    foreach (VMTCurrentDoctorSpecialization specialization in Model.SpecializationName)
     {
-        <p class="text-small">Nama Spesialisasi : @Specialization.Specialization</p>
+        if (isFirst)
+        {
+            <p class="text-small">Nama Spesialisasi: @specialization.Specialization</p>
+
+            <button class="btn btn-success position-absolute" data-id="@specialization.Id" style="bottom: 30px; right: 30px;" title="Edit" data-bs-toggle="modal" data-bs-target="#staticModal">
+                <i class="bi bi-pencil-fill"></i> Ubah Spesialisasi
+            </button>
+
+            isFirst = false;
+        }
     }
-    <button class="btn btn-success position-absolute" data-id="@spesialisasi.Id" style="bottom: 30px; right: 30px;" title="Edit" data-bs-toggle="modal" data-bs-target="#staticModal">
-        <i class="bi bi-pencil-fill"></i> Ubah Spesialisasi
-    </button>
 }
 else
 {
     <h5>Anda Belum Menambahkan Spesialisasi</h5>
     <p style="font-size: smaller;">*Silahkan isi spesialisasi pada tombol tambah</p>
 
-    <button class="btn btn-primary position-absolute" style="bottom: 30px; right: 30px;">
+    <button class="btn btn-primary position-absolute" data-id="@Model.Id" style="bottom: 30px; right: 30px;" title="Edit" data-bs-toggle="modal" data-bs-target="#staticModal">
         <i class="bi bi-plus-circle"></i> Tambah Spesialisasi
     </button>
 }
 <script>
-    $("#btnAdd").click(function (e) {
-        $("#staticModalBody").html("");
-        $("#staticModalBody").load("/Profile/CreateSpecializationDoctor/");
-    });
-
     $(".btn-primary").click(function (e) {
         $("#staticModalBody").html("");
-        $("#staticModalBody").load("/Specialization/Edit/" + $(this).data("id"));
+        $("#staticModalBody").load("/Profile/CreateSpeDoctor/" + $(this).data("id"));
+    });
+
+    $(".btn-success").click(function (e) {
+        $("#staticModalBody").html("");
+        $("#staticModalBody").load("/Profile/EditSpecializationDoctor/" + $(this).data("id"));
     });
 </script>

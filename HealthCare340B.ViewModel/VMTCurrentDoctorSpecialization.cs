@@ -21,6 +21,19 @@ namespace HealthCare340B.ViewModel
         public DateTime? DeletedOn { get; set; }
         public bool IsDelete { get; set; }
         
-        
+        public VMTCurrentDoctorSpecialization() { }
+        public VMTCurrentDoctorSpecialization(TCurrentDoctorSpecialization currentDoctorSpecialization) 
+        {
+            Id = currentDoctorSpecialization.Id;
+            DoctorId = currentDoctorSpecialization.DoctorId;
+            SpecializationId = currentDoctorSpecialization.SpecializationId;
+            CreatedBy = currentDoctorSpecialization.CreatedBy;
+            CreatedOn = currentDoctorSpecialization.CreatedOn;
+            ModifiedBy = currentDoctorSpecialization.ModifiedBy;
+            ModifiedOn = currentDoctorSpecialization.ModifiedOn;
+            DeletedBy = currentDoctorSpecialization.DeletedBy;
+            DeletedOn = currentDoctorSpecialization.DeletedOn;
+            IsDelete = currentDoctorSpecialization.IsDelete;
+        }
     }
 }

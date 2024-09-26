@@ -1,0 +1,107 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model VMTCurrentDoctorSpecialization?
+@{
+    Layout = null;
+}
+
+<div class="card mb-0">
+    <div class="card-body">
+        @{
+            if (Model != null)
+            {
+                <form id="frmSpesialisasi">
+                    <div class="card-title row">
+                        <div class="col-4">Nama Spesialisasi <span class="text-danger"> * </span></div>
+                        <div class="col-8">
+                            <select id="SpecializationId" name="SpecializationId" class="form-select">
+                                <option value="">--Pilih Kategori--</option>
+                                @if (ViewBag.Specialization != null)
+                                {
+                                    foreach (VMMSpecialization specialization in ViewBag.Specialization)
+                                    {
+                                        if (@specialization.Id == @Model.SpecializationId)
+                                        {
+
+                                            <option value="@specialization.Id" selected>@specialization.Name</option>
+                                        }
+                                        else
+                                        {
+
+                                            <option value="@specialization.Id">@specialization.Name</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <input type="hidden" name="DoctorId" value="@Model.DoctorId" />
+                    <input type="hidden" name="Id" value="@Model.Id" />
+                    <input type="hidden" name="ModifiedBy" value="@Model.CreatedBy" />
+                </form>
+            }
+            else
+            {
+                <div class="card-title">
+                    Spesialisasi Kosong
+                </div>
+            }
+        }
+
+    </div>
+    <div class="card-footer d-flex justify-content-end">
+        <button type="button" class="btn btn-success" id="btnSave">Save</button>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(() => {
+        $("#staticModalLabel").text("@ViewBag.Title");
+        $("#btnSave").click(function (e) {
+            //debugger
+            //console.log("#frmSpesialisasi isvalid?", $("#frmSpesialisasi").valid());
+            if ($("#frmSpesialisasi").valid()) {
+                $.ajax({
+                    url: "/Profile/EditSpecializationDoctor",
+                    type: "post",
+                    data: $("#frmSpesialisasi").serialize(),
+                    dataType: "json",
+                    //beforeSend: () => { },
+                    success: function (response) {
+                        if (response.statusCode == 200) {
+                            // Tampilkan alert sukses
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Data Berhasil Di Edit',
+                                showConfirmButton: false,
+                                timer: 3000 // Show the alert for 2 seconds
+                            }).then(() => {
+                                location.reload(); // Reload page after alert
+                            });
+                        } else {
+                            alert(response.statusCose + " - " + response.message)
+                        }
+                    },
+                    error: function (errResponse) {
+                        console.error(errResponse);
+                    }
+                });
+            } else {
+                console.error("Spesialisasi data is not valid");
+            }
+            return false;
+        });
+        $("#frmSpesialisasi").submit(function (e) {
+            //desable from submit function
+            e.preventDefault();
+        });
+        $("#frmSpesialisasi").validate({
+            rules: {
+                Name: {
+                    required: true
+                }
+            }
+        });
+    });
+</script>

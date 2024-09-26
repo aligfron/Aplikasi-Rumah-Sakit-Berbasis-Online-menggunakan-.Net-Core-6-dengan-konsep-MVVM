@@ -52,7 +52,7 @@ namespace HealthCare340B.Web.Models
         }
 
         //tambahan Ali
-        public async Task<List<VMMSpecialization>>? getByFilter(string? filter)
+        public async Task<List<VMMSpecialization>?> getByFilter(string? filter)
         {
             List<VMMSpecialization>? dataCoba = null;
             try
