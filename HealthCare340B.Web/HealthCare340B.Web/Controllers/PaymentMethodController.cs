@@ -82,6 +82,12 @@ namespace HealthCare340B.Web.Controllers
                     break;
             }
 
+            ViewBag.Breadcrumb = new List<BreadcrumbItem>
+            {
+                new BreadcrumbItem { Name = "Beranda", Controller = "Home", Action = "Index" },
+                new BreadcrumbItem { Name = "Payment Method", IsActive = true }
+            };
+
             ViewBag.Title = "Payment Method";
             ViewBag.Filter = filter;
             ViewBag.PageSize = (currPageSize ?? pageSize);
