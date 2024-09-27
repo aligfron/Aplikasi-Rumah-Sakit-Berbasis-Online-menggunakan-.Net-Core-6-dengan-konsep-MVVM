@@ -1,16 +1,19 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
-@model VMMCustomerMember?;
+@model List<VMMCustomerMember>?;
 @{
     Layout = null;
 }
 
 <div class="card mb-0">
-    <div class="card-body">
+    <div class="card-body mb-3">
         <p>Anda yakin ingin menghapus pasien </p>
-        <p>&ensp;<b>@Model.Fullname</b></p>
-        <p>Riwayat medis pasien akan tetap tersimpan, namun Anda tidak dapat lagi membuat janji dokter / chat online untuk pasien ini.</p>
+        @foreach (var item in Model)
+        {
+            <p class="mb-0">&ensp;<b>@item.Fullname</b></p>
+        }
+        <p class="mt-3">Riwayat medis pasien akan tetap tersimpan, namun Anda tidak dapat lagi membuat janji dokter / chat online untuk pasien ini.</p>
     </div>
 
     <div class="card-footer d-flex justify-content-center">
@@ -23,14 +26,17 @@
 <script>
     $(document).ready(function () {
         $("#staticModalLabel").text("@ViewBag.Title");
-        console.log("KATA");
+
+        // Serialize model Ids and convert them into a comma-separated string
+        var selectedIds = @Html.Raw(Json.Serialize(Model.Select(x => x.Id).ToList()));
+        var idsString = selectedIds.join(',');
 
         $("#btnDelete").click(function (e) {
             $.ajax({
-                url: "/Profile/Pasien/Delete",
+                url: "/Profile/Pasien/MultipleDelete",
                 type: "POST",
                 data: {
-                    "id": @Model.Id
+                    ids: idsString
                 },
                 dataType: "json",
                 beforeSend: () => {

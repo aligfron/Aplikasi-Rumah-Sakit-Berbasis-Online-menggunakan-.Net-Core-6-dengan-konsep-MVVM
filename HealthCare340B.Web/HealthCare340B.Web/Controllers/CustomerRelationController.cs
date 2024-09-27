@@ -10,13 +10,40 @@ namespace HealthCare340B.Web.Controllers
     {
         private readonly CustomerRelationModel _customerRelationModel;
 
+        private string? _userId;
+        private string? _roleCode;
+
         public CustomerRelationController(IConfiguration configuration)
         {
             _customerRelationModel = new CustomerRelationModel(configuration);
         }
 
+        private bool isInSession()
+        {
+            _userId = HttpContext.Session.GetString("userId") ?? null;
+
+            return _userId != null;
+        }
+
+        private bool isInRole()
+        {
+            _roleCode = HttpContext.Session.GetString("userRoleCode") ?? null;
+
+            return _roleCode == "ROLE_ADMIN";
+        }
+
         public async Task<IActionResult> Index(string? filter)
         {
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+                return RedirectToAction("Index", "Auth");
+            }
+            if (!isInRole())
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
 
             List<VMMCustomerRelation>? data = new List<VMMCustomerRelation>();
 
@@ -41,26 +68,19 @@ namespace HealthCare340B.Web.Controllers
             return View(data);
         }
 
-        public async Task<IActionResult> Details(long id)
-        {
-            VMMCustomerRelation? data = new VMMCustomerRelation();
-
-            try
-            {
-                data = await _customerRelationModel.GetById(id);
-            }
-            catch (Exception ex)
-            {
-                HttpContext.Session.SetString("errMsg", ex.Message);
-            }
-
-            ViewBag.Title = "Detail Hubungan Pelanggan";
-
-            return View(data);
-        }
-
         public IActionResult Create()
         {
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+                return RedirectToAction("Index", "Auth");
+            }
+            if (!isInRole())
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
+
             ViewBag.Title = "Tambah Hubungan Pelanggan";
 
             return View();
@@ -96,6 +116,17 @@ namespace HealthCare340B.Web.Controllers
 
         public async Task<IActionResult> Edit(long id)
         {
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+                return RedirectToAction("Index", "Auth");
+            }
+            if (!isInRole())
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
+
             VMMCustomerRelation? data = new VMMCustomerRelation();
 
             try
@@ -142,6 +173,17 @@ namespace HealthCare340B.Web.Controllers
 
         public async Task<IActionResult> Delete(long id)
         {
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+                return RedirectToAction("Index", "Auth");
+            }
+            if (!isInRole())
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
+
             VMMCustomerRelation? data = new VMMCustomerRelation();
 
             try

@@ -20,7 +20,7 @@ namespace HealthCare340B.DataAccess
             _db = db;
         }
 
-        public VMResponse<List<VMMCustomerMember>> GetByFilter(string filter)
+        public VMResponse<List<VMMCustomerMember>> GetByFilter(string filter, long parentId)
         {
             VMResponse<List<VMMCustomerMember>> response =
                 new VMResponse<List<VMMCustomerMember>>();
@@ -34,6 +34,7 @@ namespace HealthCare340B.DataAccess
                     join b in _db.MBiodata on c.BiodataId equals b.Id
                     where
                         b.Fullname!.Contains(filter)
+                        && cm.ParentBiodataId == parentId
                         && c.IsDelete == false
                         && cm.IsDelete == false
                         && cr.IsDelete == false
@@ -91,7 +92,7 @@ namespace HealthCare340B.DataAccess
             return response;
         }
 
-        public VMResponse<VMMCustomerMember> GetById(long id)
+        public VMResponse<VMMCustomerMember> GetById(long id, long parentId)
         {
             VMResponse<VMMCustomerMember> response = new VMResponse<VMMCustomerMember>();
 
@@ -106,6 +107,7 @@ namespace HealthCare340B.DataAccess
                         join b in _db.MBiodata on c.BiodataId equals b.Id
                         where
                             cm.Id == id
+                            && cm.ParentBiodataId == parentId
                             && c.IsDelete == false
                             && cm.IsDelete == false
                             && cr.IsDelete == false
@@ -169,7 +171,7 @@ namespace HealthCare340B.DataAccess
             return response;
         }
 
-        public VMResponse<List<VMMCustomerMember>?> GetByUserId(long id)
+        public VMResponse<List<VMMCustomerMember>?> GetByUserId(long id, long parentId)
         {
             VMResponse<List<VMMCustomerMember>?> response =
                 new VMResponse<List<VMMCustomerMember>?>();
@@ -182,7 +184,7 @@ namespace HealthCare340B.DataAccess
                     join cr in _db.MCustomerRelations on cm.CustomerRelationId equals cr.Id
                     join b in _db.MBiodata on cm.ParentBiodataId equals b.Id
                     join u in _db.MUsers on b.Id equals u.BiodataId
-                    where cm.IsDelete == false && u.Id == id
+                    where cm.IsDelete == false && u.Id == id && cm.ParentBiodataId == parentId
                     select new VMMCustomerMember
                     {
                         Id = cm.Id,
@@ -457,61 +459,13 @@ namespace HealthCare340B.DataAccess
                             _db.Update(customerMember);
                             _db.SaveChanges();
 
-                            //Delete customer
-                            MCustomer customer = _db.MCustomers.Find(customerMember.CustomerId);
-                            if (customer != null)
-                            {
-                                customer.DeletedBy = deletedBy;
-                                customer.DeletedOn = DateTime.Now;
-                                customer.IsDelete = true;
-                                _db.Update(customer);
-                                _db.SaveChanges();
+                            dbTran.Commit();
 
-                                //Delete biodata
-                                MBiodatum biodata = _db.MBiodata.Find(customer.BiodataId);
-                                if (biodata != null)
-                                {
-                                    biodata.DeletedBy = deletedBy;
-                                    biodata.DeletedOn = DateTime.Now;
-                                    biodata.IsDelete = true;
-                                    _db.Update(biodata);
-                                    _db.SaveChanges();
-                                }
+                            response.Data = GetById(id, (long)customerMember.ParentBiodataId).Data;
 
-                                dbTran.Commit();
-
-                                response.Data = new VMMCustomerMember
-                                {
-                                    Id = customerMember.Id,
-                                    ParentBiodataId = customerMember.ParentBiodataId,
-                                    CustomerId = customerMember.Id,
-                                    Fullname = biodata.Fullname,
-                                    Dob = customer.Dob,
-                                    Age = (int)(
-                                        (DateTime.Now - customer.Dob!.Value).TotalDays / 365.242199
-                                    ),
-                                    Gender = customer.Gender,
-                                    BloodGroupId = customer.BloodGroupId,
-                                    RhesusType = customer.RhesusType,
-                                    Height = customer.Height,
-                                    Weight = customer.Weight,
-                                    CustomerRelationId = customerMember.CustomerRelationId,
-                                    CustomerRelationName = _db
-                                        .MCustomerRelations.Find(customerMember.CustomerRelationId)
-                                        ?.Name,
-                                    CreatedBy = customerMember.CreatedBy,
-                                    CreatedOn = customerMember.CreatedOn,
-                                    ModifiedBy = customerMember.ModifiedBy,
-                                    ModifiedOn = customerMember.ModifiedOn,
-                                    DeletedBy = customerMember.DeletedBy,
-                                    DeletedOn = customerMember.DeletedOn,
-                                    IsDelete = customerMember.IsDelete,
-                                };
-
-                                response.Message =
-                                    $"{HttpStatusCode.OK} - Customer member has been deleted";
-                                response.StatusCode = HttpStatusCode.OK;
-                            }
+                            response.Message =
+                                $"{HttpStatusCode.OK} - Customer member has been deleted";
+                            response.StatusCode = HttpStatusCode.OK;
                         }
                     }
                 }

@@ -18,7 +18,7 @@ namespace HealthCare340B.Web.Models
             _apiUrl = configuration["ApiUrl"];
         }
 
-        public async Task<List<VMMCustomerMember>> GetAll()
+        public async Task<List<VMMCustomerMember>> GetAll(long parentId)
         {
             List<VMMCustomerMember>? data = null;
 
@@ -28,7 +28,7 @@ namespace HealthCare340B.Web.Models
                     VMResponse<List<VMMCustomerMember>>
                 >(
                     await _httpClient
-                        .GetAsync($"{_apiUrl}CustomerMember")
+                        .GetAsync($"{_apiUrl}CustomerMember/{parentId}")
                         .Result.Content.ReadAsStringAsync()
                 );
 
@@ -58,7 +58,7 @@ namespace HealthCare340B.Web.Models
             return data;
         }
 
-        public async Task<List<VMMCustomerMember>> GetByFilter(string filter)
+        public async Task<List<VMMCustomerMember>> GetByFilter(string filter, long parentId)
         {
             List<VMMCustomerMember>? data = null;
             try
@@ -69,8 +69,8 @@ namespace HealthCare340B.Web.Models
                     await _httpClient
                         .GetAsync(
                             (string.IsNullOrEmpty(filter))
-                                ? $"{_apiUrl}CustomerMember"
-                                : $"{_apiUrl}CustomerMember/GetByFilter/{filter}"
+                                ? $"{_apiUrl}CustomerMember/{parentId}"
+                                : $"{_apiUrl}CustomerMember/GetByFilter/{parentId}/{filter}"
                         )
                         .Result.Content.ReadAsStringAsync()
                 );
@@ -101,7 +101,7 @@ namespace HealthCare340B.Web.Models
             return data;
         }
 
-        public async Task<VMMCustomerMember> GetById(long id)
+        public async Task<VMMCustomerMember> GetById(long id, long parentId)
         {
             VMMCustomerMember? data = null;
 
@@ -111,7 +111,7 @@ namespace HealthCare340B.Web.Models
                     VMResponse<VMMCustomerMember>
                 >(
                     await _httpClient
-                        .GetAsync($"{_apiUrl}CustomerMember/{id}")
+                        .GetAsync($"{_apiUrl}CustomerMember/{id}/{parentId}")
                         .Result.Content.ReadAsStringAsync()
                 );
 

@@ -17,12 +17,12 @@ namespace HealthCare340B.API.Controllers
             _customerMember = new DACustomerMember(db);
         }
 
-        [HttpGet]
-        public async Task<ActionResult> GetAll()
+        [HttpGet("{parentId}")]
+        public async Task<ActionResult> GetAll(long parentId)
         {
             try
             {
-                VMResponse<List<VMMCustomerMember>> response = await Task.Run(() => _customerMember.GetByFilter(""));
+                VMResponse<List<VMMCustomerMember>> response = await Task.Run(() => _customerMember.GetByFilter("", parentId));
 
                 if (response.Data != null && response.Data.Count > 0)
                 {
@@ -43,12 +43,12 @@ namespace HealthCare340B.API.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult> GetById(long id)
+        [HttpGet("{id}/{parentId}")]
+        public async Task<ActionResult> GetById(long id, long parentId)
         {
             try
             {
-                VMResponse<VMMCustomerMember> response = await Task.Run(() => _customerMember.GetById(id));
+                VMResponse<VMMCustomerMember> response = await Task.Run(() => _customerMember.GetById(id, parentId));
 
                 if (response.Data != null)
                 {
@@ -69,12 +69,12 @@ namespace HealthCare340B.API.Controllers
             }
         }
 
-        [HttpGet("[action]/{filter}")]
-        public async Task<ActionResult> GetByFilter(string filter)
+        [HttpGet("[action]/{parentId}/{filter}")]
+        public async Task<ActionResult> GetByFilter(string filter, long parentId)
         {
             try
             {
-                VMResponse<List<VMMCustomerMember>> response = await Task.Run(() => _customerMember.GetByFilter(filter));
+                VMResponse<List<VMMCustomerMember>> response = await Task.Run(() => _customerMember.GetByFilter(filter, parentId));
 
                 if (response.Data != null && response.Data.Count > 0)
                 {
@@ -95,14 +95,14 @@ namespace HealthCare340B.API.Controllers
             }
         }
 
-        [HttpGet("[action]/{userId?}")]
-        public async Task<ActionResult> GetByUserId(long? userId)
+        [HttpGet("[action]/{userId?}/{parentId}")]
+        public async Task<ActionResult> GetByUserId(long? userId, long parentId)
         {
             try
             {
                 if (userId == null)
                     throw new ArgumentNullException();
-                VMResponse<List<VMMCustomerMember>?> response = await Task.Run(() => _customerMember.GetByUserId((long)userId));
+                VMResponse<List<VMMCustomerMember>?> response = await Task.Run(() => _customerMember.GetByUserId((long)userId, parentId));
                 if (response.Data != null && response.Data.Count > 0)
                 {
                     return Ok(response);

@@ -26,7 +26,6 @@
             <div class="input-group">
                 <span class="input-group-text">Urutkan</span>
                 <select id="orderBy" name="OrderBy" class="form-select">
-                    <option value="">--Pilih Urutan--</option>
                     <option value="name">Nama</option>
                     <option value="age">Umur</option>
                 </select>
@@ -74,7 +73,7 @@
                     {
                         <tr>
                             <td>
-                                <input type="checkbox" class="form-check-input" id="checkbox2">
+                                <input type="checkbox" class="form-check-input checkboxId" data-id="@item.Id">
                             </td>
                             <td>
                                 <div>
@@ -165,6 +164,40 @@
 
     $(".btnDelete").click(function (e) {
         $("#staticModalBody").html(spinner);
-        $("#staticModalBody").load("/Profile/Pasien/Delete/" + $(this).data("id"));
+        $("#staticModalBody").load("/Profile/Pasien/Delete?ids=" + $(this).data("id"));
     });
+
+    $("#btnMultipleDelete").click(function (e) {
+        var selectedIds = [];
+        $('.checkboxId:checked').each(function () {
+            selectedIds.push($(this).data('id'));
+        });
+
+        if (selectedIds.length === 0) {
+            alert("Pilih data yang ingin dihapus!");
+            return;
+        }
+
+        var idsQueryString = selectedIds.join(",");
+
+        $("#staticModalBody").html(spinner);
+        $("#staticModalBody").load("/Profile/Pasien/Delete?ids=" + idsQueryString);
+    });
+
+    // mengaktifkan atau menonaktifkan tombol Multiple Delete
+    toggleMultipleDeleteButton();
+
+    $(".checkboxId").on('change', function () {
+        toggleMultipleDeleteButton();
+    });
+
+    function toggleMultipleDeleteButton() {
+        var selectedIds = $('.checkboxId:checked');
+        if (selectedIds.length > 0) {
+            $("#btnMultipleDelete").attr("disabled", false);
+        } else {
+            $("#btnMultipleDelete").attr("disabled", true);
+        }
+    }
+
 </script>

@@ -15,6 +15,8 @@ namespace HealthCare340B.Web.Controllers
         private ProfileModel profile;
         private SpecializationModel specialization;
 
+        private string? _userId;
+
         public ProfileController(IConfiguration _config, IWebHostEnvironment _webHostEnv)
         {
             profile = new ProfileModel(_config, _webHostEnv);
@@ -22,15 +24,23 @@ namespace HealthCare340B.Web.Controllers
             imageFolder = _config["ImageFolder"];
         }
 
+        private bool isInSession()
+        {
+            _userId = HttpContext.Session.GetString("userId") ?? null;
+
+            return _userId != null;
+        }
+
         public async Task<IActionResult> Index()
         {
-            // Mengirim role ke view
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+            }
+
             ViewBag.Title = "Profil";
             ViewBag.imgFolder = imageFolder;
 
-
-
-            //string Role = "ROLE_DOKTER";
             string role = HttpContext.Session.GetString("userRoleCode")!;
             
             ViewBag.Breadcrumb = new List<BreadcrumbItem>
@@ -58,7 +68,7 @@ namespace HealthCare340B.Web.Controllers
         {
             ViewBag.Title = "Profil";
             ViewBag.imgFolder = imageFolder;
-            ViewBag.Role = "ROLE_DOKTER";
+            ViewBag.Role = HttpContext.Session.GetString("userRoleCode")!;
 
             ViewBag.Breadcrumb = new List<BreadcrumbItem>
             {
@@ -75,7 +85,7 @@ namespace HealthCare340B.Web.Controllers
         {
             ViewBag.Title = "Profil";
             ViewBag.imgFolder = imageFolder;
-            ViewBag.Role = "ROLE_PASIEN";
+            ViewBag.Role = HttpContext.Session.GetString("userRoleCode")!;
 
             ViewBag.Breadcrumb = new List<BreadcrumbItem>
             {

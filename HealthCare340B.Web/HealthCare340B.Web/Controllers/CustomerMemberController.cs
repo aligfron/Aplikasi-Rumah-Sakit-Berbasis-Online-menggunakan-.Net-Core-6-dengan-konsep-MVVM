@@ -1,8 +1,8 @@
-﻿using HealthCare340B.ViewModel;
+﻿using System.Net;
+using HealthCare340B.ViewModel;
 using HealthCare340B.Web.AddOns;
 using HealthCare340B.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace HealthCare340B.Web.Controllers
 {
@@ -12,6 +12,9 @@ namespace HealthCare340B.Web.Controllers
         private readonly CustomerMemberModel _customerMemberModel;
         private readonly BloodGroupModel _bloodGroupModel;
         private readonly CustomerRelationModel _customerRelationModel;
+
+        private string? _userId;
+        private string? _roleCode;
 
         private readonly int _pageSize;
         private readonly string _imageFolder;
@@ -26,6 +29,20 @@ namespace HealthCare340B.Web.Controllers
             _imageFolder = configuration["ImageFolder"];
         }
 
+        private bool isInSession()
+        {
+            _userId = HttpContext.Session.GetString("userId") ?? null;
+
+            return _userId != null;
+        }
+
+        private bool isInRole()
+        {
+            _roleCode = HttpContext.Session.GetString("userRoleCode") ?? null;
+
+            return _roleCode == "ROLE_PASIEN";
+        }
+
         [Route("")]
         public async Task<IActionResult> Index(
             string? filter,
@@ -35,12 +52,24 @@ namespace HealthCare340B.Web.Controllers
             string? orderDirection
         )
         {
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+                return RedirectToAction("Index", "Auth");
+            }
+            if (!isInRole())
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
+
             List<VMMCustomerMember>? data = new List<VMMCustomerMember>();
 
             try
             {
                 data = await _customerMemberModel.GetByFilter(
-                    string.IsNullOrEmpty(filter) ? "" : filter
+                    string.IsNullOrEmpty(filter) ? "" : filter,
+                    (long)HttpContext.Session.GetInt32("userBiodataId")!
                 );
             }
             catch (Exception ex)
@@ -112,6 +141,17 @@ namespace HealthCare340B.Web.Controllers
         [Route("Create")]
         public async Task<IActionResult> Create()
         {
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+                return RedirectToAction("Index", "Auth");
+            }
+            if (!isInRole())
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
+
             ViewBag.Title = "Tambah Pasien";
             ViewBag.BloodGroups = await _bloodGroupModel.GetAll();
             ViewBag.CustomerRelations = await _customerRelationModel.GetAll();
@@ -127,6 +167,7 @@ namespace HealthCare340B.Web.Controllers
 
             try
             {
+                data.ParentBiodataId = (long)HttpContext.Session.GetInt32("userBiodataId")!;
                 data.CreatedBy = long.Parse(HttpContext.Session.GetString("userId")!);
 
                 response = await _customerMemberModel.CreateAsync(data);
@@ -151,11 +192,22 @@ namespace HealthCare340B.Web.Controllers
         [Route("Edit/{id}")]
         public async Task<IActionResult> Edit(long id)
         {
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+                return RedirectToAction("Index", "Auth");
+            }
+            if (!isInRole())
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
+
             VMMCustomerMember? data = new VMMCustomerMember();
 
             try
             {
-                data = await _customerMemberModel.GetById(id);
+                data = await _customerMemberModel.GetById(id, (long)HttpContext.Session.GetInt32("userBiodataId")!);
             }
             catch (Exception ex)
             {
@@ -198,14 +250,43 @@ namespace HealthCare340B.Web.Controllers
             return response;
         }
 
-        [Route("Delete/{id}")]
-        public async Task<IActionResult> Delete(long id)
+        [Route("Delete")]
+        public async Task<IActionResult> Delete(string ids)
         {
-            VMMCustomerMember? data = new VMMCustomerMember();
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+                return RedirectToAction("Index", "Auth");
+            }
+            if (!isInRole())
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
+
+            List<VMMCustomerMember>? data = new List<VMMCustomerMember>();
 
             try
             {
-                data = await _customerMemberModel.GetById(id);
+                if (!string.IsNullOrEmpty(ids))
+                {
+                    long parentBiodataId = long.Parse(HttpContext.Session.GetInt32("userBiodataId")!.ToString()!);
+
+                    // Pisahkan string IDs yang dipisahkan koma menjadi array
+                    List<long> idArray = ids.Split(',').Select(long.Parse).ToList();
+
+                    foreach (long id in idArray)
+                    {
+                        try
+                        {
+                            data.Add(await _customerMemberModel.GetById(id, parentBiodataId));
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception(ex.Message);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -236,6 +317,59 @@ namespace HealthCare340B.Web.Controllers
                 else
                 {
                     HttpContext.Session.SetString("errMsg", response.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+
+            return response;
+        }
+
+        [HttpPost]
+        [Route("MultipleDelete")]
+        public async Task<VMResponse<VMMCustomerMember>?> MultipleDeleteAsync(string ids)
+        {
+            VMResponse<VMMCustomerMember>? response = null;
+            List<string> failedDeletes = new List<string>();
+
+            try
+            {
+                if (!string.IsNullOrEmpty(ids))
+                {
+                    long userId = long.Parse(HttpContext.Session.GetString("userId")!);
+                    long parentBiodataId = long.Parse(HttpContext.Session.GetInt32("userBiodataId")!.ToString()!);
+
+                    // Pisahkan string IDs yang dipisahkan koma menjadi array
+                    List<long> idArray = ids.Split(',').Select(long.Parse).ToList();
+
+                    foreach (long i in idArray)
+                    {
+                        try
+                        {
+                            response = await _customerMemberModel.DeleteAsync(i, userId);
+                        }
+                        catch
+                        {
+
+                            var member = await _customerMemberModel.GetById(i, parentBiodataId);
+                            failedDeletes.Add(member.Fullname!);
+                        }
+                    }
+                }
+
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    HttpContext.Session.SetString("successMsg", response.Message);
+                }
+                else
+                {
+                    HttpContext.Session.SetString(
+                        "errMsg",
+                        "Failed to delete Customer Member: "
+                            + string.Join(", ", failedDeletes)
+                    );
                 }
             }
             catch (Exception ex)
