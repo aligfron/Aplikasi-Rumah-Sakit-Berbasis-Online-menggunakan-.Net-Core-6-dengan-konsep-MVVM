@@ -94,7 +94,10 @@ namespace HealthCare340B.Web.Controllers
                         HttpContext.Session.SetString("userRoleCode", dataApi.RoleCode!);
                         
                         HttpContext.Session.SetInt32("userBiodataId", (int)dataApi.BiodataId!);
-                        HttpContext.Session.SetString("userImagePath", string.IsNullOrEmpty(dataApi.ImagePath) ? "blank-profile-picture.png" : dataApi.ImagePath);
+                        if (!string.IsNullOrEmpty(dataApi.ImagePath))
+                        {
+                            HttpContext.Session.SetString("userImagePath", dataApi.ImagePath);
+                        }
                         HttpContext.Session.SetString("userSince", dataApi.CreatedOn.ToString("yyyy"));
                         return RedirectToAction("Index", "Home");
                     }

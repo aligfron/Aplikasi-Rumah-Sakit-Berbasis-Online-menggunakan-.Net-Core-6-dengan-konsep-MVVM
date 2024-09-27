@@ -49,7 +49,7 @@
                                 <i class="fas fa-pencil-alt"></i>
                             </label>
                             <input type="file" id="imageUpload" name="ImageFile" class="d-none" accept="image/*" onchange="previewImage(event)">
-                            <input type="hidden" name="ImagePath" value="@(string.IsNullOrEmpty(Context.Session.GetString("userImagePath")) ? "blank-profile-picture.png" : null)" />
+                            <input type="hidden" name="ImagePath" value="@(string.IsNullOrEmpty(Context.Session.GetString("userImagePath")) ? null : Context.Session.GetString("userImagePath"))" />
                         </form>
                         <button type="button" id="saveImageBtn" class="btn btn-primary mt-3 d-none">Simpan Gambar</button>
                         <button type="button" id="cancelImageBtn" class="btn btn-danger mt-3 d-none">Cancel</button>
