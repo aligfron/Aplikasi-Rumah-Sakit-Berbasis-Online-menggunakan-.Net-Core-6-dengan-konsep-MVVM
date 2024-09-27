@@ -70,20 +70,31 @@
                     </div>
                 </div>
 
-                <div class="mb-3 d-flex align-items-center justify-content-between">
-                    <div class="form-group me-3">
-                        <label for="height">Tinggi Badan</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="height" name="Height" value="@Model.Height">
-                            <span class="input-group-text">cm</span>
+                <div class="row">
+                    <div class="col-sm mb-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="form-group me-3 mb-0">
+                                <label for="height">Tinggi Badan</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="height" name="Height" value="@Model.Height">
+                                    <span class="input-group-text">cm</span>
+                                </div>
+                            </div>
                         </div>
+                        <p id="height-group" class="mb-0"></p>
                     </div>
-                    <div class="form-group">
-                        <label for="weight">Berat Badan</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="weight" name="Weight" value="@Model.Weight">
-                            <span class="input-group-text">kg</span>
+
+                    <div class="col-sm mb-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="form-group mb-0">
+                                <label for="weight">Berat Badan</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="weight" name="Weight" value="@Model.Weight">
+                                    <span class="input-group-text">kg</span>
+                                </div>
+                            </div>
                         </div>
+                        <p id="weight-group" class="mb-0"></p>
                     </div>
                 </div>
 
@@ -122,84 +133,121 @@
 <script>
     $(document).ready(function () {
         $("#staticModalLabel").text("@ViewBag.Title");
-    });
+    
 
-    $("#btnSave").click((e) => $("#frmCustomerMember").submit());
+        $("#btnSave").click((e) => $("#frmCustomerMember").submit());
 
-    $("#frmCustomerMember").submit(function (e) {
-        //Disable form submit function
-        e.preventDefault();
+        $("#frmCustomerMember").submit(function (e) {
+            //Disable form submit function
+            e.preventDefault();
 
-        if ($("#frmCustomerMember").valid()) {
-            $.ajax({
-                url: "/Profile/Pasien/Edit",
-                type: "POST",
-                data: $("#frmCustomerMember").serialize(),
-                dataType: "json",
-                beforeSend: () => {
+            if ($("#frmCustomerMember").valid()) {
+                // Ganti koma dengan titik sebelum kirim data
+                convertDotTocomma();
 
-                },
-                success: function (response) {
-                    if (response.statusCode == 200 || response.statusCode == 201) {
-                        location.reload();
+                $.ajax({
+                    url: "/Profile/Pasien/Edit",
+                    type: "POST",
+                    data: $("#frmCustomerMember").serialize(),
+                    dataType: "json",
+                    beforeSend: () => {
+
+                    },
+                    success: function (response) {
+                        if (response.statusCode == 200 || response.statusCode == 201) {
+                            location.reload();
+                        }
+                        else {
+                            alert(response.statusCode + " - " + response.message);
+                        }
+                    },
+                    error: function (errResponse) {
+                        console.error(errResponse);
                     }
-                    else {
-                        alert(response.statusCode + " - " + response.message);
-                    }
+                });
+            }
+            else {
+                console.error("Form is invalid!");
+            }
+
+            return false;
+        });
+
+        // Validasi custom untuk mengizinkan koma atau titik sebagai pemisah desimal
+        $.validator.addMethod("customNumber", function (value, element) {
+            // Ganti koma dengan titik, lalu cek apakah ini angka
+            var newValue = value.replace(",", ".");
+            return this.optional(element) || !isNaN(newValue) && !isNaN(parseFloat(newValue));
+        }, "*Masukkan angka yang valid (dengan koma atau titik)");
+
+        $("#frmCustomerMember").validate({
+            rules: {
+                Fullname: {
+                    required: true,
+                    minlength: 3
                 },
-                error: function (errResponse) {
-                    console.error(errResponse);
+                Dob: {
+                    required: true
+                },
+                Gender: {
+                    required: true
+                },
+                Height: {
+                    customNumber: true
+                },
+                Weight: {
+                    customNumber: true
+                },
+                CustomerRelationId: {
+                    required: true
                 }
-            });
-        }
-        else {
-            console.error("Form is invalid!");
-        }
 
-        return false;
-    });
+            },
+            messages: {
+                Fullname: {
+                    required: "*Nama Lengkap harus diisi",
+                    minlength: "*Nama Lengkap harus terdiri dari minimal 3 karakter"
+                },
+                Dob: {
+                    required: "*Tanggal Lahir harus diisi"
+                },
+                Gender: {
+                    required: "*Jenis Kelamin harus diisi"
+                },
+                Height: {
+                    number: "*Masukkan angka yang valid"
+                },
+                Weight: {
+                    number: "*Masukkan angka yang valid"
+                },
+                CustomerRelationId: {
+                    required: "*Relasi harus diisi"
+                }
+            },
+            errorClass: "text-danger",
+            errorPlacement: function (error, element) {
+                if (element.attr("name") == "Gender") {
+                    // Menempatkan pesan error di bawah label "Jenis Kelamin"
+                    error.insertAfter("#gender-group");
+                } else if (element.attr("name") == "Height") {
+                    error.insertAfter("#height-group");
+                } else if (element.attr("name") == "Weight") {
+                    error.insertAfter("#weight-group");
+                } else {
+                    // Penempatan default untuk elemen lain
+                    error.insertAfter(element);
+                }
+            }
+        });
 
-    $("#frmCustomerMember").validate({
-        rules: {
-            Fullname: {
-                required: true,
-                minlength: 3
-            },
-            Dob: {
-               required: true
-            },
-            Gender: {
-                required: true
-            },
-            CustomerRelationId: {
-                required: true
-            }
+        // Fungsi untuk mengganti koma menjadi titik sebelum pengiriman data
+        function convertDotTocomma() {
+            var height = $("#height").val().replace(".", ",");
+            var weight = $("#weight").val().replace(".", ",");
 
-        },
-        messages: {
-            Fullname: {
-                required: "*Nama Lengkap harus diisi",
-                minlength: "*Nama Lengkap harus terdiri dari minimal 3 karakter"
-            },
-            Dob: {
-                required: "*Tanggal Lahir harus diisi"
-            },
-            Gender: {
-                required: "*Jenis Kelamin harus diisi"
-            },
-            CustomerRelationId: {
-                required: "*Relasi harus diisi"
-            }
-        },
-        errorClass: "text-danger",
-        errorPlacement: function (error, element) {
-            if (element.attr("name") == "Gender") {
-                // Menempatkan pesan error di bawah label "Jenis Kelamin"
-                error.insertAfter("#gender-group");
-            } else {
-                // Penempatan default untuk elemen lain
-                error.insertAfter(element);
-            }
+            // Set kembali nilai dengan titik untuk pengiriman ke server
+            $("#height").val(height);
+            $("#weight").val(weight);
         }
     });
 

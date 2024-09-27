@@ -152,9 +152,17 @@ namespace HealthCare340B.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            try
+            {
+                ViewBag.BloodGroups = await _bloodGroupModel.GetAll();
+                ViewBag.CustomerRelations = await _customerRelationModel.GetAll();
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+
             ViewBag.Title = "Tambah Pasien";
-            ViewBag.BloodGroups = await _bloodGroupModel.GetAll();
-            ViewBag.CustomerRelations = await _customerRelationModel.GetAll();
 
             return View();
         }
@@ -208,6 +216,8 @@ namespace HealthCare340B.Web.Controllers
             try
             {
                 data = await _customerMemberModel.GetById(id, (long)HttpContext.Session.GetInt32("userBiodataId")!);
+                ViewBag.BloodGroups = await _bloodGroupModel.GetAll();
+                ViewBag.CustomerRelations = await _customerRelationModel.GetAll();
             }
             catch (Exception ex)
             {
@@ -215,8 +225,6 @@ namespace HealthCare340B.Web.Controllers
             }
 
             ViewBag.Title = "Edit Pasien";
-            ViewBag.BloodGroups = await _bloodGroupModel.GetAll();
-            ViewBag.CustomerRelations = await _customerRelationModel.GetAll();
 
             return View(data);
         }

@@ -7,14 +7,17 @@ namespace HealthCare340B.Web.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly string imageFolder;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IConfiguration _config)
         {
             _logger = logger;
+            imageFolder = _config["ImageFolder"];
         }
 
         public IActionResult Index()
         {
+            ViewBag.imgFolder = imageFolder;
 
             return View();
         }
