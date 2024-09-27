@@ -28,9 +28,11 @@ namespace HealthCare340B.Web.Controllers
             ViewBag.Title = "Profil";
             ViewBag.imgFolder = imageFolder;
 
-            //string Role = "ROLE_DOKTER";
-            string role = "ROLE_DOKTER";
 
+
+            //string Role = "ROLE_DOKTER";
+            string role = HttpContext.Session.GetString("userRoleCode")!;
+            
             ViewBag.Breadcrumb = new List<BreadcrumbItem>
             {
                 new BreadcrumbItem { Name = "Beranda", Controller = "Home", Action = "Index" },
@@ -63,8 +65,9 @@ namespace HealthCare340B.Web.Controllers
                 new BreadcrumbItem { Name = "Beranda", Controller = "Home", Action = "Index" },
                 new BreadcrumbItem { Name = "Profile", IsActive = true }
             };
-
-            VMMDoctor? data = await profile.GetByIdProfilDokter(1);
+            int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
+            VMMDoctor? GetDoctorByBiodataId = await profile.GetDoctorByBiodataId(bioId);
+            VMMDoctor? data = await profile.GetByIdProfilDokter(GetDoctorByBiodataId!.Id);
             return View(data);
         }
 

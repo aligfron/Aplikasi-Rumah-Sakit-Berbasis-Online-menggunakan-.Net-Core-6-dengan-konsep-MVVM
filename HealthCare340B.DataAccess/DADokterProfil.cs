@@ -18,7 +18,7 @@ namespace HealthCare340B.DataAccess
         {
             db = _db;
         }
-        public VMResponse<VMMDoctor?> GetByDokterProfil(int id)
+        public VMResponse<VMMDoctor?> GetByDokterProfil(long id)
         {
             VMResponse<VMMDoctor?> response = new VMResponse<VMMDoctor?>();
             try
@@ -77,8 +77,8 @@ namespace HealthCare340B.DataAccess
                             ).ToList(),
 
                             InstitutionName = (
-                                from pendidikan in db.MDoctorEducations 
-                                where doktor.Id == pendidikan.DoctorId &&
+                                from pendidikan in db.MDoctorEducations
+                                where pendidikan.DoctorId == doktor.Id &&
                                 doktor.IsDelete == false
                                 select new VMMDoctorEducation
                                 {
@@ -162,6 +162,51 @@ namespace HealthCare340B.DataAccess
                     response.StatusCode = HttpStatusCode.InternalServerError;
                     response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
                 }
+            }
+            return response;
+        }
+
+        public VMResponse<VMMDoctor?> GetDoctorByBiodataId(int idBiodata)
+        {
+            VMResponse<VMMDoctor?> response = new VMResponse<VMMDoctor?>();
+            try
+            {
+                if (idBiodata > 0)
+                {
+                    response.Data = (
+
+                        from doktor in db.MDoctors
+                        where doktor.IsDelete == false
+                        && (doktor.BiodataId == idBiodata)
+                        select new VMMDoctor
+                        {
+                            Id = doktor.Id,
+                            BiodataId = doktor.BiodataId
+                        }
+
+                    ).FirstOrDefault();
+
+                    if (response.Data != null)
+                    {
+                        response.StatusCode = HttpStatusCode.OK;
+                        response.Message = $"{HttpStatusCode.OK} - GetDoctorByBiodataId Sukses Full";
+                    }
+                    else
+                    {
+                        response.StatusCode = HttpStatusCode.NoContent;
+                        response.Message = $"{HttpStatusCode.NoContent} - GetDoctorByBiodataId does not exis";
+                    }
+                }
+                else
+                {
+                    response.StatusCode = HttpStatusCode.BadRequest;
+                    response.Message = $"{HttpStatusCode.BadRequest} - please input GetDoctorByBiodataId";
+                }
+            }
+            catch (Exception e)
+            {
+
+                response.Message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
             }
             return response;
         }

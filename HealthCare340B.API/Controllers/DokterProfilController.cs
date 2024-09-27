@@ -16,7 +16,7 @@ namespace HealthCare340B.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetById(int id)
+        public async Task<ActionResult> GetById(long id)
         {
             try
             {
@@ -59,6 +59,29 @@ namespace HealthCare340B.API.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine("Photo.Update " + ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("[action]/{idBiodata?}")]
+        public async Task<ActionResult> GetDoctorByBiodataId(int idBiodata)
+        {
+            try
+            {
+                VMResponse<VMMDoctor?> response = await Task.Run(() => dokterProfil.GetDoctorByBiodataId(idBiodata));
+                if (response.Data != null)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    Console.WriteLine(response.Message);
+                    return NoContent();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("DokterProfilController.GetByID " + ex.Message);
                 return BadRequest(ex.Message);
             }
         }
