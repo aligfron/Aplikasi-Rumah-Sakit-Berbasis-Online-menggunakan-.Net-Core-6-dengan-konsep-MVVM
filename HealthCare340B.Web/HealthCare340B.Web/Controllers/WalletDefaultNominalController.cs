@@ -158,6 +158,25 @@ namespace HealthCare340B.Web.Controllers
                     StatusCode = HttpStatusCode.Forbidden,
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
+
+            List<VMMWalletDefaultNominal>? dataSearch = new List<VMMWalletDefaultNominal>();
+            try
+            {
+                dataSearch = await walletDefaultNominal.GetByFilter(data.Nominal);
+                if (dataSearch != null && dataSearch.Count > 0)
+                    throw new Exception("Duplicate Data!");
+            }
+            catch (Exception e)
+            {
+                if (dataSearch != null && dataSearch.Count > 0)
+                {
+                    VMResponse<VMMWalletDefaultNominal> response = new VMResponse<VMMWalletDefaultNominal>();
+                    response.StatusCode = HttpStatusCode.BadRequest;
+                    response.Message = $"{HttpStatusCode.BadRequest} - Duplicate Data!";
+                    return response;
+                }
+            }
+
             data.ModifiedBy = long.Parse(userId!);
             VMResponse<VMMWalletDefaultNominal>? dataApi = new VMResponse<VMMWalletDefaultNominal>();
             try

@@ -45,6 +45,31 @@ namespace HealthCare340B.Web.Controllers
             return true;
         }
 
+        private string ModifyString(string dataName)
+        {
+            try
+            {
+                string[] words = dataName.Trim().Split(' ');
+                string modifiedName = "";
+
+                foreach (string word in words)
+                {
+                    if (word == " " || string.IsNullOrEmpty(word))
+                        continue;
+                    modifiedName += word;
+                    if (!word.EndsWith("-"))
+                        modifiedName += " ";
+                }
+
+                modifiedName = modifiedName.Trim();
+                return modifiedName;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }         
+        }
+
 
         public async Task<IActionResult> Index(string? filter, int? pageNumber, int? currPageSize, string? orderBy)
         {
@@ -124,9 +149,18 @@ namespace HealthCare340B.Web.Controllers
 
             List<VMMPaymentMethod>? dataSearch = new List<VMMPaymentMethod>();
 
+            string modifiedName = ModifyString(data.Name!);
+            if (string.IsNullOrEmpty(modifiedName))
+            {
+                VMResponse<VMMPaymentMethod> response = new VMResponse<VMMPaymentMethod>();
+                response.StatusCode = HttpStatusCode.BadRequest;
+                response.Message = $"{HttpStatusCode.BadRequest} - Input Data is Invalid!";
+                return response;
+            }
+
             try
             {
-                dataSearch = await paymentMethod.GetByFilter(data.Name);
+                dataSearch = await paymentMethod.GetByFilter(modifiedName);
                 if (dataSearch != null && dataSearch.Count > 0)
                     throw new Exception("Duplicate Data!");
             }
@@ -182,6 +216,34 @@ namespace HealthCare340B.Web.Controllers
                     StatusCode = HttpStatusCode.Forbidden,
                     Message = $"{HttpStatusCode.Forbidden} - You are not authorized!"
                 };
+
+            List<VMMPaymentMethod>? dataSearch = new List<VMMPaymentMethod>();
+
+            string modifiedName = ModifyString(data.Name);
+            if (string.IsNullOrEmpty(modifiedName))
+            {
+                VMResponse<VMMPaymentMethod> response = new VMResponse<VMMPaymentMethod>();
+                response.StatusCode = HttpStatusCode.BadRequest;
+                response.Message = $"{HttpStatusCode.BadRequest} - Input Data is Invalid!";
+                return response;
+            }
+
+            try
+            {
+                dataSearch = await paymentMethod.GetByFilter(modifiedName);
+                if (dataSearch != null && dataSearch.Count > 0)
+                    throw new Exception("Duplicate Data!");
+            }
+            catch (Exception e)
+            {
+                if (dataSearch != null && dataSearch.Count > 0)
+                {
+                    VMResponse<VMMPaymentMethod> response = new VMResponse<VMMPaymentMethod>();
+                    response.StatusCode = HttpStatusCode.BadRequest;
+                    response.Message = $"{HttpStatusCode.BadRequest} - Duplicate Data!";
+                    return response;
+                }
+            }
 
             data.ModifiedBy = long.Parse(userId!);
             VMResponse<VMMPaymentMethod>? dataApi = new VMResponse<VMMPaymentMethod>();

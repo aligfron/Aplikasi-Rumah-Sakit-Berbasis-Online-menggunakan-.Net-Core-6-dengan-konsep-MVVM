@@ -35,8 +35,8 @@
 
         $.validator.addMethod("alphanumeric", function (value, element) {
             //test user value with the regex
-            return this.optional(element) || /^[\w\s]+$/i.test(value);
-        }, "Only Alphanumeric and Space Characters are allowed!");
+            return this.optional(element) || /^[\w\s-]+$/i.test(value);
+        }, "Only Alphanumeric, Space, and Dash are allowed!");
 
         $("#frmPaymentMethod").validate({
             rules: {
