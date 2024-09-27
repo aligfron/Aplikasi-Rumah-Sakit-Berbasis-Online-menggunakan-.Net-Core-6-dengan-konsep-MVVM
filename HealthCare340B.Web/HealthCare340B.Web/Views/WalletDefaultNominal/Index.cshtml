@@ -3,6 +3,7 @@
 *@
 @model List<VMMWalletDefaultNominal>?
 @{
+    long testId = 2;
 }
 
 <div class="page-title">
@@ -95,6 +96,10 @@
     </table>
 </div>
 
+<div>
+    <button data-id="@testId" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#staticModal">Test</button>
+</div>
+
 <script>
     $("#btnAdd").click(function (e) {
         $("#staticModalBody").html();
@@ -109,5 +114,16 @@
     $(".btn-outline-danger").click(function (e) {
         $("#staticModalBody").html();
         $("#staticModalBody").load("/WalletDefaultNominal/Delete/" + $(this).data("id"));
+    });
+
+    $(".btn-outline-danger").click(function (e) {
+        $("#staticModalBody").html();
+        $("#staticModalBody").load("/WalletDefaultNominal/Delete/" + $(this).data("id"));
+    });
+
+    $(".btn-info").click(function (e) {
+        var variable = $(this).data("id");
+        $("#staticModalBody").html();
+        $("#staticModalBody").load("/Appointment/Create/");
     });
 </script>

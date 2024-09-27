@@ -1,0 +1,107 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model VMMDoctor?
+@{
+    Layout = null;
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="row d-flex justify-content-between">
+            <div class="col-3">
+                <img id="profileImage" src="~/@ViewBag.imgFolder/@(Model.ImagePath ?? "blank-profile-picture.png")" alt="Avatar" class="img-thumbnail rounded-circle">
+            </div>
+            <div class="col-2"></div>
+            <div class="col-7">
+                <h3>@Model.Fullname</h3>
+                <h5>@Model.Str</h5>
+            </div>
+        </div>
+        &nbsp;
+        <form id="frmAppointment">
+            <div class="row mb-3">
+                <div class="col-4">Konsultasi Untuk<span class="text-danger">*</span></div>
+                <div class="col-8">
+                    <select id="member" name="Member" class="form-select">
+                        <option value="">-- Select Member --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-4">Faskes<span class="text-danger">*</span></div>
+                <div class="col-8">
+                    <select id="member" name="Member" class="form-select">
+                        <option value="">-- Select MedFac --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-4">Waktu Kedatangan<span class="text-danger">*</span></div>
+                <div class="input-group d-inline-flex align-items-center w-auto">
+                    <input id="time" name="AppointmentDate" size="24" disabled />
+                    <button class="btn btn-info"><i class="fas fa-calendar"></i></button>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-4">Tindakan<span class="text-danger">*</span></div>
+                <div class="col-8">
+                    <select id="tindakan" name="Tindakan" class="form-select" disabled>
+                        <option value="">-- Select Action --</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="d-flex justify-content-between">
+        <div class="w-10"></div>
+        <div class="w-30"><button id="btnCancel" class="btn btn-outline-danger">Cancel</button></div>
+        <div class="w-10"></div>
+        <div class="w-30"><button id="btnSave" class="btn btn-outline-success">Save</button></div>
+        <div class="w-10"></div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(() => {
+        $.ajax({
+            url: "Appointment/GetMemberByUserId",
+            data: {
+                userId: @Context.Session.GetString("userId")
+            },
+            dataType: "json",
+            beforeSend: () => { },
+            success: function (response) {
+                debugger;
+                console.log(response.statusCode);
+                $("#member").empty();
+                if (response.statusCode == 200) {
+                    if (response.data.length > 0) {
+                        $.each(
+                            response.data,
+                            function (idx, data) {
+                                $("#member").append(
+                                    `<option value="${data.id}">${data.fullname}, ${data.customerRelationName}</option>`
+                                );
+                            }
+                        );
+                    }
+                    else if (response.statusCode == 204) {
+                        $("#member").append(
+                            `<option value="0">${data.name}</option>`
+                        );
+                    }
+                }
+                else {
+                    $("#member").append(
+                        `<option value="">Something's wrong</option>`
+                    );
+                }
+            },
+            error: function (errResponse) {
+                console.error("errResponse", errResponse)
+                debugger;
+            }
+        });
+    })
+</script>

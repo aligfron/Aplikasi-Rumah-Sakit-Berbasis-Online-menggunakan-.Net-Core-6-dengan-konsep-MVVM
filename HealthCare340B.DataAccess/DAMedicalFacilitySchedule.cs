@@ -18,7 +18,7 @@ namespace HealthCare340B.DataAccess
             db = _db;
         }
 
-        public VMResponse<List<VMMMedicalFacilitySchedule>?> GetByMedicalFacilityIdAndDoctorId(long doctorId, long mfId)
+        public VMResponse<List<VMMMedicalFacilitySchedule>?> GetByMedicalFacilityIdAndDoctorId(long mfId, long doctorId)
         {
             VMResponse<List<VMMMedicalFacilitySchedule>?> response = new VMResponse<List<VMMMedicalFacilitySchedule>?>();
 

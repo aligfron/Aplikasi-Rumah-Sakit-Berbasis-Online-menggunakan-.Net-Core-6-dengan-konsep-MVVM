@@ -106,5 +106,52 @@ namespace HealthCare340B.DataAccess
 
             return response;
         }
+
+        public VMResponse<VMMDoctor?> GetById(long id)
+        {
+            VMResponse<VMMDoctor?> response = new VMResponse<VMMDoctor?>();
+
+            try
+            {
+                response.Data = (
+                    from d in db.MDoctors
+                    join b in db.MBiodata on d.BiodataId equals b.Id
+                    join o in db.TDoctorOffices on d.Id equals o.DoctorId
+                    join f in db.MMedicalFacilities on o.MedicalFacilityId equals f.Id
+                    join s in db.MSpecializations on o.Specialization equals s.Name
+                    join t in db.TDoctorTreatments on d.Id equals t.DoctorId
+                    where d.IsDelete == false && d.Id == id
+                    select new VMMDoctor
+                    {
+                        Id = d.Id,
+                        BiodataId = d.BiodataId,
+                        Str = d.Str,
+                        Fullname = b.Fullname,
+                        Specialization = s.Name,
+                        MedicalFacilityName = f.Name,
+                        Treatment = t.Name,
+                        StartDate = o.StartDate,
+                        EndDate = o.EndDate,
+                    }
+                    ).FirstOrDefault();
+
+                response.Message = (response.Data != null)
+                    ? $"{HttpStatusCode.OK} - Doctor is found!"
+                    : $"{HttpStatusCode.NoContent} - No doctor is found";
+
+                response.StatusCode = (response.Data != null)
+                    ? HttpStatusCode.OK
+                    : HttpStatusCode.NoContent;
+
+
+            }
+            catch (Exception e)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
+                response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+
+            return response;
+        }
     }
 }
