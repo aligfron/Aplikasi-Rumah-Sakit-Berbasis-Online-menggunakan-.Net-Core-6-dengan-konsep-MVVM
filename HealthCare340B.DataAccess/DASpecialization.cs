@@ -184,7 +184,7 @@ namespace HealthCare340B.DataAccess
 
                     response.Data = new VMMSpecialization(existingData);
                     response.StatusCode = HttpStatusCode.OK;
-                    response.Message = $"{HttpStatusCode.OK} - Product Has Been Updated";
+                    response.Message = $"{HttpStatusCode.OK} - Specialization Has Been Updated";
                 }
                 catch (Exception ex)
                 {
@@ -197,7 +197,7 @@ namespace HealthCare340B.DataAccess
         }
 
 
-        public VMResponse<VMMSpecialization> Delete(int id, int userId)
+        public VMResponse<VMMSpecialization> Delete(int id, long userId)
 
         {
             VMResponse<VMMSpecialization?> response = new VMResponse<VMMSpecialization?>();

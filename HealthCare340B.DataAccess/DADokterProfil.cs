@@ -105,18 +105,18 @@ namespace HealthCare340B.DataAccess
                     if (response.Data != null)
                     {
                         response.StatusCode = HttpStatusCode.OK;
-                        response.Message = $"{HttpStatusCode.OK} - Spesialisasi Sukses Full";
+                        response.Message = $"{HttpStatusCode.OK} - Dokter Profil Sukses Full";
                     }
                     else
                     {
                         response.StatusCode = HttpStatusCode.NoContent;
-                        response.Message = $"{HttpStatusCode.NoContent} - Spesialisasi does not exis";
+                        response.Message = $"{HttpStatusCode.NoContent} - Dokter Profil does not exis";
                     }
                 }
                 else
                 {
                     response.StatusCode = HttpStatusCode.BadRequest;
-                    response.Message = $"{HttpStatusCode.BadRequest} - please input Spesialisasi";
+                    response.Message = $"{HttpStatusCode.BadRequest} - please input Dokter Profil";
                 }
             }
             catch (Exception e)
@@ -140,7 +140,7 @@ namespace HealthCare340B.DataAccess
                     if (existingData == null)
                     {
                         response.StatusCode = HttpStatusCode.NotFound;
-                        response.Message = $"{HttpStatusCode.NotFound} - Biodata Not Found";
+                        response.Message = $"{HttpStatusCode.NotFound} - Dokter Profil Not Found";
                         return response;
                     }
                     existingData.ImagePath = data.ImagePath;
@@ -154,7 +154,7 @@ namespace HealthCare340B.DataAccess
 
                     response.Data = new VMMBiodatum(existingData);
                     response.StatusCode = HttpStatusCode.OK;
-                    response.Message = $"{HttpStatusCode.OK} - Biodata Has Been Updated";
+                    response.Message = $"{HttpStatusCode.OK} - Dokter Profil Been Updated";
                 }
                 catch (Exception ex)
                 {

@@ -18,7 +18,6 @@
                     </div>
                     
                     <input type="hidden" name="Id" value="@Model.Id" />
-                    <input type="hidden" name="ModifiedBy" value="@Model.CreatedBy" />
                 </form>
             }
             else
@@ -34,13 +33,10 @@
         <button type="button" class="btn btn-success" id="btnSave">Save</button>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(() => {
         $("#staticModalLabel").text("@ViewBag.Title");
         $("#btnSave").click(function (e) {
-            //debugger
-            //console.log("#frmSpesialisasi isvalid?", $("#frmSpesialisasi").valid());
             if ($("#frmSpesialisasi").valid()) {
                 $.ajax({
                     url: "/Specialization/Edit",
@@ -50,15 +46,7 @@
                     //beforeSend: () => { },
                     success: function (response) {
                         if (response.statusCode == 200) {
-                            // Tampilkan alert sukses
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Data Berhasil Di Edit',
-                                showConfirmButton: false,
-                                timer: 3000 // Show the alert for 2 seconds
-                            }).then(() => {
-                                location.reload(); // Reload page after alert
-                            });
+                                location.reload(); 
                         } else {
                             alert(response.statusCose + " - " + response.message)
                         }
@@ -73,7 +61,6 @@
             return false;
         });
         $("#frmSpesialisasi").submit(function (e) {
-            //desable from submit function
             e.preventDefault();
         });
         $("#frmSpesialisasi").validate({

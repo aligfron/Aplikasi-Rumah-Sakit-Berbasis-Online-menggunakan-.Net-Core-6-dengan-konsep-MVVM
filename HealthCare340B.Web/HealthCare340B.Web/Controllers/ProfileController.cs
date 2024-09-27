@@ -14,8 +14,8 @@ namespace HealthCare340B.Web.Controllers
         private readonly string imageFolder;
         private ProfileModel profile;
         private SpecializationModel specialization;
-
         private string? _userId;
+        private string? _roleCode;
 
         public ProfileController(IConfiguration _config, IWebHostEnvironment _webHostEnv)
         {
@@ -29,6 +29,18 @@ namespace HealthCare340B.Web.Controllers
             _userId = HttpContext.Session.GetString("userId") ?? null;
 
             return _userId != null;
+        }
+        private bool isInRolePasien()
+        {
+            _roleCode = HttpContext.Session.GetString("userRoleCode") ?? null;
+
+            return _roleCode == "ROLE_PASIEN";
+        }
+        private bool isInRoleDokter()
+        {
+            _roleCode = HttpContext.Session.GetString("userRoleCode") ?? null;
+
+            return _roleCode == "ROLE_DOKTER";
         }
 
         public async Task<IActionResult> Index()
@@ -66,6 +78,15 @@ namespace HealthCare340B.Web.Controllers
 
         public async Task<IActionResult> IndexDoctorProfile()
         {
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+            }
+            if (!isInRoleDokter())
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
             ViewBag.Title = "Profil";
             ViewBag.imgFolder = imageFolder;
             ViewBag.Role = HttpContext.Session.GetString("userRoleCode")!;
@@ -83,6 +104,15 @@ namespace HealthCare340B.Web.Controllers
 
         public async Task<IActionResult> IndexCustomerProfile()
         {
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+            }
+            if (!isInRolePasien())
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
             ViewBag.Title = "Profil";
             ViewBag.imgFolder = imageFolder;
             ViewBag.Role = HttpContext.Session.GetString("userRoleCode")!;
@@ -103,7 +133,7 @@ namespace HealthCare340B.Web.Controllers
 
             try
             {
-                data.Id = (long)HttpContext.Session.GetInt32("userBiodataId");
+                data.Id = (long)HttpContext.Session.GetInt32("userBiodataId")!;
                 data.ModifiedBy = long.Parse(HttpContext.Session.GetString("userId")!);
 
                 response = await profile.UpdateAsync(data);
@@ -180,7 +210,7 @@ namespace HealthCare340B.Web.Controllers
         }
 
 
-
+        //ali
         public async Task<IActionResult> CreateSpeDoctor(int id)
         {
             ViewBag.Specialization = await specialization.getByFilter("");
@@ -191,7 +221,26 @@ namespace HealthCare340B.Web.Controllers
         [HttpPost]
         public async Task<VMResponse<VMTCurrentDoctorSpecialization>?> CreateSpecializationDoctorAsync(VMTCurrentDoctorSpecialization data)
         {
-            return (await profile.CreateSpecializationDoctorAsync(data));
+            VMResponse<VMTCurrentDoctorSpecialization>? response = null;
+
+            try
+            {
+                data.CreatedBy = long.Parse(HttpContext.Session.GetString("userId")!);
+                response = await profile.CreateSpecializationDoctorAsync(data);
+                if (response.StatusCode == HttpStatusCode.Created)
+                {
+                    HttpContext.Session.SetString("successMsg", response.Message);
+                }
+                else
+                {
+                    HttpContext.Session.SetString("errMsg", response.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+            return (response);
         }
         public async Task<IActionResult> EditSpecializationDoctor(int id)
         {
@@ -203,7 +252,26 @@ namespace HealthCare340B.Web.Controllers
         [HttpPost]
         public async Task<VMResponse<VMTCurrentDoctorSpecialization>?> EditSpecializationDoctorAsync(VMTCurrentDoctorSpecialization data)
         {
-            return (await profile.EditSpecializationDoctorAsync(data));
+            VMResponse<VMTCurrentDoctorSpecialization>? response = null;
+
+            try
+            {
+                data.ModifiedBy = long.Parse(HttpContext.Session.GetString("userId")!);
+                response = await profile.EditSpecializationDoctorAsync(data);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    HttpContext.Session.SetString("successMsg", response.Message);
+                }
+                else
+                {
+                    HttpContext.Session.SetString("errMsg", response.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+            return (response);
         }
     }
 }

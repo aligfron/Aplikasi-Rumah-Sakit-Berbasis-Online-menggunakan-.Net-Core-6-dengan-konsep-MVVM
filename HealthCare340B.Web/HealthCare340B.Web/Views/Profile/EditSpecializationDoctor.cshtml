@@ -38,7 +38,6 @@
                     </div>
                     <input type="hidden" name="DoctorId" value="@Model.DoctorId" />
                     <input type="hidden" name="Id" value="@Model.Id" />
-                    <input type="hidden" name="ModifiedBy" value="@Model.CreatedBy" />
                 </form>
             }
             else
@@ -70,15 +69,8 @@
                     //beforeSend: () => { },
                     success: function (response) {
                         if (response.statusCode == 200) {
-                            // Tampilkan alert sukses
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Data Berhasil Di Edit',
-                                showConfirmButton: false,
-                                timer: 3000 // Show the alert for 2 seconds
-                            }).then(() => {
-                                location.reload(); // Reload page after alert
-                            });
+                            
+                                location.reload(); 
                         } else {
                             alert(response.statusCose + " - " + response.message)
                         }

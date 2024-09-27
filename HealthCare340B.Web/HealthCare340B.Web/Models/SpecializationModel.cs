@@ -173,7 +173,7 @@ namespace HealthCare340B.Web.Models
             }
             return apiResponse;
         }
-        public async Task<VMResponse<VMMSpecialization>?> DeleteAsync(int id, int userId)
+        public async Task<VMResponse<VMMSpecialization>?> DeleteAsync(int id, long userId)
         {
             VMResponse<VMMSpecialization>? apiResponse = new VMResponse<VMMSpecialization>();
             try

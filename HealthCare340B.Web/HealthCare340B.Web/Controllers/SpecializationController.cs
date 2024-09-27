@@ -4,6 +4,7 @@ using HealthCare340B.Web.AddOns;
 using HealthCare340B.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Net;
 
 namespace HealthCare340B.Web.Controllers
 {
@@ -11,15 +12,40 @@ namespace HealthCare340B.Web.Controllers
     {
         private readonly SpecializationModel spesialisasi;
         private readonly int pageSize;
-        
+        private string? _userId;
+        private string? _roleCode;
         public SpecializationController(IConfiguration _config)
         {
             spesialisasi = new SpecializationModel(_config);
             pageSize = int.Parse(_config["PageSize"]);
         }
+
+        private bool isInSession()
+        {
+            _userId = HttpContext.Session.GetString("userId") ?? null;
+
+            return _userId != null;
+        }
+
+        private bool isInRole()
+        {
+            _roleCode = HttpContext.Session.GetString("userRoleCode") ?? null;
+
+            return _roleCode == "ROLE_ADMIN";
+        }
         public async Task<IActionResult> Index(string? filter, int? pageNumber, int? currPageSize)
         {
-            
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+                return RedirectToAction("Index", "Auth");
+            }
+            if (!isInRole())
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
+
             List<VMMSpecialization>? data = new List<VMMSpecialization>();
             
                 data = (string.IsNullOrEmpty(filter)) ? await spesialisasi.getByFilter("") : await spesialisasi.getByFilter(filter);
@@ -32,6 +58,16 @@ namespace HealthCare340B.Web.Controllers
         }
         public IActionResult Create()
         {
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+                return RedirectToAction("Index", "Auth");
+            }
+            if (!isInRole())
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
             ViewBag.Title = "New Spesialisasi";
 
             return View();
@@ -39,10 +75,39 @@ namespace HealthCare340B.Web.Controllers
         [HttpPost]
         public async Task<VMResponse<VMMSpecialization>?> CreateAsync(VMMSpecialization data)
         {
-            return (await spesialisasi.CreateAsync(data));
+            VMResponse<VMMSpecialization>? response = null;
+
+            try
+            {
+                data.CreatedBy = long.Parse(HttpContext.Session.GetString("userId")!);
+                response = await spesialisasi.CreateAsync(data);
+                if (response.StatusCode == HttpStatusCode.Created)
+                {
+                    HttpContext.Session.SetString("successMsg", response.Message);
+                }
+                else
+                {
+                    HttpContext.Session.SetString("errMsg", response.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+            return (response);
         }
         public async Task<IActionResult> Edit(int id)
         {
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+                return RedirectToAction("Index", "Auth");
+            }
+            if (!isInRole())
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
             VMMSpecialization? data = await spesialisasi.getById(id);
 
             ViewBag.Title = "Spesialisasi Edit";
@@ -51,19 +116,67 @@ namespace HealthCare340B.Web.Controllers
         [HttpPost]
         public async Task<VMResponse<VMMSpecialization>?> EditAsync(VMMSpecialization data)
         {
-            return (await spesialisasi.UpdateAsync(data));
+            VMResponse<VMMSpecialization>? response = null;
+
+            try
+            {
+                data.ModifiedBy = long.Parse(HttpContext.Session.GetString("userId")!);
+                response = await spesialisasi.UpdateAsync(data);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    HttpContext.Session.SetString("successMsg", response.Message);
+                }
+                else
+                {
+                    HttpContext.Session.SetString("errMsg", response.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+            return (response);
         }
         public IActionResult Delete(int id)
         {
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+                return RedirectToAction("Index", "Auth");
+            }
+            if (!isInRole())
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
 
             ViewBag.Title = "Delete Spesialisasi";
 
             return View(id);
         }
         [HttpPost]
-        public async Task<VMResponse<VMMSpecialization>?> DeleteAsync(int id, int userId)
+        public async Task<VMResponse<VMMSpecialization>?> DeleteAsync(int id)
         {
-            return (await spesialisasi.DeleteAsync(id, userId));
+            VMResponse<VMMSpecialization>? response = null;
+
+            try
+            {
+                long userId = long.Parse(HttpContext.Session.GetString("userId")!);
+                response = await spesialisasi.DeleteAsync(id, userId);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    HttpContext.Session.SetString("successMsg", response.Message);
+                }
+                else
+                {
+                    HttpContext.Session.SetString("errMsg", response.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+            return (response);
         }
     }
 }

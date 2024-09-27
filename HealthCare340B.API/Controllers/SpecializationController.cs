@@ -145,7 +145,7 @@ namespace HealthCare340B.API.Controllers
         }
 
         [HttpDelete("{id?}/{userId?}")]
-        public async Task<ActionResult> Delete(int id, int userId)
+        public async Task<ActionResult> Delete(int id, long userId)
         {
             try
             {

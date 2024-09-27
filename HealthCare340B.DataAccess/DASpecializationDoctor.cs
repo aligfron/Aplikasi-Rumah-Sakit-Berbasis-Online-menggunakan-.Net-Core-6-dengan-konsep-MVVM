@@ -120,7 +120,7 @@ namespace HealthCare340B.DataAccess
 
                     response.Data = new VMTCurrentDoctorSpecialization(existingData);
                     response.StatusCode = HttpStatusCode.OK;
-                    response.Message = $"{HttpStatusCode.OK} - Product Has Been Updated";
+                    response.Message = $"{HttpStatusCode.OK} - Specialization Has Been Updated";
                 }
                 catch (Exception ex)
                 {

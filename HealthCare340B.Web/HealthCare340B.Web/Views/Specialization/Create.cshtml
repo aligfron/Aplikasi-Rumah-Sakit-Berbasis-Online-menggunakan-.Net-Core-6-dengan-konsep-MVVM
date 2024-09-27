@@ -13,8 +13,6 @@
                 <div class="col-4">Full Name <span class="text-danger"> * </span></div>
                 <div class="col-8"><input type="text" class="form-control" name="Name" /></div>
             </div>
-            
-            <input type="hidden" name="CreatedBy" value="1" />
         </form>
     </div>
     <div class="card-footer d-flex justify-content-end">
@@ -23,13 +21,10 @@
 </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(() => {
         $("#staticModalLabel").text("@ViewBag.Title");
         $("#btnSave").click(function (e) {
-            //debugger
-            //console.log("#frmSpesialisasi isvalid?", $("#frmSpesialisasi").valid());
             if ($("#frmSpesialisasi").valid()) {
                 $.ajax({
                     url: "/Specialization/Create",
@@ -39,15 +34,7 @@
                     //beforeSend: () => { },
                     success: function (response) {
                         if (response.statusCode == 200 || response.statusCode == 201) {
-                            // Tampilkan alert sukses
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Berhasil Menambahkan Data',
-                                showConfirmButton: false,
-                                timer: 3000 // Show the alert for 2 seconds
-                            }).then(() => {
-                                location.reload(); // Reload page after alert
-                            });
+                                location.reload(); 
                         } else {
                             alert(response.statusCose + " - " + response.message)
                         }
@@ -62,7 +49,6 @@
             return false;
         });
         $("#frmSpesialisasi").submit(function (e) {
-            //desable from submit function
             e.preventDefault();
         });
         $("#frmSpesialisasi").validate({
