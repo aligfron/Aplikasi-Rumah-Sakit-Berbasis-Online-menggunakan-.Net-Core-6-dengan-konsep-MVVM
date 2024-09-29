@@ -27,7 +27,7 @@ namespace HealthCare340B.DataAccess
                 response.Data = (
                     from mfs in db.MMedicalFacilitySchedules
                     join dos in db.TDoctorOfficeSchedules on mfs.Id equals dos.MedicalFacilityScheduleId
-                    where mfs.IsDelete == false && dos.DoctorId == doctorId && mfs.MedicalFacilityId == mfId && dos.Slot > 0
+                    where mfs.IsDelete == false && dos.DoctorId == doctorId && mfs.MedicalFacilityId == mfId
                     select new VMMMedicalFacilitySchedule
                     {
                         Id = mfs.Id,
@@ -35,6 +35,8 @@ namespace HealthCare340B.DataAccess
                         Day = mfs.Day,
                         TimeScheduleStart = mfs.TimeScheduleStart,
                         TimeScheduleEnd = mfs.TimeScheduleEnd,
+                        DoctorOfficeScheduleId = dos.Id,
+                        Slot = dos.Slot,
                         CreatedBy = mfs.CreatedBy,
                         CreatedOn = mfs.CreatedOn,
                         ModifiedBy = mfs.ModifiedBy,

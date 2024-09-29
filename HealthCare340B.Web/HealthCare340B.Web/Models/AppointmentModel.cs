@@ -60,42 +60,6 @@ namespace HealthCare340B.Web.Models
             return data;
         }
 
-        public async Task<VMResponse<List<VMMCustomerMember>?>> GetMember(long userId, long parentId)
-        {
-            VMResponse<List<VMMCustomerMember>>? apiResponse = new VMResponse<List<VMMCustomerMember>>();
-            try
-            {
-                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync(
-                  $"{apiUrl}CustomerMember/GetByUserId/{userId}"
-                  );
-
-                if (apiResponseMsg != null)
-                {
-                    if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
-                    {
-                        apiResponse = JsonConvert.DeserializeObject<VMResponse<List<VMMCustomerMember>>?>
-                            (apiResponseMsg.Content.ReadAsStringAsync().Result);
-                    }
-                    else
-                    {
-                        apiResponse.StatusCode = HttpStatusCode.NoContent;
-                        apiResponse.Message = "No Data!";
-                    }
-                }
-                else
-                {
-                    throw new Exception("Customer Member API could not be reached");
-                }
-            }
-            catch (Exception e)
-            {
-                //Logging
-                Console.WriteLine("AppointmentModel.GetMember: " + e.Message);
-                throw new Exception("AppointmentModel.GetMember: " + e.Message);
-            }
-            return apiResponse;
-        }
-
         public async Task<List<VMMMedicalFacility>?> GetMedicalFacility(long doctorId)
         {
             List<VMMMedicalFacility>? data = null;
@@ -172,6 +136,35 @@ namespace HealthCare340B.Web.Models
             }
 
             return data;
+        }
+
+        public async Task<List<DateTime>?> GetEmptySlotDate(List<VMMMedicalFacilitySchedule> data)
+        {
+            List<DateTime>? apiResponse = null;
+            try
+            {
+                jsonData = JsonConvert.SerializeObject(data);
+                content = new StringContent(    // Create a blank HttpRequest Document
+                    jsonData,               // Put the Request Body (data)
+                    Encoding.UTF8,          // Assign the Request body's character set
+                    "application/json"      // Assain the Request body's format / Content-Type
+                    );
+
+                apiResponse =
+                 JsonConvert.DeserializeObject<List<DateTime>?>(     // Convert the Json string to a class
+                     await httpClient.PostAsync($"{apiUrl}Appointment/GetEmptySlotDate", content)    // Call the API
+                     .Result                                                     // Read the Result
+                     .Content                                                    // Get the Content Result
+                     .ReadAsStringAsync()                                        // Convert the content as string
+                 );
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+            return apiResponse;
+            
         }
 
         public async Task<List<VMTDoctorTreatment>?> GetTreatment(long medicalFacilityId, long doctorId)

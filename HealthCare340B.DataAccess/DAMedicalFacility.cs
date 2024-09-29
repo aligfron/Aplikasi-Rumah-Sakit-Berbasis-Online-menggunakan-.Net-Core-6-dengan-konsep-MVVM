@@ -63,7 +63,7 @@ namespace HealthCare340B.DataAccess
             return response;
         }
 
-        public VMResponse<List<VMMMedicalFacility>?> GetByDoctorId(long idDoctorOffice)
+        public VMResponse<List<VMMMedicalFacility>?> GetByDoctorId(long idDoctor)
         {
             VMResponse<List<VMMMedicalFacility>?> response = new VMResponse<List<VMMMedicalFacility>?>();
 
@@ -72,7 +72,7 @@ namespace HealthCare340B.DataAccess
                 response.Data = (
                     from mf in db.MMedicalFacilities
                     join dof in db.TDoctorOffices on mf.Id equals dof.MedicalFacilityId
-                    where mf.IsDelete == false && dof.DoctorId == idDoctorOffice
+                    where mf.IsDelete == false && dof.DoctorId == idDoctor
                     select new VMMMedicalFacility
                     {
                         Id = mf.Id,

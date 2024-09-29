@@ -13,6 +13,9 @@ namespace HealthCare340B.ViewModel
         public string? Day { get; set; }
         public string? TimeScheduleStart { get; set; }
         public string? TimeScheduleEnd { get; set; }
+        public long? DoctorOfficeId { get; set; }
+        public long? DoctorOfficeScheduleId { get; set; }
+        public int? Slot { get; set; }
         public long CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
         public long? ModifiedBy { get; set; }

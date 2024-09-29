@@ -5,6 +5,7 @@
 @{
     Layout = null;
 }
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <div class="card">
     <div class="card-body">
@@ -24,22 +25,22 @@
                 <div class="col-4">Konsultasi Untuk<span class="text-danger">*</span></div>
                 <div class="col-8">
                     <select id="member" name="Member" class="form-select">
-                        <option value="">-- Select Member --</option>
+                        <option value="0">Sendiri</option>
                     </select>
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col-4">Faskes<span class="text-danger">*</span></div>
                 <div class="col-8">
-                    <select id="member" name="Member" class="form-select">
-                        <option value="">-- Select MedFac --</option>
+                    <select id="medFac" name="MedFac" class="form-select">
+                        <option value="0">-- Select MedFac --</option>
                     </select>
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col-4">Waktu Kedatangan<span class="text-danger">*</span></div>
                 <div class="input-group d-inline-flex align-items-center w-auto">
-                    <input id="time" name="AppointmentDate" size="24" disabled />
+                    <input id="date" name="AppointmentDate" type="datetime" size="24" disabled />
                     <button class="btn btn-info"><i class="fas fa-calendar"></i></button>
                 </div>
             </div>
@@ -61,13 +62,14 @@
         <div class="w-10"></div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
     $(document).ready(() => {
         $.ajax({
-            url: "Appointment/GetMemberByUserId",
+            url: "Appointment/GetMemberById",
             data: {
-                userId: @Context.Session.GetString("userId")
+                biodataId: @Context.Session.GetInt32("userBiodataId")
             },
             dataType: "json",
             beforeSend: () => { },
@@ -75,6 +77,9 @@
                 debugger;
                 console.log(response.statusCode);
                 $("#member").empty();
+                $("#member").append(
+                    `<option value="0">Sendiri</option>`
+                );
                 if (response.statusCode == 200) {
                     if (response.data.length > 0) {
                         $.each(
@@ -86,16 +91,7 @@
                             }
                         );
                     }
-                    else if (response.statusCode == 204) {
-                        $("#member").append(
-                            `<option value="0">${data.name}</option>`
-                        );
-                    }
-                }
-                else {
-                    $("#member").append(
-                        `<option value="">Something's wrong</option>`
-                    );
+
                 }
             },
             error: function (errResponse) {
@@ -103,5 +99,115 @@
                 debugger;
             }
         });
+
+        $.ajax({
+            url: "Appointment/GetMedFacByDoctorId",
+            data: {
+                doctorId: @ViewBag.DoctorId
+                },
+            dataType: "json",
+            beforeSend: () => { },
+            success: function (response) {
+                debugger;
+                console.log(response.statusCode);
+                $("#medFac").empty();
+                $("#medFac").append(
+                    `<option value="">-- Select MedFac --</option>`
+                );
+                if (response.statusCode == 200) {
+                    if (response.data.length > 0) {
+                        $.each(
+                            response.data,
+                            function (idx, data) {
+                                $("#medFac").append(
+                                    `<option value="${data.id}">${data.name}</option>`
+                                );
+                            }
+                        );
+                    }
+                }
+            },
+            error: function (errResponse) {
+                console.error("errResponse", errResponse)
+                debugger;
+            }
+        });
+
+        $("#medFac").change(function(e) {
+            $("#tindakan").empty();
+            $("#date").val("");
+            if ($(this).val() != 0) {
+                $.ajax({
+                    url: "Appointment/GetSchedule",
+                    data: {
+                        medFacId: $(this).val(),
+                        doctorId: @ViewBag.DoctorId
+                            },
+                    dataType: "json",
+                    beforeSend: () => { },
+                    success: function(response) {
+                        $("#date").val("");
+                        $("#date").prop("disabled", false);
+                        $("#date").flatpickr({
+                            minDate: new Date().fp_incr(1),
+                            dateFormat: "Y-m-d",
+                            enable: [
+                                function (date) {
+                                    var checkDay = false;
+                                    $.each(
+                                        response,
+                                        function (idx, data) {
+                                            if (date.getDay() === data) {
+                                                checkDay = true;
+                                                return;
+                                            }
+                                        }
+                                    );
+                                    return checkDay;
+                                }                                
+                            ]
+                        });
+                    }
+                });
+
+                $.ajax({
+                    url: "Appointment/GetTreatment",
+                    data: {
+                        medFacId: $(this).val(),
+                        doctorId: @ViewBag.DoctorId
+                    },
+                    dataType: "json",
+                    beforeSend: () => { },
+                    success: function (response) {
+                        debugger;
+                        console.log(response.statusCode);
+                        $("#tindakan").empty();
+                        if (response.statusCode == 200) {
+                            if (response.data.length > 0) {
+                                $("#tindakan").prop("disabled", false);
+                                $.each(
+                                    response.data,
+                                    function (idx, data) {
+                                        $("#tindakan").append(
+                                            `<option value="${data.id}">${data.name}</option>`
+                                        );
+                                    }
+                                );
+                            }
+                        }
+                    },
+                    error: function (errResponse) {
+                        console.error("errResponse", errResponse)
+                        debugger;
+                    }
+                });
+            }
+            else {
+                $("#tindakan").empty();
+                $("#tindakan").prop("disabled", true);
+                $("#date").val("");
+                $("#date").prop("disabled", true);
+            }
+        })
     })
 </script>

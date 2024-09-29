@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace HealthCare340B.DataAccess
 {
@@ -19,15 +20,89 @@ namespace HealthCare340B.DataAccess
             db = _db;
         }
 
-        public VMResponse<VMTAppointment?> GetByDate(DateTime appDate)
+        public List<DateTime>? GetEmptySlotDate(List<VMMMedicalFacilitySchedule> data)
         {
-            VMResponse<VMTAppointment?> response = new VMResponse<VMTAppointment?>();
+            List<DateTime> excludedDate = new List<DateTime>();
+            List<VMAppointmentSchedule> appSchedule = new List<VMAppointmentSchedule>();
+            try
+            {              
+                foreach (VMMMedicalFacilitySchedule sch in data)
+                {
+                    List<VMTAppointment>? appointment = (
+                        from ap in db.TAppointments
+                        where ap.IsDelete == false && ap.DoctorOfficeScheduleId == sch.DoctorOfficeScheduleId
+                        select new VMTAppointment
+                        {
+                            Id = ap.Id,
+                            DoctorOfficeId = ap.DoctorOfficeId,
+                            DoctorOfficeScheduleId = ap.DoctorOfficeScheduleId,
+                            DoctorOfficeTreatmentId = ap.DoctorOfficeTreatmentId,
+                            AppointmentDate = ap.AppointmentDate,
+                            CreatedBy = ap.CreatedBy,
+                            CreatedOn = ap.CreatedOn,
+                            ModifiedBy = ap.ModifiedBy,
+                            ModifiedOn = ap.ModifiedOn,
+                            DeletedBy = ap.DeletedBy,
+                            DeletedOn = ap.DeletedOn,
+                            IsDelete = ap.IsDelete
+                        }
+                    ).ToList();
+
+                    List<DateTime> dateSch = new List<DateTime>();
+
+                    foreach (VMTAppointment date in appointment)
+                    {
+                        dateSch.Add((DateTime)date.AppointmentDate!);
+                    }
+
+                    dateSch.Sort();
+
+                    DateTime? compare = null;
+                    int count = 0;
+                    foreach (DateTime date in dateSch)
+                    {
+                        if (compare == null)
+                        {
+                            compare = date;
+                            count++;
+                        }
+                        else if (compare == date && count++ < sch.Slot)
+                            count++;
+                        else
+                        {
+                            if (count >= sch.Slot)
+                                excludedDate.Add((DateTime)(compare + 
+                                    new TimeSpan(DateTime.Parse(sch.TimeScheduleStart!).Hour, 
+                                    DateTime.Parse(sch.TimeScheduleStart!).Minute, 0)));
+                            count = 1;
+                            compare = date;
+                        }
+                    }
+
+                    if (count >= sch.Slot)
+                        excludedDate.Add((DateTime)(compare +
+                        new TimeSpan(DateTime.Parse(sch.TimeScheduleStart!).Hour,
+                        DateTime.Parse(sch.TimeScheduleStart!).Minute, 0))!);
+
+
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Something's wrong - {e.Message}");
+            }
+            return excludedDate;
+        }
+
+        public VMResponse<List<VMTAppointment>?> GetByDateAndDoctorOfficeScheduleId(DateTime appDate, long doctorOfficeScheduleId)
+        {
+            VMResponse<List<VMTAppointment>?> response = new VMResponse<List<VMTAppointment>?>();
 
             try
             {
                 response.Data = (
                     from ap in db.TAppointments
-                    where ap.IsDelete == false && ap.AppointmentDate == appDate
+                    where ap.IsDelete == false && ap.AppointmentDate == appDate && ap.DoctorOfficeScheduleId == doctorOfficeScheduleId
                     select new VMTAppointment
                     {
                         Id = ap.Id,
@@ -43,7 +118,7 @@ namespace HealthCare340B.DataAccess
                         DeletedOn = ap.DeletedOn,
                         IsDelete = ap.IsDelete
                     }
-                ).FirstOrDefault();
+                ).ToList();
 
                 if (response.Data != null)
                 {
@@ -156,7 +231,7 @@ namespace HealthCare340B.DataAccess
             }
             catch
             {
-                slot = -1;
+                slot = null;
             }
 
             return slot;
@@ -244,103 +319,50 @@ namespace HealthCare340B.DataAccess
                     // Check if the customer has an appointment in the input date
                     if (GetByDate((DateTime)data.AppointmentDate!, (long)data.CustomerId!).Data == null)
                     {
-                        if (GetByDate((DateTime)data.AppointmentDate!).Data == null)
-                        {
-                            // Check if the slot is still available
-                            if (Slot((long)data.DoctorOfficeScheduleId!) > 0)
+                        // Check if there is any slot left for the input date and doctor office
+                        if (GetByDateAndDoctorOfficeScheduleId((DateTime)data.AppointmentDate!, (long)data.DoctorOfficeScheduleId).Data == null ||
+                            (GetByDateAndDoctorOfficeScheduleId((DateTime)data.AppointmentDate!, (long)data.DoctorOfficeScheduleId).Data != null &&
+                            GetByDateAndDoctorOfficeScheduleId((DateTime)data.AppointmentDate!, (long)data.DoctorOfficeScheduleId).Data!.Count < 
+                            Slot((long)data.DoctorOfficeScheduleId)))
+                        {                    
+                            TAppointment newData = new TAppointment();
+                            newData.CustomerId = data.CustomerId;
+                            newData.DoctorOfficeId = data.DoctorOfficeId;
+                            newData.DoctorOfficeScheduleId = data.DoctorOfficeScheduleId;
+                            newData.DoctorOfficeTreatmentId = data.DoctorOfficeTreatmentId;
+                            newData.AppointmentDate = data.AppointmentDate;
+                            newData.CreatedBy = data.CreatedBy;
+                            newData.CreatedOn = DateTime.Now;
+
+                            db.Add(newData);
+                            db.SaveChanges();
+
+                            dbTran.Commit();
+
+                            response.Data = new VMTAppointment
                             {
-                                TAppointment newData = new TAppointment();
-                                newData.CustomerId = data.CustomerId;
-                                newData.DoctorOfficeId = data.DoctorOfficeId;
-                                newData.DoctorOfficeScheduleId = data.DoctorOfficeScheduleId;
-                                newData.DoctorOfficeTreatmentId = data.DoctorOfficeTreatmentId;
-                                newData.AppointmentDate = data.AppointmentDate;
-                                newData.CreatedBy = data.CreatedBy;
-                                newData.CreatedOn = DateTime.Now;
+                                Id = newData.Id,
+                                CustomerId = newData.CustomerId,
+                                DoctorOfficeId = newData.DoctorOfficeId,
+                                DoctorOfficeScheduleId = newData.DoctorOfficeScheduleId,
+                                DoctorOfficeTreatmentId = newData.DoctorOfficeTreatmentId,
+                                CreatedBy = newData.CreatedBy,
+                                CreatedOn = newData.CreatedOn,
+                                ModifiedBy = newData.ModifiedBy,
+                                ModifiedOn = newData.ModifiedOn,
+                                DeletedBy = newData.DeletedBy,
+                                DeletedOn = newData.DeletedOn,
+                                IsDelete = newData.IsDelete,
+                            };
 
-                                // Decrement slot by 1
-                                VMTDoctorOfficeSchedule? existingDataDOS = (
-                                    from dos in db.TDoctorOfficeSchedules
-                                    where dos.IsDelete == false && dos.Id == (long)data.DoctorOfficeScheduleId!
-                                    select new VMTDoctorOfficeSchedule
-                                    {
-                                        Id = dos.Id,
-                                        DoctorId = dos.Id,
-                                        MedicalFacilityScheduleId = dos.MedicalFacilityScheduleId,
-                                        Slot = dos.Slot,
-                                        CreatedBy = dos.CreatedBy,
-                                        CreatedOn = dos.CreatedOn,
-                                        ModifiedBy = dos.ModifiedBy,
-                                        ModifiedOn = dos.ModifiedOn,
-                                        DeletedBy = dos.DeletedBy,
-                                        DeletedOn = dos.DeletedOn,
-                                        IsDelete = dos.IsDelete
-                                    }
-                                ).FirstOrDefault();
-
-                                if (existingDataDOS != null)
-                                {
-                                    db.Add(newData);
-                                    db.SaveChanges();
-
-                                    //dbTran.Commit();
-
-                                    response.Data = new VMTAppointment
-                                    {
-                                        Id = newData.Id,
-                                        CustomerId = newData.CustomerId,
-                                        DoctorOfficeId = newData.DoctorOfficeId,
-                                        DoctorOfficeScheduleId = newData.DoctorOfficeScheduleId,
-                                        DoctorOfficeTreatmentId = newData.DoctorOfficeTreatmentId,
-                                        CreatedBy = newData.CreatedBy,
-                                        CreatedOn = newData.CreatedOn,
-                                        ModifiedBy = newData.ModifiedBy,
-                                        ModifiedOn = newData.ModifiedOn,
-                                        DeletedBy = newData.DeletedBy,
-                                        DeletedOn = newData.DeletedOn,
-                                        IsDelete = newData.IsDelete,
-                                    };
-
-                                    TDoctorOfficeSchedule updatedDataDOS = new TDoctorOfficeSchedule
-                                    {
-                                        Id = existingDataDOS.Id,
-                                        DoctorId = existingDataDOS.Id,
-                                        MedicalFacilityScheduleId = existingDataDOS.MedicalFacilityScheduleId,
-                                        Slot = existingDataDOS.Slot - 1,
-                                        CreatedBy = existingDataDOS.CreatedBy,
-                                        CreatedOn = existingDataDOS.CreatedOn,
-                                        ModifiedBy = existingDataDOS.ModifiedBy,
-                                        ModifiedOn = existingDataDOS.ModifiedOn,
-                                        DeletedBy = existingDataDOS.DeletedBy,
-                                        DeletedOn = existingDataDOS.DeletedOn,
-                                        IsDelete = existingDataDOS.IsDelete
-                                    };
-
-                                    db.Update(updatedDataDOS);
-                                    db.SaveChanges();
-
-                                    dbTran.Commit();
-
-                                    response.StatusCode = HttpStatusCode.Created;
-                                    response.Message = $"{HttpStatusCode.Created} - New Appointment has been successfully created!";
-                                }
-                                else
-                                {
-                                    throw new Exception("Slot cannot be updated!");
-                                }
-                                
-                            }
-                            else
-                            {
-                                response.StatusCode = HttpStatusCode.BadRequest;
-                                response.Message = $"{HttpStatusCode.BadRequest} - Slot is empty!";
-                            }
-                           
+                            response.StatusCode = HttpStatusCode.Created;
+                            response.Message = $"{HttpStatusCode.Created} - New Appointment has been successfully created!";
+                            
                         }
                         else
                         {
                             response.StatusCode = HttpStatusCode.Found;
-                            response.Message = $"{HttpStatusCode.Found} - There is already an appointment for this doctor for this time";
+                            response.Message = $"{HttpStatusCode.Found} - Slot is Full!";
                         }
                     }      
                     else

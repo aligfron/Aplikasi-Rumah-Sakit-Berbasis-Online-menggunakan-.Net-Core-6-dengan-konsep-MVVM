@@ -18,6 +18,28 @@ namespace HealthCare340B.API.Controllers
             appointment = new DAAppointment(_db);
         }
 
+        [HttpPost("[action]")]
+        public async Task<ActionResult> GetEmptySlotDate(List<VMMMedicalFacilitySchedule> data)
+        {
+            try
+            {
+                List<DateTime>? excludedDate = await Task.Run(() => appointment.GetEmptySlotDate(data));
+                if (excludedDate!.Count > 0)
+                {
+                    return Ok(excludedDate);
+                }
+                else
+                {
+                    Console.WriteLine("Every slot date is available!");
+                    return NoContent();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"{HttpStatusCode.BadRequest}");
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult> Create(VMTAppointment data)
         {

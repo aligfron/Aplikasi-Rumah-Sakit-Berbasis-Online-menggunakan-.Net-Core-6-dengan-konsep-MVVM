@@ -116,22 +116,12 @@ namespace HealthCare340B.DataAccess
                 response.Data = (
                     from d in db.MDoctors
                     join b in db.MBiodata on d.BiodataId equals b.Id
-                    join o in db.TDoctorOffices on d.Id equals o.DoctorId
-                    join f in db.MMedicalFacilities on o.MedicalFacilityId equals f.Id
-                    join s in db.MSpecializations on o.Specialization equals s.Name
-                    join t in db.TDoctorTreatments on d.Id equals t.DoctorId
-                    where d.IsDelete == false && d.Id == id
                     select new VMMDoctor
                     {
                         Id = d.Id,
                         BiodataId = d.BiodataId,
                         Str = d.Str,
-                        Fullname = b.Fullname,
-                        Specialization = s.Name,
-                        MedicalFacilityName = f.Name,
-                        Treatment = t.Name,
-                        StartDate = o.StartDate,
-                        EndDate = o.EndDate,
+                        Fullname = b.Fullname
                     }
                     ).FirstOrDefault();
 
