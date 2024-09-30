@@ -296,6 +296,55 @@ namespace HealthCare340B.DataAccess
             }
         }
 
+        public VMResponse<VMMCustomer> GetCustId(long bioId)
+        {
+            VMResponse<VMMCustomer> response = new VMResponse<VMMCustomer>();
+
+            try
+            {
+                response.Data = (
+                    from c in db.MCustomers
+                    where c.IsDelete == false && c.BiodataId == bioId
+                    select new VMMCustomer
+                    {
+                        Id = c.Id,
+                        BiodataId = c.BiodataId,
+                        Dob = c.Dob,
+                        Gender = c.Gender,
+                        BloodGroupId = c.BloodGroupId,
+                        RhesusType = c.RhesusType,
+                        Height = c.Height,
+                        Weight = c.Weight,
+                        CreatedBy = c.CreatedBy,
+                        CreatedOn = c.CreatedOn,
+                        ModifiedBy = c.ModifiedBy,
+                        ModifiedOn = c.ModifiedOn,
+                        DeletedBy = c.DeletedBy,
+                        DeletedOn = c.DeletedOn,
+                        IsDelete = c.IsDelete
+                    }
+                    ).FirstOrDefault();
+
+                if (response.Data != null)
+                {
+                    response.StatusCode = HttpStatusCode.OK;
+                    response.Message = $"{HttpStatusCode.OK} - Customer successfully fetch!";
+                }
+                else
+                {
+                    response.StatusCode = HttpStatusCode.NoContent;
+                    response.Message = $"{HttpStatusCode.NoContent} - Customer does not exist!";
+                }
+
+            }
+            catch (Exception e)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
+            }
+
+            return response;
+        }
+
         public VMResponse<VMTAppointment> Create(VMTAppointment data)
         {
             VMResponse<VMTAppointment> response = new VMResponse<VMTAppointment>();

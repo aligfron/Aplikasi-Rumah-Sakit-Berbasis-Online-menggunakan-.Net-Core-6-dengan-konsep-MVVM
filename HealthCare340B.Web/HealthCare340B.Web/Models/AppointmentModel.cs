@@ -362,6 +362,46 @@ namespace HealthCare340B.Web.Models
             return data;
         }
 
+        public async Task<long> GetCustId(long bioId)
+        {
+            VMMCustomer? data = null;
+            VMResponse<VMMCustomer>? apiResponse = new VMResponse<VMMCustomer>();
+            try
+            {
+                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync(
+                   $"{apiUrl}Appointment/GetCustId/{bioId}"
+                   );
+
+                if (apiResponseMsg != null)
+                {
+                    if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
+                    {
+                        apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMCustomer>?>
+                            (apiResponseMsg.Content.ReadAsStringAsync().Result);
+
+                        data = apiResponse!.Data;
+                    }
+                    else
+                    {
+                        throw new Exception($"{HttpStatusCode.NoContent} - Customer is not Found!");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Appointment API could not be reached");
+                }
+            }
+            catch (Exception e)
+            {
+                //Logging
+                Console.WriteLine("AppointmentModel.GetCustId: " + e.Message);
+                throw new Exception("AppointmentModel.GetCustId: " + e.Message);
+            }
+
+            return data!.Id;
+
+        }
+
         public async Task<VMResponse<VMTAppointment>?> Create(VMTAppointment data)
         {
             VMResponse<VMTAppointment>? apiResponse = new VMResponse<VMTAppointment>();

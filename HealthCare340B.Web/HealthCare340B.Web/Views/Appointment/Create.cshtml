@@ -340,15 +340,29 @@
         $("#btnSave").click(function (e) {
             var dofId = null;
             var dosId = null;
-            $ajax.({
+            var dateString = $("#date").val().split("-");
+            var dateChoice = new Date(dateString[0], dateString[1] - 1, dateString[2]);
+            var dateDate = dateChoice.getDate();
+            if (dateDate < 10) {
+                dateDate = "0" + dateDate;
+            }
+            var dateMonth = dateChoice.getMonth() + 1;
+            if (dateMonth < 10) {
+                dateMonth = "0" + dateMonth;
+            }
+            var dateYear = dateChoice.getFullYear();
+            var fullDate = (dateYear + "-" + dateMonth + "-" + dateDate + " " + $("#sesi").val() + ":00");
+            console.log(fullDate);
+            $.ajax({
                 url: "Appointment/GetDoctorOfficeId",
                 data: {
                     medFacId: $("#medFac").val(),
                     doctorId: @ViewBag.DoctorId
                 },
-                dataType: "json",
+                async: false,
                 beforeSend: () => { },
                 success: function (response) {
+                    debugger;
                     dofId = response;
                 },
                 error: function (errResponse) {
@@ -358,16 +372,18 @@
                 }
             });
 
-            $ajax.({
+            $.ajax({
                 url: "Appointment/GetDoctorOfficeScheduleId",
                 data: {
                     doctorId: @ViewBag.DoctorId,
                     medFacId: $("#medFac").val(),
-                    day: $("#date").val().getDay()
+                    day: dateChoice.getDay(),
                     timeStart: $("#sesi").val()
                     },
+                async: false,
                 beforeSend: () => { },
                 success: function (response) {
+                    debugger;
                     dosId = response;
                 },
                 error: function (errResponse) {
@@ -385,16 +401,11 @@
                     dofId: dofId,
                     dosId: dosId,
                     dotId: $("#tindakan").val(),
-                    appDate: $("#date").val().toString()
+                    appDate: fullDate
                 },
                 beforeSend: () => { },
                 success: function (response) {
-                    if (response.statusCode == 201 || response.statusCode == 200) {
-                        alert(response.message, "success");
-                    }
-                    else {
-                        alert(response.message, "danger");
-                    }
+                    alert("success");
                 },
                 error: function (errResponse) {
                     console.log(errResponse);

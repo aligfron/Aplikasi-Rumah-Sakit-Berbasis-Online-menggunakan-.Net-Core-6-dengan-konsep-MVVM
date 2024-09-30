@@ -40,13 +40,37 @@ namespace HealthCare340B.API.Controllers
             }
         }
 
+        [HttpGet("[action]/{bioId?}")]
+        public async Task<ActionResult> GetCustId(long? bioId)
+        {
+            try
+            {
+                if (bioId == null)
+                    throw new ArgumentNullException();
+                VMResponse<VMMCustomer> response = await Task.Run(() => appointment.GetCustId((long)bioId));
+
+                if (response.Data != null)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return NoContent(); 
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"{HttpStatusCode.BadRequest} - {e.Message}");
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult> Create(VMTAppointment data)
         {
             try
             {
                 VMResponse<VMTAppointment> response = await Task.Run(() => appointment.Create(data));
-                if (response.StatusCode == HttpStatusCode.OK)
+                if (response.StatusCode == HttpStatusCode.Created)
                     return Created("api/Appointment", response);
                 else
                     throw new Exception(response.Message);

@@ -300,6 +300,8 @@ namespace HealthCare340B.Web.Controllers
             try
             {
                 // If custId = 0, find custId using biodataId session!
+                if (custId == 0)
+                    custId = await appointment.GetCustId((long)HttpContext.Session.GetInt32("userBiodataId")!);
                 VMTAppointment data = new VMTAppointment
                 {
                     CustomerId = custId,
