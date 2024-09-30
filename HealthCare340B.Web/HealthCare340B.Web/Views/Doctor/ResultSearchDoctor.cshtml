@@ -86,21 +86,29 @@
                                     <div class="col-md-4 text-center">
                                         @if (!string.IsNullOrEmpty(doctor.ImagePath))
                                         {
-                                            <!-- Display doctor's profile image if ImagePath is not null -->
-                                            <img src=" @doctor.ImagePath ?? ~/images/images_doctor.jpeg" alt="Doctor Profile" class="img-fluid rounded-circle" style="width: 100px; height: 100px;" />
+                                            <img id="profileImage" src="~/@ViewBag.ImgFolder/@(doctor.ImagePath ?? "images/images_doctor.jpeg")" alt="Avatar" class="rounded-circle" style="width: 100px; height: 100px;">
                                         }
-                                        <p class="mt-2 text-muted">Aktif</p>
-@*                                         <div class="d-grid gap-2">
-                                            @if (doctor.IsOnline)
+                                        else
+                                        {
+                                            <img id="profileImage" src="~/images/images_doctor.jpeg" alt="Avatar" class="rounded-circle" style="width: 100px; height: 100px;">
+                                        }
+                                        <div class="d-grid gap-2">
+                                            @if (doctor.IsOnline && doctor.IsAvailable)
                                             {
                                                 <button class="btn btn-primary">Chat</button>
+                                                <button class="btn btn-success mt-2">Buat Janji</button>
+                                            }
+                                            else if (doctor.IsOnline && !doctor.IsAvailable)
+                                            {
+                                                <button class="btn btn-primary" disabled>Chat</button>
+                                                <button class="btn btn-success mt-2" disabled>Buat Janji</button>
                                             }
                                             else
                                             {
                                                 <span class="text-muted">Offline</span>
+                                                <button class="btn btn-success mt-2">Buat Janji</button>
                                             }
-                                            <button class="btn btn-success mt-2">Buat Janji</button>
-                                        </div> *@
+                                        </div>
                                     </div>
                                 </div>
                             </div>

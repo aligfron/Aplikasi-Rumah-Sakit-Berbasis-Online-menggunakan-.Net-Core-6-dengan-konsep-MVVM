@@ -8,7 +8,7 @@
 
 <div class="card">
     <div class="card-body">
-        <form id="frmCreateAlamat">
+        <form id="frmUpdateAlamat">
             <!-- Label Alamat -->
             <div class="row mb-3">
                 <label class="col-12 col-form-label">Label Alamat<span class="text-danger">*</span></label>
@@ -85,11 +85,12 @@
             </div>
 
             <input type="hidden" name="ModifiedBy" value="1" />
+            <input type="hidden" name="Id" value="@Model.Id" />
 
             <!-- Buttons -->
             <div class="d-flex justify-content-between mt-5">
                 <button type="reset" id="btnReset" class="btn btn-outline-info">Reset</button>
-                <button type="button" id="btnSave" class="btn btn-info">Save</button>
+                <button type="submit" id="btnSave" class="btn btn-info">Save</button>
             </div>
         </form>
     </div>
@@ -98,75 +99,76 @@
 <script>
     $("#staticModalLabel").text("@ViewBag.Title");
 
-    $("#frmUpdateAlamat").validate({
-        rules: {
-            Label: {
-                maxlength: 100,
-                minlength: 3,
-                required: true
-            },
-            Recipient: {
-                required: true
-            },
-            RecipientPhoneNumber: {
-                required: true
-            },
-            Location: {
-                required: true
-            }
-        },
-        messages: {
-            Label: {
-                required: "Silahkan masukkan Label Alamat"
-            },
-            Recipient: {
-                required: "Silahkan masukkan Nama Penerima"
-            },
-            RecipientPhoneNumber: {
-                required: "Silahkan masukkan Kontak Penerima"
-            },
-            LocationId: {
-                required: "Silahkan masukkan Kecamatan / Kota"
-            }
-        },
-        errorClass: "text-danger"
-    });
+    $(document).ready(function () {
 
-    $("#btnSave").click(function (e) {
-        // debugger;
-        if ($("#frmUpdateAlamat").valid()) {
-            $.ajax({
-                url: "/Profile/Edit",
-                type: "put",
-                data: $("#frmUpdateAlamat").serialize(),
-                dataType: "json",
-                beforeSend: () => { },
-                success: function (response) {
-                    if (response.statusCode == 200 || response.statusCode == 201) {
-                        alert(response.statusCode + " - " + response.message);
-
-                        location.reload();
-                    }
-                    else {
-                        alert(response.statusCode + " - " + response.message);
-                    }
+        $("#frmUpdateAlamat").validate({
+            rules: {
+                Label: {
+                    maxlength: 100,
+                    minlength: 3,
+                    required: true
                 },
-                error: function (errResponse) {
-                    console.error(errResponse);
-                    debugger;
+                Recipient: {
+                    required: true
+                },
+                RecipientPhoneNumber: {
+                    required: true
+                },
+                Location: {
+                    required: true
                 }
-            });
-        }
-        else {
-            console.error("Alamat data is not valid");
-        }
+            },
+            messages: {
+                Label: {
+                    required: "Silahkan masukkan Label Alamat"
+                },
+                Recipient: {
+                    required: "Silahkan masukkan Nama Penerima"
+                },
+                RecipientPhoneNumber: {
+                    required: "Silahkan masukkan Kontak Penerima"
+                },
+                LocationId: {
+                    required: "Silahkan masukkan Kecamatan / Kota"
+                }
+            },
+            errorClass: "text-danger"
+        });
 
-        return false;
+        $("#frmUpdateAlamat").submit(function (e) {
+            //disable form submit function
+            e.preventDefault();
+        });
+
+        $("#btnSave").click(function (e) {
+            if ($("#frmUpdateAlamat").valid()) {
+                $.ajax({
+                    url: "/Profile/EditAlamat",
+                    type: "post",
+                    data: $("#frmUpdateAlamat").serialize(),
+                    dataType: "json",
+                    beforeSend: () => { },
+                    success: function (response) {
+                        if (response.statusCode == 200 || response.statusCode == 201) {
+                            alert(response.statusCode + "-" + response.message);
+                            window.location.href = "/Profile/IndexCustomerProfile";
+                        } else {
+                            alert(response.statusCode + "-" + response.message);
+                        }
+                    },
+                    error: function (errResponse) {
+                        console.error(errResponse);
+                        debugger;
+                    }
+                });
+            } else {
+                console.error("Form alamat data is not valid");
+            }
+            return false;
+        });
+
+        $("#btnReset").click(() => {
+            $("#frmUpdateAlamat")[0].reset();
+        });
     });
-
-    $("#frmUpdateAlamat").submit(function (e) {
-        e.preventDefault();
-    });
-
-    $("#btnReset").click(() => { $("#frmUpdateAlamat")[0].reset(); });
 </script>

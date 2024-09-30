@@ -32,8 +32,16 @@
 
 <script>
     $(document).ready(function () {
-        $('#alamat').load('/Profile/TabAlamat')
+        console.log("Document is ready");
+        $("#alamat").load('/Profile/TabAlamat', function (response, status, xhr) {
+            if (status == "error") {
+                console.log("Error: " + xhr.status + " " + xhr.statusText);
+            } else {
+                console.log("TabAlamat content loaded successfully.");
+            }
+        });
     });
+
 </script>
 
 <!-- Uncomment untuk load konten menggunakan AJAX -->

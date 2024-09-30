@@ -43,6 +43,8 @@ namespace HealthCare340B.ViewModel
         
         public List<VMTAppointment>? Appointment { get; set; }
 
+        public string? LastEducationEndYear { get; set; }
+
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
@@ -50,17 +52,21 @@ namespace HealthCare340B.ViewModel
         {
             get
             {
-                var endDate = EndDate ?? DateTime.Now;
-                int years = endDate.Year - StartDate.Year;
-                if (endDate.Month < StartDate.Month ||
-                    (endDate.Month == StartDate.Month && endDate.Day < StartDate.Day))
+                if (LastEducationEndYear != null && int.TryParse(LastEducationEndYear, out int endYear))
                 {
-                    years--;
+                    return DateTime.Now.Year - endYear;
                 }
-
-                return years;
+                return 0;
             }
         }
+
+        public bool IsOnline { get; set; }
+        public bool IsAvailable { get; set; }
+
+        public string MedicalFacilityCategory { get; set; }
+        public string MedicalFacilityScheduleDay { get; set; }
+        public TimeSpan? MedicalFacilityScheduleStartTime { get; set; }
+        public TimeSpan? MedicalFacilityScheduleEndTime { get; set; }
 
     }
 }

@@ -8,8 +8,9 @@
 <div class="card">
     <div class="card-body">
         <i class="fas fa-exclamation-triangle fa-align-left float-xxl-start text-danger h1 me-3"></i>
-        <span>are you sure want to DELETE with ID = </span>
-        <span>@Model?</span>
+        <span>apakah anda yakin ingin menghapus Biodata Alamat dengan ID = </span>
+        <span>@Model?
+        </span>
         <span>Anda tidak dapat mengembalikan alamat yang sudah dihapus</span>
     </div>
     <div class="card-footer d-flex justify-content-end">
@@ -21,4 +22,27 @@
 
 <script>
     $("#staticModalLabel").text("@ViewBag.Title");
+
+    $(document).on("click", "#btnDelete", function (e) {
+        console.log("Delete button clicked");
+        $.ajax({
+            url: "/Profile/Delete",
+            type: "post",
+            data: {
+                "id": @Model,
+                "userId": 1,
+            },
+            dataType: "json",
+            success: function (response) {
+                if (response.statusCode == 200) {
+                    alert(response.statusCode + "-" + response.message);
+                    location.reload();
+                }
+            },
+            error: function (errResponse) {
+                console.error("Biodata Address Deletion Failed", errResponse);
+            }
+        });
+    });
+
 </script>

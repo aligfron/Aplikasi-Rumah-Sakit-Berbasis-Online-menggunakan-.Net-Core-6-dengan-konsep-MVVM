@@ -15,13 +15,15 @@ namespace HealthCare340B.Web.Controllers
         private ProfileModel profile;
         private SpecializationModel specialization;
         private string? _userId;
-        private string? _roleCode;
+        private string? _roleCode; 
+        private readonly int pageSize;
 
         public ProfileController(IConfiguration _config, IWebHostEnvironment _webHostEnv)
         {
             profile = new ProfileModel(_config, _webHostEnv);
             specialization = new SpecializationModel(_config);
             imageFolder = _config["ImageFolder"];
+            pageSize = int.Parse(_config["PageSize"]);
         }
 
         private bool isInSession()
@@ -158,11 +160,16 @@ namespace HealthCare340B.Web.Controllers
 
             //return (await profile.UpdateAsync(data));
         }
-        public async Task<IActionResult> DeleteAlamat()
+        [HttpGet("/Profile/DeleteAlamat/{id}")]
+        public async Task<IActionResult> DeleteAlamat(int id)
         {
             ViewBag.Title = "Hapus Alamat";
-            return View();
+            return View(id);
         }
+        [HttpPost]
+        public async Task<VMResponse<VMMBiodataAddress>?> DeleteAsync(int id, int userId)
+            => (await profile.DeleteAsync(id, userId));
+
 
         public async Task<IActionResult> CreateAlamat()
         {
@@ -177,6 +184,7 @@ namespace HealthCare340B.Web.Controllers
         public async Task<VMResponse<VMMBiodataAddress>?> CreateAsync(VMMBiodataAddress data)
            => await profile.CreateAsync(data);
 
+        [HttpGet("/Profile/EditAlamat/{id}")]
         public async Task<IActionResult> EditAlamat(int id)
         {
             VMMBiodataAddress? data = await profile.GetByIdAlamat(id);
@@ -187,30 +195,64 @@ namespace HealthCare340B.Web.Controllers
             return View(data);
         }
 
-        public async Task<IActionResult> TabAlamat()
+
+        [HttpGet("/Profile/TabAlamat")]
+        public async Task<IActionResult> TabAlamat(string? filter, int? pageNumber, int? currentPageSize, string? orderBy)
         {
             ViewBag.Title = "Daftar Alamat";
 
-            var bioAddress = new List<VMMBiodataAddress>();
+            List<VMMBiodataAddress>? data = new List<VMMBiodataAddress>();
             try
             {
-                bioAddress = await profile.GetAllBioAddress();
+                data = await profile.GetByFilter(filter);
             }
             catch (Exception ex)
             {
                 HttpContext.Session.SetString("errMsg", ex.Message);
             }
 
-            if (bioAddress == null || !bioAddress.Any())
+            switch (orderBy)
+            {
+                case "label_desc":
+                    data = data?.OrderByDescending(p => p.Label).ToList();
+                    break;
+                case "label":
+                    data = data?.OrderBy(p => p.Label).ToList();
+                    break;
+                case "recipient_desc":
+                    data = data?.OrderByDescending(p => p.Recipient).ToList();
+                    break;
+                case "recipient":
+                    data = data?.OrderBy(p => p.Recipient).ToList();
+                    break;
+                case "id_desc":
+                    data = data?.OrderByDescending(p => p.Id).ToList();
+                    break;
+                default:
+                    data = data?.OrderBy(p => p.Id).ToList();
+                    break;
+            }
+            if (data == null || !data.Any())
             {
                 ViewBag.Message = "Tidak ada Biodata Address ditemukan berdasarkan pencarian Anda.";
-                bioAddress = new List<VMMBiodataAddress>();
+                data = new List<VMMBiodataAddress>();
             }
 
-            return View(bioAddress);
+            ViewBag.BioAddressId = string.IsNullOrEmpty(orderBy) ? "id_desc" : "";
+            ViewBag.OrderRecipient = (orderBy == "recipient") ? "recipient_desc" : "recipient";
+            ViewBag.OrderLabel = (orderBy == "label") ? "label_desc" : "label";
+            ViewBag.PageSize = currentPageSize ?? 10; // default page size
+            ViewBag.OrderBy = orderBy;
+            ViewBag.Filter = filter;
+
+
+            return View(Pagination<VMMBiodataAddress>.Create(data ?? new List<VMMBiodataAddress>(), pageNumber ?? 1, ViewBag.PageSize));
         }
+        [HttpPost]
+        public async Task<VMResponse<VMMBiodataAddress>?> EditAlamatAsync(VMMBiodataAddress data)
+            => (await profile.UpdateAsync(data));
 
-
+        
         //ali
         public async Task<IActionResult> CreateSpeDoctor(int id)
         {

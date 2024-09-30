@@ -24,13 +24,25 @@
         <p class='my-2' id="profilContent">Loading...</p>
     </div>
     <div class="tab-pane fade" id="alamat" role="tabpanel" aria-labelledby="alamat-tab">
-        <!--Tab Alamat-->
-        <partial name="TabAlamat" />
     </div>
     <div class="tab-pane fade" id="pembayaran" role="tabpanel" aria-labelledby="pembayaran-tab">
         <p class='my-2' id="pembayaranContent">Loading...</p>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        console.log("Document is ready");
+        $("#alamat").load('/Profile/TabAlamat', function (response, status, xhr) {
+            if (status == "error") {
+                console.log("Error: " + xhr.status + " " + xhr.statusText);
+            } else {
+                console.log("TabAlamat content loaded successfully.");
+            }
+        });
+    });
+
+</script>
 
 <!-- Uncomment untuk load konten menggunakan AJAX -->
 @*<script>

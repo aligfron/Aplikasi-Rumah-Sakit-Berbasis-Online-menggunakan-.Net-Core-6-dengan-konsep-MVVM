@@ -290,8 +290,10 @@ namespace HealthCare340B.DataAccess
                             PostalCode = existingData.PostalCode,
                             Address = existingData.Address,
 
-                            ModifiedBy = userId,
-                            ModifiedOn = DateTime.Now,
+                            ModifiedBy = existingData.ModifiedBy,
+                            ModifiedOn = existingData.ModifiedOn,
+                            DeletedBy = userId,
+                            DeletedOn = DateTime.Now,
 
                             IsDelete = true,
                             CreatedBy = existingData.CreatedBy,

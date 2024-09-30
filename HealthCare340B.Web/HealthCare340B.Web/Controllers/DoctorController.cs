@@ -55,6 +55,7 @@ namespace HealthCare340B.Web.Controllers
             return View();
         }
 
+
         [HttpPost]
         public async Task<IActionResult> ResultSearchDoctor(VMMDoctor dataFilter)
         {
@@ -72,6 +73,13 @@ namespace HealthCare340B.Web.Controllers
                 {
                     Console.WriteLine($"Doctor: {doc.Fullname}, Specialization: {doc.Specialization}, Medical Facility: {doc.MedicalFacilityName}");
                 }
+
+
+                foreach (var doc in data)
+                {
+                    doc.IsOnline = DetermineIfDoctorIsOnline(doc);
+                    doc.IsAvailable = DetermineIfDoctorIsAvailable(doc);
+                }
             }
 
             ViewBag.Location = dataFilter.MedicalFacilityName;
@@ -87,6 +95,31 @@ namespace HealthCare340B.Web.Controllers
             }
 
             return View("ResultSearchDoctor", data);
+        }
+
+        private bool DetermineIfDoctorIsOnline(VMMDoctor doctor)
+        {
+            return doctor.MedicalFacilityCategory != null && doctor.MedicalFacilityCategory.Equals("Online", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool DetermineIfDoctorIsAvailable(VMMDoctor doctor)
+        {
+            var now = DateTime.Now;
+            var currentDay = now.DayOfWeek.ToString();
+            var currentTime = now.TimeOfDay;
+
+            if (doctor.MedicalFacilityScheduleDay != null && doctor.MedicalFacilityScheduleDay.Equals(currentDay, StringComparison.OrdinalIgnoreCase))
+            {
+                if (doctor.MedicalFacilityScheduleStartTime.HasValue && doctor.MedicalFacilityScheduleEndTime.HasValue)
+                {
+                    if (currentTime >= doctor.MedicalFacilityScheduleStartTime.Value && currentTime <= doctor.MedicalFacilityScheduleEndTime.Value)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
 

@@ -1,61 +1,51 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@model List<VMMBiodataAddress>
+﻿@model Pagination<VMMBiodataAddress>
 @{
     Layout = null;
 }
 
 <div class="container my-3">
     <div class="row mb-3">
-        <div class="col">
-            <input type="text" class="form-control" placeholder="Cari alamat atau nama penerima">
-        </div>
+        <form class="w-50" id="frmBioAddressFilter" method="get">
+            <div class="input-group">
+                <input class="form-control" type="text" id="Filter" name="filter" value="@ViewBag.Filter" placeholder="Masukkan Nama penerima atau alamat" />
+                <input type="hidden" name="tab" value="alamat" />
+                <button type="submit" id="btnSearch" class="btn btn-primary input-group-text"><i class="fas fa-search"></i></button>
+            </div>
+        </form>
         <div class="col-auto">
-            <button class="btn btn-primary">Urutkan</button>
-        </div>
-        <div class="col-auto">
-            <select class="form-select">
-                <option selected>Label Alamat</option>
-                <option value="1">Rumah</option>
-                <option value="2">Kantor</option>
+            <select class="form-select" name="orderBy" onchange="this.form.submit()">
+                <option value="" selected>Urutkan</option>
+                <option value="label">Label Ascending</option>
+                <option value="label_desc">Label Descending</option>
+                <option value="recipient">Recipient Ascending</option>
+                <option value="recipient_desc">Recipient Descending</option>
+                <option value="id_desc">ID Descending</option>
             </select>
         </div>
     </div>
 
-    <div class="row mb-3">
-        <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex">
-                <button id="btnDelete" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#staticModal"><i class="fas fa-trash"></i> Hapus</button>
-            </div>
-            <div class="d-flex align-items-center">
-                <a href="#" class="btn btn-link text-decoration-none">A-Z</a>
-                <input type="number" class="form-control mx-2" name="filter" value="@ViewBag.Filter" style="width: 60px;">
-                <a href="#" id="btnAdd" class="btn btn-link text-decoration-none" data-bs-toggle="modal" data-bs-target="#staticModal"><i class="fas fa-plus"></i> Tambah</a>
-            </div>
-        </div>
-    </div>
-
-
     <ul class="list-group">
         @if (Model != null)
         {
-            @foreach (VMMBiodataAddress bioAddress in Model)
+            foreach (var bioAddress in Model)
             {
-                <li class="list-group-item d-flex justify-content-between align-items-start">
-                    <div class="ms-2 me-auto">
-                        <div class="d-flex align-items-center mb-2">
-                            <input type="checkbox" class="form-check-input me-2">
-                            <span class="fw-bold">@bioAddress.Label</span>
+                if (!bioAddress.IsDelete)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="d-flex align-items-center mb-2">
+                                <input type="checkbox" class="form-check-input me-2">
+                                <span class="fw-bold">@bioAddress.Label</span>
+                            </div>
+                            <p class="mb-1 text-muted">@bioAddress.Recipient, @bioAddress.RecipientPhoneNumber</p>
+                            <p class="mb-1">@bioAddress.Address</p>
                         </div>
-                        <p class="mb-1 text-muted">@bioAddress.Recipient, @bioAddress.RecipientPhoneNumber</p>
-                        <p class="mb-1">@bioAddress.Address</p>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <button href="#" data-id="@bioAddress.Id" id="btnEdit" data-bs-toggle="modal" data-bs-target="#staticModal" class="btn btn-link me-2"><i class="fas fa-pen"></i>Ubah</button>
-                        <button href="#" id="btnDeleteId" data-bs-toggle="modal" data-bs-target="#staticModal" class="btn btn-link text-danger"><i class="fas fa-trash"></i>Hapus</button>
-                    </div>
-                </li>
+                        <div class="d-flex align-items-center">
+                            <button data-id="@bioAddress.Id" data-bs-toggle="modal" data-bs-target="#staticModal" class="btn btn-link me-2 btnEdit"><i class="fas fa-pen"></i>Ubah</button>
+                            <button data-id="@bioAddress.Id" data-bs-toggle="modal" data-bs-target="#staticModal" class="btn btn-link text-danger btnDeleteId"><i class="fas fa-trash"></i>Hapus</button>
+                        </div>
+                    </li>
+                }
             }
         }
         else
@@ -64,22 +54,41 @@
         }
     </ul>
 
-
     <div class="row mt-3">
-        <div class="col">
-            <button class="btn btn-secondary">Sebelumnya</button>
-            <button class="btn btn-secondary">Selanjutnya</button>
+        <div class="col" role="group">
+            <a asp-controller="Profile" asp-action="TabAlamat" asp-route-currentPageSize="@ViewBag.PageSize"
+               asp-route-filter="@ViewBag.Filter" asp-route-orderBy="@ViewBag.OrderBy"
+               asp-route-pageNumber="@(!Model.HasPreviousPage ? Model.PageIndex : Model.PageIndex - 1)"
+               class="btn btn-secondary @(!Model.HasPreviousPage ? "disabled" : "")" title="Previous Page...">
+                <i class="fas fa-backward"></i>
+            </a>
+            <a class="btn btn-secondary @(!Model.HasNextPage ? "disabled" : "")" title="Next Page..."
+               asp-controller="Profile" asp-action="TabAlamat" asp-route-currentPageSize="@ViewBag.PageSize"
+               asp-route-filter="@ViewBag.Filter" asp-route-orderBy="@ViewBag.OrderBy"
+               asp-route-pageNumber="@(!Model.HasNextPage ? Model.PageIndex : Model.PageIndex + 1)">
+                <i class="fas fa-forward"></i>
+            </a>
         </div>
-        <div class="col text-end">
-            <span>Menampilkan 1 - 3 dari 3</span>
-        </div>
+        <div class="col-lg-11">Page @Model.PageIndex of @Model.TotalPages (Total Data: @Model.TotalData)</div>
     </div>
 </div>
 
 <script>
-    $("#btnDeleteId").click(function (e) {
+
+    // function RefreshPage(filter, pageNumber, pageSize, orderBy) {
+    //     location.href = `/Profile/IndexCustomerProfile?filter=${filter}&pageNumber=${pageNumber}&currPageSize=${pageSize}&orderBy=${orderBy}`;
+    // }
+
+    // $("th a").click(function (e) {
+    //     let orderBy = $(this).data("orderby");
+
+    //     RefreshPage("@ViewBag.Filter", "@Model.PageIndex", "@ViewBag.PageSize", orderBy);
+    // });
+
+
+    $(".btnDeleteId").click(function (e) {
         $("#staticModalBody").html("")
-        $("#staticModalBody").load("/Profile/DeleteAlamat")
+        $("#staticModalBody").load("/Profile/DeleteAlamat/" + $(this).data("id"))
     });
 
     $("#btnAdd").click(function (e) {
@@ -87,9 +96,33 @@
         $("#staticModalBody").load("/Profile/CreateAlamat")
     });
 
-    $("#btnEdit").click(function (e) {
+    $(".btnEdit").click(function (e) {
+        console.log($(this).data("id"))
         $("#staticModalBody").html("")
         $("#staticModalBody").load("/Profile/EditAlamat/" + $(this).data("id"))
     });
+
+    $(document).ready(function () {
+        $("#btnSearch").click(function (e) {
+            e.preventDefault()
+            console.log("button search click")
+            let filter = $("#Filter").val()
+            $.ajax({
+                url: "/Profile/TabAlamat",
+                type: "get",
+                data: {"filter" : filter},
+                success: function (response) {
+                    console.log(response)
+                    $("#alamat").html(response)
+                },
+                error: function (errResponse) {
+                    console.error(errResponse);
+                    debugger;
+                }
+            });
+        });
+    });
+    
+
 
 </script>

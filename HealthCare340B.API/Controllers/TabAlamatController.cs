@@ -129,7 +129,7 @@ namespace HealthCare340B.API.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPut("[action]")]
         public async Task<ActionResult> Update(VMMBiodataAddress data)
         {
             try
