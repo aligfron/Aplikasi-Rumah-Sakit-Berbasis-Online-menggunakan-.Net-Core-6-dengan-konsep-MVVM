@@ -72,7 +72,7 @@ namespace HealthCare340B.DataAccess
                 response.Data = (
                     from mf in db.MMedicalFacilities
                     join dof in db.TDoctorOffices on mf.Id equals dof.MedicalFacilityId
-                    where mf.IsDelete == false && dof.DoctorId == idDoctor
+                    where mf.IsDelete == false && dof.DoctorId == idDoctor && dof.EndDate > DateTime.Now
                     select new VMMMedicalFacility
                     {
                         Id = mf.Id,

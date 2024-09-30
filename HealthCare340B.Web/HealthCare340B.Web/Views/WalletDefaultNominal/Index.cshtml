@@ -124,6 +124,6 @@
     $(".btn-info").click(function (e) {
         var variable = $(this).data("id");
         $("#staticModalBody").html();
-        $("#staticModalBody").load("/Appointment/Create/");
+        $("#staticModalBody").load("/Appointment/Create/" + $(this).attr("data-id"));
     });
 </script>

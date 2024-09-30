@@ -99,6 +99,162 @@ namespace HealthCare340B.Web.Models
             return data;
         }
 
+        public async Task<long?> GetDoctorOfficeId(long doctorId, long medFacId)
+        {
+            VMTDoctorOffice? data = null;
+            VMResponse<VMTDoctorOffice>? apiResponse = new VMResponse<VMTDoctorOffice>();
+            try
+            {
+                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync(
+                   $"{apiUrl}DoctorOffice/GetByDoctorIdAndMedFacId/{doctorId}/{medFacId}"
+                   );
+
+                if (apiResponseMsg != null)
+                {
+                    if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
+                    {
+                        apiResponse = JsonConvert.DeserializeObject<VMResponse<VMTDoctorOffice>?>
+                            (apiResponseMsg.Content.ReadAsStringAsync().Result);
+
+                        data = apiResponse!.Data;
+                    }
+                    else
+                    {
+                        throw new Exception($"{HttpStatusCode.NoContent} - Doctor Office is not Found!");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Doctor Office API could not be reached");
+                }
+            }
+            catch (Exception e)
+            {
+                //Logging
+                Console.WriteLine("AppointmentModel.GetDoctorOfficeId: " + e.Message);
+                throw new Exception("AppointmentModel.GetDoctorOfficeId: " + e.Message);
+            }
+
+            return data!.Id;
+        }
+
+        public async Task<long?> GetDoctorOfficeScheduleId(long doctorId, long medFacId, string day, string timeStart)
+        {
+            VMTDoctorOfficeSchedule? data = null;
+            VMResponse<VMTDoctorOfficeSchedule>? apiResponse = new VMResponse<VMTDoctorOfficeSchedule>();
+            try
+            {
+                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync(
+                   $"{apiUrl}DoctorOfficeSchedule/GetByUserChoice/{doctorId}/{medFacId}/{day}/{timeStart}"
+                   );
+
+                if (apiResponseMsg != null)
+                {
+                    if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
+                    {
+                        apiResponse = JsonConvert.DeserializeObject<VMResponse<VMTDoctorOfficeSchedule>?>
+                            (apiResponseMsg.Content.ReadAsStringAsync().Result);
+
+                        data = apiResponse!.Data;
+                    }
+                    else
+                    {
+                        throw new Exception($"{HttpStatusCode.NoContent} - Doctor Office Schedule is not Found!");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Doctor Office Schedule API could not be reached");
+                }
+            }
+            catch (Exception e)
+            {
+                //Logging
+                Console.WriteLine("AppointmentModel.GetDoctorOfficeSchedule: " + e.Message);
+                throw new Exception("AppointmentModel.GetDoctorOfficeSchedule: " + e.Message);
+            }
+
+            return data!.Id;
+        }
+
+        public async Task<DateTime?> GetStartDate(long doctorId, long medFacId)
+        {
+            VMTDoctorOffice? data = null;
+            VMResponse<VMTDoctorOffice>? apiResponse = new VMResponse<VMTDoctorOffice>();
+            try
+            {
+                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync(
+                   $"{apiUrl}DoctorOffice/GetByDoctorIdAndMedFacId/{doctorId}/{medFacId}"
+                   );
+
+                if (apiResponseMsg != null)
+                {
+                    if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
+                    {
+                        apiResponse = JsonConvert.DeserializeObject<VMResponse<VMTDoctorOffice>?>
+                            (apiResponseMsg.Content.ReadAsStringAsync().Result);
+
+                        data = apiResponse!.Data;
+                    }
+                    else
+                    {
+                        throw new Exception($"{HttpStatusCode.NoContent} - Doctor Office is not Found!");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Doctor Office API could not be reached");
+                }
+            }
+            catch (Exception e)
+            {
+                //Logging
+                Console.WriteLine("AppointmentModel.GetStartDate: " + e.Message);
+                throw new Exception("AppointmentModel.GetStartDate: " + e.Message);
+            }
+
+            return data!.StartDate;
+        }
+
+        public async Task<DateTime?> GetEndDate(long doctorId, long medFacId)
+        {
+            VMTDoctorOffice? data = null;
+            VMResponse<VMTDoctorOffice>? apiResponse = new VMResponse<VMTDoctorOffice>();
+            try
+            {
+                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync(
+                   $"{apiUrl}DoctorOffice/GetByDoctorIdAndMedFacId/{doctorId}/{medFacId}"
+                   );
+
+                if (apiResponseMsg != null)
+                {
+                    if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
+                    {
+                        apiResponse = JsonConvert.DeserializeObject<VMResponse<VMTDoctorOffice>?>
+                            (apiResponseMsg.Content.ReadAsStringAsync().Result);
+
+                        data = apiResponse!.Data;
+                    }
+                    else
+                    {
+                        throw new Exception($"{HttpStatusCode.NoContent} - Doctor Office is not Found!");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Doctor Office API could not be reached");
+                }
+            }
+            catch (Exception e)
+            {
+                //Logging
+                Console.WriteLine("AppointmentModel.GetStartDate: " + e.Message);
+                throw new Exception("AppointmentModel.GetStartDate: " + e.Message);
+            }
+
+            return data!.EndDate;
+        }
+
         public async Task<List<VMMMedicalFacilitySchedule>?> GetMedicalFacilitySchedule(long medicalFacilityId, long doctorId)
         {
             List<VMMMedicalFacilitySchedule>? data = null;

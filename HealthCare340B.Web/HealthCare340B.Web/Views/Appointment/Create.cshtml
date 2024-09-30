@@ -39,9 +39,16 @@
             </div>
             <div class="row mb-3">
                 <div class="col-4">Waktu Kedatangan<span class="text-danger">*</span></div>
-                <div class="input-group d-inline-flex align-items-center w-auto">
-                    <input id="date" name="AppointmentDate" type="datetime" size="24" disabled />
-                    <button class="btn btn-info"><i class="fas fa-calendar"></i></button>
+                <div class="col-8">
+                    <input id="date" name="AppointmentDate" type="datetime" size="29" disabled />
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-4">Sesi<span class="text-danger">*</span></div>
+                <div class="col-8">
+                    <select id="sesi" name="Sesi" class="form-select" disabled>
+                        <option value="">-- Select Sesi --</option>
+                    </select>
                 </div>
             </div>
             <div class="row mb-3">
@@ -58,7 +65,7 @@
         <div class="w-10"></div>
         <div class="w-30"><button id="btnCancel" class="btn btn-outline-danger">Cancel</button></div>
         <div class="w-10"></div>
-        <div class="w-30"><button id="btnSave" class="btn btn-outline-success">Save</button></div>
+        <div class="w-30"><button id="btnSave" class="btn btn-outline-info">Buat Janji</button></div>
         <div class="w-10"></div>
     </div>
 </div>
@@ -70,12 +77,12 @@
             url: "Appointment/GetMemberById",
             data: {
                 biodataId: @Context.Session.GetInt32("userBiodataId")
-            },
+                },
             dataType: "json",
             beforeSend: () => { },
             success: function (response) {
-                debugger;
-                console.log(response.statusCode);
+                //debugger;
+                //console.log(response.statusCode);
                 $("#member").empty();
                 $("#member").append(
                     `<option value="0">Sendiri</option>`
@@ -104,12 +111,12 @@
             url: "Appointment/GetMedFacByDoctorId",
             data: {
                 doctorId: @ViewBag.DoctorId
-                },
+                    },
             dataType: "json",
             beforeSend: () => { },
             success: function (response) {
-                debugger;
-                console.log(response.statusCode);
+                //debugger;
+                //console.log(response.statusCode);
                 $("#medFac").empty();
                 $("#medFac").append(
                     `<option value="">-- Select MedFac --</option>`
@@ -133,23 +140,86 @@
             }
         });
 
-        $("#medFac").change(function(e) {
+        $("#medFac").change(function (e) {
             $("#tindakan").empty();
             $("#date").val("");
+            var emptySlotDate = null;
+            var startDate = null;
+            var endDate = null;
             if ($(this).val() != 0) {
                 $.ajax({
-                    url: "Appointment/GetSchedule",
+                    url: "Appointment/GetStartDate",
+                    data: {
+                        doctorId: @ViewBag.DoctorId,
+                        medFacId: $("#medFac").val()
+                    },
+                    dataType: "json",
+                    async: false,
+                    beforeSend: () => { },
+                    success: function (response) {
+                        debugger;
+                        startDate = response;
+                    },
+                    error: function (errResponse) {
+                        debugger;
+                        console.log(errResponse);
+                    }
+                });
+
+                $.ajax({
+                    url: "Appointment/GetEndDate",
+                    data: {
+                        doctorId: @ViewBag.DoctorId,
+                        medFacId: $("#medFac").val()
+                    },
+                    dataType: "json",
+                    async: false,
+                    beforeSend: () => { },
+                    success: function (response) {
+                        debugger;
+                        endDate = response;
+                    },
+                    error: function (errResponse) {
+                        debugger;
+                        console.log(errResponse);
+                    }
+                });
+
+                $.ajax({
+                    url: "Appointment/GetEmptySlotDate",
+                    data: {
+                        medFacId: $("#medFac").val(),
+                        doctorId: @ViewBag.DoctorId
+                                                                },
+                    dataType: "json",
+                    async: false,
+                    beforeSend: () => { },
+                    success: function (response) {
+                        debugger;
+                        emptySlotDate = response;
+                    },
+                    error: function (errResponse) {
+                        debugger;
+                        console.log(errResponse);
+                    }
+                });
+
+                $.ajax({
+                    url: "Appointment/GetScheduleDayOfWeek",
                     data: {
                         medFacId: $(this).val(),
                         doctorId: @ViewBag.DoctorId
-                            },
+                                },
                     dataType: "json",
                     beforeSend: () => { },
-                    success: function(response) {
+                    success: function (response) {
+                        //debugger;
                         $("#date").val("");
-                        $("#date").prop("disabled", false);
+                        $("#date").prop("disabled", false)
+
                         $("#date").flatpickr({
-                            minDate: new Date().fp_incr(1),
+                            minDate: startDate,
+                            maxDate: endDate,
                             dateFormat: "Y-m-d",
                             enable: [
                                 function (date) {
@@ -157,14 +227,39 @@
                                     $.each(
                                         response,
                                         function (idx, data) {
-                                            if (date.getDay() === data) {
+                                            //debugger;
+                                            var checkSlotDate = true
+                                            $.each(
+                                                emptySlotDate,
+                                                function (idx2, data2) {
+
+                                                    debugger;
+                                                    var dateDate = date.getDate();
+                                                    if (dateDate < 10) {
+                                                        dateDate = "0" + dateDate;
+                                                    }
+                                                    var dateMonth = date.getMonth() + 1;
+                                                    if (dateMonth < 10) {
+                                                        dateMonth = "0" + dateMonth;
+                                                    }
+                                                    var dateYear = date.getFullYear();
+                                                    var fullDate = (dateYear + "-" + dateMonth + "-" + dateDate + "T00:00:00")
+                                                    if (fullDate == data2) {
+                                                        debugger;
+                                                        checkSlotDate = false;
+                                                        return
+                                                    }
+                                                }
+                                            )
+                                            if (date.getDay() === data && checkSlotDate) {
+                                                debugger;
                                                 checkDay = true;
                                                 return;
                                             }
                                         }
                                     );
                                     return checkDay;
-                                }                                
+                                }
                             ]
                         });
                     }
@@ -175,11 +270,11 @@
                     data: {
                         medFacId: $(this).val(),
                         doctorId: @ViewBag.DoctorId
-                    },
+                        },
                     dataType: "json",
                     beforeSend: () => { },
                     success: function (response) {
-                        debugger;
+                        //debugger;
                         console.log(response.statusCode);
                         $("#tindakan").empty();
                         if (response.statusCode == 200) {
@@ -207,7 +302,106 @@
                 $("#tindakan").prop("disabled", true);
                 $("#date").val("");
                 $("#date").prop("disabled", true);
+                $("#sesi").val("");
+                $("#sesi").prop("disabled", true);
             }
-        })
-    })
+
+            $("#date").change(function (e) {
+                $("#sesi").prop("disabled", false);
+                $.ajax({
+                    url: "Appointment/GetTimeSlot",
+                    data: {
+                        medFacId: $("#medFac").val(),
+                        doctorId: @ViewBag.DoctorId,
+                        date: $(this).val().toString()
+                    },
+                    dataType: "json",
+                    async: false,
+                    beforeSend: () => { },
+                    success: function (response) {
+                        $("#sesi").empty();
+                        $.each(
+                            response,
+                            function (idx, data) {
+                                $("#sesi").append(
+                                    `<option value="${data.timeScheduleStart}">${data.range}</option>`
+                                )
+                            }
+                        )
+                    },
+                    error: function (errResponse) {
+                        debugger;
+                        console.log(errResponse);
+                    }
+                });
+            });
+        });
+
+        $("#btnSave").click(function (e) {
+            var dofId = null;
+            var dosId = null;
+            $ajax.({
+                url: "Appointment/GetDoctorOfficeId",
+                data: {
+                    medFacId: $("#medFac").val(),
+                    doctorId: @ViewBag.DoctorId
+                },
+                dataType: "json",
+                beforeSend: () => { },
+                success: function (response) {
+                    dofId = response;
+                },
+                error: function (errResponse) {
+                    debugger;
+                    console.log(errResponse);
+                    location.reload()
+                }
+            });
+
+            $ajax.({
+                url: "Appointment/GetDoctorOfficeScheduleId",
+                data: {
+                    doctorId: @ViewBag.DoctorId,
+                    medFacId: $("#medFac").val(),
+                    day: $("#date").val().getDay()
+                    timeStart: $("#sesi").val()
+                    },
+                beforeSend: () => { },
+                success: function (response) {
+                    dosId = response;
+                },
+                error: function (errResponse) {
+                    debugger;
+                    console.log(errResponse);
+                    location.reload()
+                }
+            });
+
+            $.ajax({
+                url: "/Appointment/Create",
+                type: "post",
+                data: {
+                    custId: $("#member").val(),
+                    dofId: dofId,
+                    dosId: dosId,
+                    dotId: $("#tindakan").val(),
+                    appDate: $("#date").val().toString()
+                },
+                beforeSend: () => { },
+                success: function (response) {
+                    if (response.statusCode == 201 || response.statusCode == 200) {
+                        alert(response.message, "success");
+                    }
+                    else {
+                        alert(response.message, "danger");
+                    }
+                },
+                error: function (errResponse) {
+                    console.log(errResponse);
+                    debugger;
+                }
+            });
+
+        });
+    });
 </script>

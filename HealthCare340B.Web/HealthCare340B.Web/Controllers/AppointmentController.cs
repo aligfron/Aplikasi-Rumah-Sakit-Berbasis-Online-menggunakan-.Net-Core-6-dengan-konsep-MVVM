@@ -89,7 +89,25 @@ namespace HealthCare340B.Web.Controllers
             return response;
         }
 
-        public async Task<List<int>?> GetSchedule(long medFacId, long doctorId)
+        public async Task<DateTime?> GetStartDate(long doctorId, long medFacId)
+        {
+            DateTime? startDate = await appointment.GetStartDate(doctorId, medFacId);
+            if (startDate > DateTime.Now)
+            {
+                return startDate;
+            }
+            else
+            {
+                return DateTime.Now.AddDays(1);
+            }
+        }
+        public async Task<DateTime?> GetEndDate(long doctorId, long medFacId)
+        {
+            DateTime? endDate = await appointment.GetEndDate(doctorId, medFacId);
+            return endDate;           
+        }
+
+        public async Task<List<int>?> GetScheduleDayOfWeek(long medFacId, long doctorId)
         {
             try
             {
@@ -103,15 +121,133 @@ namespace HealthCare340B.Web.Controllers
 
                 listDayOfWeek = listDayOfWeek.Distinct().ToList();
 
-                List<DateTime>? emptySlotDate = null;
-                if (response != null)
-                    emptySlotDate = await appointment.GetEmptySlotDate(response);
                 return listDayOfWeek;
             }
             catch (Exception e)
             {
                 return new List<int>();
             }
+        }
+
+        public async Task<List<DateTime>?> GetEmptySlotDate(long medFacId, long doctorId)
+        {
+            try
+            {
+                List<VMMMedicalFacilitySchedule>? response = await appointment.GetMedicalFacilitySchedule(medFacId, doctorId);
+
+                //List<int> listDayOfWeek = new List<int>();
+                //foreach (VMMMedicalFacilitySchedule day in response!)
+                //{
+                //    listDayOfWeek.Add(StringToDayOfWeekInt(day.Day!));
+                //}
+
+                //listDayOfWeek = listDayOfWeek.Distinct().ToList();
+
+                List<DateTime>? emptySlotDateTime = null;
+                if (response != null)
+                    emptySlotDateTime = await appointment.GetEmptySlotDate(response);
+
+                List<DateTime>? emptySlotDate = new List<DateTime>();
+                if (emptySlotDateTime != null && emptySlotDateTime.Count > 0)
+                {
+                    int count = 0;
+                    foreach (DateTime date in emptySlotDateTime)
+                    {
+                        foreach (VMMMedicalFacilitySchedule sch in response!)
+                        {
+                            DateTime timeStart = DateTime.Parse(sch.TimeScheduleStart!);
+                            if (sch.Day == date.DayOfWeek.ToString() &&
+                                timeStart.ToString("HH:mm") != date.ToString("HH:mm")
+                                )
+                            {
+                                count += 1;
+                            }
+                        }
+                        int counter = 0;
+                        foreach (DateTime date2 in emptySlotDateTime)
+                        {
+                            if (date == date2)
+                                continue;
+                            if (date.Date == date2.Date)
+                            {
+                                counter += 1;
+                            }
+                        }
+                        if (count == counter)
+                            emptySlotDate.Add(date.Date);
+                        count = 0;
+                        counter = 0;
+                    }
+                    if (emptySlotDate.Count > 0)
+                        emptySlotDate = emptySlotDate.Distinct().ToList();
+
+                }
+                return emptySlotDate;
+            }
+            catch (Exception e)
+            {
+                return new List<DateTime>();
+            }
+        }
+
+        public async Task<List<VMAppointmentSchedule>> GetTimeSlot(long medFacId, long doctorId, string date)
+        {
+            List<VMMMedicalFacilitySchedule>? response = await appointment.GetMedicalFacilitySchedule(medFacId, doctorId);
+
+            List<DateTime>? emptySlotDateTime = null;
+            if (response != null)
+                emptySlotDateTime = await appointment.GetEmptySlotDate(response);
+
+            List<string>? emptyHourSlot = new List<string>();
+            DateTime dateChoice = DateTime.Parse(date);
+
+            foreach (DateTime dateTime in emptySlotDateTime)
+            {
+                if (dateTime.Date == dateChoice.Date)
+                {
+                    emptyHourSlot.Add(dateTime.Hour.ToString() + ":" + dateTime.Minute.ToString());
+                }
+            }
+
+            List<VMAppointmentSchedule> listSch = new List<VMAppointmentSchedule>();
+
+            if (emptyHourSlot.Count > 0)
+            {
+                foreach (string hour in emptyHourSlot)
+                {
+                    VMAppointmentSchedule sch = new VMAppointmentSchedule();
+                    foreach (VMMMedicalFacilitySchedule mfs in response!)
+                    {
+                        DateTime timeStart = DateTime.Parse(mfs.TimeScheduleStart!);
+                        DateTime hourParsed = DateTime.Parse(hour);
+                        if (mfs.Day == dateChoice.DayOfWeek.ToString() &&
+                            timeStart.ToString("HH:mm") != hourParsed.ToString("HH:mm"))
+                        {
+                            sch.TimeScheduleStart = mfs.TimeScheduleStart;
+                            sch.Range = $"{mfs.TimeScheduleStart} - {mfs.TimeScheduleEnd}";
+                            listSch.Add(sch);
+                        }
+                    }
+                    
+                }               
+            }
+            else
+            {
+                VMAppointmentSchedule sch = new VMAppointmentSchedule();
+                foreach (VMMMedicalFacilitySchedule mfs in response!)
+                {
+                    DateTime timeStart = DateTime.Parse(mfs.TimeScheduleStart!);
+                    if (mfs.Day == dateChoice.DayOfWeek.ToString())
+                    {
+                        sch.TimeScheduleStart = mfs.TimeScheduleStart;
+                        sch.Range = $"{mfs.TimeScheduleStart} - {mfs.TimeScheduleEnd}";
+                        listSch.Add(sch);
+                        sch = new VMAppointmentSchedule();
+                    }
+                }             
+            }
+
+            return listSch;
         }
 
         public async Task<VMResponse<List<VMTDoctorTreatment>?>> GetTreatment(long medFacId, long doctorId)
@@ -129,6 +265,58 @@ namespace HealthCare340B.Web.Controllers
                 response.Message = $"{HttpStatusCode.BadRequest} - Treatment Not Found!";
             }
             return response;
+        }
+
+        public async Task<long?> GetDoctorOfficeId(long medFacId, long doctorId)
+        {
+            try
+            {
+                return await appointment.GetDoctorOfficeId(doctorId, medFacId);
+                
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task<long?> GetDoctorOfficeScheduleId(long doctorId, long medFacId, int day, string timeStart)
+        {
+            try
+            {
+                string dayString = ((DayOfWeek)day).ToString();
+                return await appointment.GetDoctorOfficeScheduleId(doctorId, medFacId, dayString, timeStart);
+
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<VMResponse<VMTAppointment>> Create(long custId, long dofId, long dosId, long dotId, string appDate)
+        {
+            try
+            {
+                // If custId = 0, find custId using biodataId session!
+                VMTAppointment data = new VMTAppointment
+                {
+                    CustomerId = custId,
+                    DoctorOfficeId = dofId,
+                    DoctorOfficeScheduleId = dosId,
+                    DoctorOfficeTreatmentId = dotId,
+                    AppointmentDate = DateTime.Parse(appDate),
+                    CreatedBy = long.Parse(HttpContext.Session.GetString("userId")!)
+                };
+
+                return await appointment.Create(data);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+           
         }
     }
 }
