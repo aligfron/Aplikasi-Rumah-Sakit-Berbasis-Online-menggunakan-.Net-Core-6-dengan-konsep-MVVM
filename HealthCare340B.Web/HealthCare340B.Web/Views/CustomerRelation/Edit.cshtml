@@ -43,6 +43,9 @@
             //Disable form submit function
             e.preventDefault();
 
+            // Trim semua input teks untuk menghapus spasi di awal dan akhir serta menghilangkan spasi berlebih di tengah
+            trimAndCleanInput("#name");
+
             if ($("#frmCustomerRelation").valid()) {
                 $.ajax({
                     url: "/CustomerRelation/Edit",
@@ -55,6 +58,9 @@
                     success: function (response) {
                         if (response.statusCode == 200 || response.statusCode == 201) {
                             location.reload();
+                        }
+                        else if (response.statusCode == 409) {
+                            toastAlert(response.message, "error");
                         }
                         else {
                             alert(response.statusCode + " - " + response.message);
@@ -76,7 +82,10 @@
             rules: {
                 Name: {
                     required: true,
-                    minlength: 3
+                    minlength: 3,
+                    normalizer: function (value) {
+                        return $.trim(value);
+                    }
                 },
             },
             messages: {

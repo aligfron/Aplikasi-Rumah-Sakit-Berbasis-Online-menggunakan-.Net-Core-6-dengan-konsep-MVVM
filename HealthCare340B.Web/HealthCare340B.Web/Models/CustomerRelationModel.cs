@@ -142,6 +142,34 @@ namespace HealthCare340B.Web.Models
             return data;
         }
 
+        public async Task<bool> CheckNameExistsAsync(string name)
+        {
+            bool isExists = false;
+
+            try
+            {
+                List<VMMCustomerRelation>? apiResponse = GetAll().Result;
+
+                if (apiResponse != null)
+                {
+                    isExists = apiResponse.Any(x => x.Name.ToLower() == name.ToLower());
+                }
+                else
+                {
+                    throw new Exception("Customer Relation data could not be retrieved");
+                }
+
+            }
+            catch (Exception e)
+            {
+                // Logging
+                Console.WriteLine("CustomerRelationModel.CheckNameExistsAsync: " + e.Message);
+                throw new Exception("CustomerRelationModel.CheckNameExistsAsync: " + e.Message);
+            }
+
+            return isExists;
+        }
+
         public async Task<VMResponse<VMMCustomerRelation>> CreateAsync(VMMCustomerRelation data)
         {
             VMResponse<VMMCustomerRelation>? apiResponse = new VMResponse<VMMCustomerRelation>();

@@ -56,7 +56,7 @@ namespace HealthCare340B.Web.Controllers
                 HttpContext.Session.SetString("errMsg", ex.Message);
             }
 
-            ViewBag.Title = "Hubungan Pelanggan";
+            ViewBag.Title = "Hubungan Pasien";
             ViewBag.Filter = filter;
 
             ViewBag.Breadcrumb = new List<BreadcrumbItem>
@@ -81,7 +81,7 @@ namespace HealthCare340B.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            ViewBag.Title = "Tambah Hubungan Pelanggan";
+            ViewBag.Title = "Tambah Hubungan Pasien";
 
             return View();
         }
@@ -89,19 +89,29 @@ namespace HealthCare340B.Web.Controllers
         [HttpPost]
         public async Task<VMResponse<VMMCustomerRelation>?> CreateAsync(VMMCustomerRelation data)
         {
-            VMResponse<VMMCustomerRelation>? response = null;
+            VMResponse<VMMCustomerRelation>? response = new VMResponse<VMMCustomerRelation>();
 
             try
             {
                 data.CreatedBy = long.Parse(HttpContext.Session.GetString("userId")!);
 
-                response = await _customerRelationModel.CreateAsync(data);
+                bool isNameExists = await _customerRelationModel.CheckNameExistsAsync(data.Name);
+
+                if (isNameExists)
+                {
+                    response.StatusCode = HttpStatusCode.Conflict;
+                    response.Message = "Nama sudah digunakan";
+                }
+                else
+                {
+                    response = await _customerRelationModel.CreateAsync(data);
+                }
 
                 if (response.StatusCode == HttpStatusCode.Created)
                 {
                     HttpContext.Session.SetString("successMsg", response.Message);
                 }
-                else
+                else if (response.StatusCode != HttpStatusCode.Conflict)
                 {
                     HttpContext.Session.SetString("errMsg", response.Message);
                 }
@@ -138,7 +148,7 @@ namespace HealthCare340B.Web.Controllers
                 HttpContext.Session.SetString("errMsg", ex.Message);
             }
 
-            ViewBag.Title = "Edit Hubungan Pelanggan";
+            ViewBag.Title = "Edit Hubungan Pasien";
 
             return View(data);
         }
@@ -146,19 +156,29 @@ namespace HealthCare340B.Web.Controllers
         [HttpPost]
         public async Task<VMResponse<VMMCustomerRelation>?> EditAsync(VMMCustomerRelation data)
         {
-            VMResponse<VMMCustomerRelation>? response = null;
+            VMResponse<VMMCustomerRelation>? response = new VMResponse<VMMCustomerRelation>();
 
             try
             {
                 data.ModifiedBy = long.Parse(HttpContext.Session.GetString("userId")!);
 
-                response = await _customerRelationModel.UpdateAsync(data);
+                bool isNameExists = await _customerRelationModel.CheckNameExistsAsync(data.Name);
+
+                if (isNameExists)
+                {
+                    response.StatusCode = HttpStatusCode.Conflict;
+                    response.Message = "Nama sudah digunakan";
+                }
+                else
+                {
+                    response = await _customerRelationModel.UpdateAsync(data);
+                }
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     HttpContext.Session.SetString("successMsg", response.Message);
                 }
-                else
+                else if (response.StatusCode != HttpStatusCode.Conflict)
                 {
                     HttpContext.Session.SetString("errMsg", response.Message);
                 }
@@ -195,7 +215,7 @@ namespace HealthCare340B.Web.Controllers
                 HttpContext.Session.SetString("errMsg", ex.Message);
             }
 
-            ViewBag.Title = "Hapus Hubungan Pelanggan";
+            ViewBag.Title = "Hapus Hubungan Pasien";
 
             return View(data);
         }

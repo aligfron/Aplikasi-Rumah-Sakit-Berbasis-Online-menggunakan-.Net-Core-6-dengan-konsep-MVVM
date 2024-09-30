@@ -32,6 +32,8 @@
             //Disable form submit function
             e.preventDefault();
 
+            trimAndCleanInput("#name");
+
             if ($("#frmCustomerRelation").valid()) {
                 $.ajax({
                     url: "/CustomerRelation/Create",
@@ -45,8 +47,11 @@
                         if (response.statusCode == 200 || response.statusCode == 201) {
                             location.reload();
                         }
+                        else if (response.statusCode == 409) {
+                            toastAlert(response.message, "error");
+                        }
                         else {
-                            alert(response.statusCode + " - " + response.message);
+                            location.reload();
                         }
                     },
                     error: function (errResponse) {
@@ -65,7 +70,10 @@
             rules: {
                 Name: {
                     required: true,
-                    minlength: 3
+                    minlength: 3,
+                    normalizer: function (value) {
+                        return $.trim(value);
+                    }
                 },
             },
             messages: {

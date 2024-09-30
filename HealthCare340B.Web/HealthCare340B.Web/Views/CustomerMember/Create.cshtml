@@ -15,7 +15,7 @@
 
             <div class="form-group  mb-3">
                 <label for="dob">Tanggal Lahir<span class="text-danger">*</span></label>
-                <input type="Date" id="dob" class="form-control" name="Dob">
+                <input type="date" id="dob" class="form-control flatpickr-max-today" name="Dob">
             </div>
             <div class="form-group mb-3 ">
                 <div id="gender-group" class="d-flex align-items-center justify-content-between">
@@ -121,10 +121,14 @@
             //Disable form submit function
             e.preventDefault();
 
-            if ($("#frmCustomerMember").valid()) {
-                // Ganti koma dengan titik sebelum kirim data
-                convertDotTocomma();
+            trimAndCleanInput("#fullname");
+            trimAndCleanInput("#height");
+            trimAndCleanInput("#weight");
 
+            // Ganti koma dengan titik sebelum kirim data
+            convertDotTocomma();
+
+            if ($("#frmCustomerMember").valid()) {
                 $.ajax({
                     url: "/Profile/Pasien/Create",
                     type: "POST",
@@ -164,7 +168,10 @@
             rules: {
                 Fullname: {
                     required: true,
-                    minlength: 3
+                    minlength: 3,
+                    normalizer: function (value) {
+                        return $.trim(value);
+                    }
                 },
                 Dob: {
                     required: true
@@ -173,10 +180,16 @@
                     required: true
                 },
                 Height: {
-                    customNumber: true
+                    customNumber: true,
+                    normalizer: function (value) {
+                        return $.trim(value);
+                    }
                 },
                 Weight: {
-                    customNumber: true
+                    customNumber: true,
+                    normalizer: function (value) {
+                        return $.trim(value);
+                    }
                 },
                 CustomerRelationId: {
                     required: true
@@ -229,6 +242,14 @@
             $("#height").val(height);
             $("#weight").val(weight);
         }
+
+        flatpickr('.flatpickr-max-today', {
+            "locale": "id",
+            maxDate: "today",
+            altInput: true,
+            altFormat: "j F Y",
+            dateFormat: "Y-m-d",
+        });
     });
 
 </script>

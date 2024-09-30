@@ -5,6 +5,8 @@
     Layout = "_Layout";
 }
 
+<link rel="stylesheet" href="~/lib/mazer/extensions/flatpickr/flatpickr.min.css">
+
 <div class="page-title">
     <div class="row">
         <div class="col-12 col-md-6 order-md-1 order-last">
@@ -48,7 +50,7 @@
                             <label for="imageUpload" class="position-absolute" style="cursor: pointer;">
                                 <i class="fas fa-pencil-alt"></i>
                             </label>
-                            <input type="file" id="imageUpload" name="ImageFile" class="d-none" accept="image/*" onchange="previewImage(event)">
+                            <input type="file" id="imageUpload" name="ImageFile" class="d-none" accept="image/png, image/gif, image/jpeg" onchange="previewImage(event)">
                             <input type="hidden" name="ImagePath" value="@(string.IsNullOrEmpty(Context.Session.GetString("userImagePath")) ? null : Context.Session.GetString("userImagePath"))" />
                         </form>
                         <button type="button" id="saveImageBtn" class="btn btn-primary mt-3 d-none">Simpan Gambar</button>
@@ -58,7 +60,7 @@
                         <p class="mb-1">Bronze Member</p>
                         <p>Since @Context.Session.GetString("userSince")</p>
                     </div>
-                </div> 
+                </div>
             </div>
 
             <div class="card">
@@ -78,10 +80,22 @@
     </div>
 </section>
 
+
+<script src="~/lib/mazer/extensions/flatpickr/flatpickr.min.js"></script>
+<script src="~/lib/mazer/extensions/flatpickr/l10n/id.js"></script>
+
 <script>
     function previewImage(event) {
         const reader = new FileReader();
         const file = event.target.files[0];
+
+        // Validasi jenis file
+        const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!validImageTypes.includes(file.type)) {
+            toastAlert("File harus berupa gambar (jpg, png, gif)", "error");
+            event.target.value = ''; // Reset input file
+            return;
+        }
 
         reader.onload = function () {
             const output = document.getElementById('profileImage');
