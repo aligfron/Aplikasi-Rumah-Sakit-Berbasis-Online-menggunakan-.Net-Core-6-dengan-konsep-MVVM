@@ -13,7 +13,8 @@
                 <a class="nav-link" id="v-pills-pasien-tab" asp-controller="Pasien" asp-action="Index">Pasien</a>
                 <a class="nav-link" id="v-pills-pembelianobat-tab" href="#">Pembelian Obat</a>
                 <a class="nav-link" id="v-pills-rencanakedatangan-tab" href="#">Rencana Kedatangan</a>
-                <a class="nav-link" id="v-pills-riwayatchatdokter-tab"href="#">Riwayat Chat Dokter</a>
+                <a class="nav-link" id="v-pills-riwayatchatdokter-tab" href="#">Riwayat Chat Dokter</a>
+                <a class="nav-link" id="v-pills-riwayatkedatangan-tab" asp-controller="Pasien" asp-action="Index">Riwayat Kedatangan</a>
             </div>
         </div>
     </div>
@@ -32,6 +33,8 @@
                 $("#v-pills-rencanakedatangan-tab").addClass("active");
             } else if (currentUrl.includes('/Profile/RiwayatChatDokter')) {
                 $("#v-pills-riwayatchatdokter-tab").addClass("active");
+            } else if (currentUrl.includes('/Profile/RiwayatKedatangan')) {
+                $("#v-pills-riwayatkedatangan-tab").addClass("active");
             }
 
             // Navigasi klik tanpa refresh halaman
@@ -51,6 +54,12 @@
 
             $("#v-pills-riwayatchatdokter-tab").click(function (e) {
                 e.preventDefault();
+            });
+
+            $("#v-pills-riwayatkedatangan-tab").click(function (e) {
+                e.preventDefault();
+
+                location.href = '/Profile/Pasien';
             });
         });
     </script>
