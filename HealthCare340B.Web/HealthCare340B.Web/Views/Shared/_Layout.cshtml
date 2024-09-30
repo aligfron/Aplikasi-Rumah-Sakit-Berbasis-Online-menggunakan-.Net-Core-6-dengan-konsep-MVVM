@@ -68,6 +68,14 @@
             "<span class='visually-hidden'>Loading...</span>" +
             "</div>" +
             "</div>"
+
+        // Fungsi untuk trim spasi di awal/akhir dan menghapus spasi berlebih di tengah input
+        function trimAndCleanInput(inputSelector) {
+            var inputValue = $(inputSelector).val();
+            var trimmedValue = $.trim(inputValue); // Trim spasi di awal dan akhir
+            var cleanedValue = trimmedValue.replace(/\s+/g, ' '); // Hapus spasi berlebih di tengah
+            $(inputSelector).val(cleanedValue); // Set nilai yang sudah di trim dan dibersihkan
+        }
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
