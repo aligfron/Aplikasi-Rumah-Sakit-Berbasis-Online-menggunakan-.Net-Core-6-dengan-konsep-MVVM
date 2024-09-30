@@ -14,10 +14,12 @@ namespace HealthCare340B.Web.Controllers
         private readonly int pageSize;
         private string? _userId;
         private string? _roleCode;
+        private readonly string imageFolder;
         public SpecializationController(IConfiguration _config)
         {
             spesialisasi = new SpecializationModel(_config);
             pageSize = int.Parse(_config["PageSize"]);
+            imageFolder = _config["ImageFolder"];
         }
 
         private bool isInSession()
@@ -45,18 +47,18 @@ namespace HealthCare340B.Web.Controllers
                 HttpContext.Session.SetString("errMsg", "You are not authorized!");
                 return RedirectToAction("Index", "Home");
             }
-
             List<VMMSpecialization>? data = new List<VMMSpecialization>();
             
                 data = (string.IsNullOrEmpty(filter)) ? await spesialisasi.getByFilter("") : await spesialisasi.getByFilter(filter);
-           
+
+            ViewBag.imgFolder = imageFolder;
             ViewBag.Title = "Spesialisasi Index";
             ViewBag.filter = filter;
             ViewBag.PageSize = (currPageSize ?? pageSize);
 
             return View(Pagination<VMMSpecialization>.Create(data ?? new List<VMMSpecialization>(), pageNumber ?? 1, ViewBag.PageSize));
         }
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             if (!isInSession())
             {
@@ -69,8 +71,10 @@ namespace HealthCare340B.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
             ViewBag.Title = "New Spesialisasi";
+            List<VMMSpecialization>? data = new List<VMMSpecialization>();
 
-            return View();
+            data = await spesialisasi.getByFilter("");
+            return View(data);
         }
         [HttpPost]
         public async Task<VMResponse<VMMSpecialization>?> CreateAsync(VMMSpecialization data)
@@ -109,9 +113,14 @@ namespace HealthCare340B.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
             VMMSpecialization? data = await spesialisasi.getById(id);
-
+            ViewBag.dataid = data!.Id;
+            ViewBag.dataname = data.Name;
             ViewBag.Title = "Spesialisasi Edit";
-            return View(data);
+
+            List<VMMSpecialization>? data2 = new List<VMMSpecialization>();
+
+            data2 = await spesialisasi.getByFilter("");
+            return View(data2);
         }
         [HttpPost]
         public async Task<VMResponse<VMMSpecialization>?> EditAsync(VMMSpecialization data)
@@ -137,7 +146,7 @@ namespace HealthCare340B.Web.Controllers
             }
             return (response);
         }
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id, int pageNumber, int currPageSize)
         {
             if (!isInSession())
             {
@@ -149,11 +158,14 @@ namespace HealthCare340B.Web.Controllers
                 HttpContext.Session.SetString("errMsg", "You are not authorized!");
                 return RedirectToAction("Index", "Home");
             }
-
+            VMMSpecialization? data = await spesialisasi.getById(id);
             ViewBag.Title = "Delete Spesialisasi";
+            ViewBag.PageNumber = pageNumber;
+            ViewBag.PageSize = currPageSize;
 
-            return View(id);
+            return View(data);
         }
+
         [HttpPost]
         public async Task<VMResponse<VMMSpecialization>?> DeleteAsync(int id)
         {

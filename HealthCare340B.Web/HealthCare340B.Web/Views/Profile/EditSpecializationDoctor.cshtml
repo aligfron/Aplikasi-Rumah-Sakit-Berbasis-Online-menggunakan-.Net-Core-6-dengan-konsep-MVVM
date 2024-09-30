@@ -34,6 +34,7 @@
                                     }
                                 }
                             </select>
+                            <span id="specializationError" class="text-danger" style="display:none;"></span>
                         </div>
                     </div>
                     <input type="hidden" name="DoctorId" value="@Model.DoctorId" />
@@ -58,8 +59,15 @@
     $(document).ready(() => {
         $("#staticModalLabel").text("@ViewBag.Title");
         $("#btnSave").click(function (e) {
-            //debugger
-            //console.log("#frmSpesialisasi isvalid?", $("#frmSpesialisasi").valid());
+            var selectedSpecialization = $("#SpecializationId").val();
+
+            // Mengatur pesan error
+            if (selectedSpecialization === "") {
+                $("#specializationError").text("Data belum dipilih.").show(); // Menampilkan pesan error
+                return;
+            } else {
+                $("#specializationError").hide(); // Menyembunyikan pesan error jika valid
+            }
             if ($("#frmSpesialisasi").valid()) {
                 $.ajax({
                     url: "/Profile/EditSpecializationDoctor",
@@ -90,8 +98,13 @@
         });
         $("#frmSpesialisasi").validate({
             rules: {
-                Name: {
+                SpecializationId: {
                     required: true
+                }
+            },
+            messages: {
+                SpecializationId: {
+                    required: "Nama Spesialisasi belum dipilih."
                 }
             }
         });

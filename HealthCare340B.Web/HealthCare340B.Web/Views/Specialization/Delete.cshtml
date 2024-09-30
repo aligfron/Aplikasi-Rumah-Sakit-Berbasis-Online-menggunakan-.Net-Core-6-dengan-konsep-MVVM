@@ -1,7 +1,7 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
-@model int
+@model VMMSpecialization?
 @{
     Layout = null;
 }
@@ -10,7 +10,7 @@
     <div class="card-body">
         <div>
             <i class="fas fa-exclamation-triangle text-danger h1 me-3"></i>
-            <span>Are you sure want to Delete data with ID @Model?</span>
+            <span>Are you sure want to Delete data with Name <b>"@Model!.Name"</b></span>
         </div>
         <div class="card-footer d-flax justify-content-end">
             <button id="btnDelete" class="btn btn-danger">Confirm</button>
@@ -24,25 +24,38 @@
 <script>
     $("#staticModalLabel").text("@ViewBag.Title");
     $("#btnDelete").click(function (e) {
+        e.preventDefault(); // Mencegah form submit jika ada
+
+        // Ambil nilai halaman saat ini dan total halaman dari ViewBag
+        var currentPage = @ViewBag.pageNumber;
+        var pageSize = @ViewBag.PageSize;
+
         $.ajax({
             url: "/Specialization/Delete",
             type: "post",
             data: {
-                "id": @Model   
-            },
+                "id": @Model.Id
+                },
             dataType: "json",
-            //beforeSend: () => { },
             success: function (response) {
                 if (response.statusCode == 200 || response.statusCode == 201) {
-                   
+                    // Cek apakah hanya ada 1 data tersisa di halaman ini
+                    if ($("tbody tr").length === 1) {
+                        // Pindah ke halaman sebelumnya jika ada
+                        window.location.href = "/Specialization/Index?pageNumber=" + (currentPage - 1) + "&currPageSize=" + pageSize;
+                    } else {
+                        // Jika masih ada data, reload halaman
                         location.reload();
+                    }
                 } else {
-                    alert(response.statusCose + " - " + response.message)
+                    alert(response.statusCode + " - " + response.message);
                 }
             },
             error: function (errResponse) {
                 console.error(errResponse);
+                alert("Terjadi kesalahan saat menghapus data.");
             }
         });
     });
 </script>
+

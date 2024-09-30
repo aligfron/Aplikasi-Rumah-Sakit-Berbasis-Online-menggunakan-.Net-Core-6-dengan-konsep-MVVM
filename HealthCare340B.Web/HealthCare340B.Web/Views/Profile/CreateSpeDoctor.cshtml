@@ -1,6 +1,7 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+
 @{
     Layout = null;
 }
@@ -17,12 +18,11 @@
                         {
                             foreach (VMMSpecialization specialization in ViewBag.Specialization)
                             {
-
-                                    <option value="@specialization.Id">@specialization.Name</option>
-                                
+                                <option value="@specialization.Id">@specialization.Name</option>
                             }
                         }
                     </select>
+                    <span id="specializationError" class="text-danger" style="display:none;"></span> <!-- Tempat untuk menampilkan pesan error -->
                 </div>
             </div>
             <input type="hidden" name="DoctorId" value="@ViewBag.Doctor.Id" />
@@ -32,26 +32,35 @@
         <button type="button" class="btn btn-success" id="btnSave">Save</button>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     $(document).ready(() => {
         $("#staticModalLabel").text("@ViewBag.Title");
+
         $("#btnSave").click(function (e) {
-            //debugger
-            //console.log("#frmSpesialisasi isvalid?", $("#frmSpesialisasi").valid());
+            // Mengambil nilai dari dropdown
+            var selectedSpecialization = $("#SpecializationId").val();
+
+            // Mengatur pesan error
+            if (selectedSpecialization === "") {
+                $("#specializationError").text("Data belum dipilih.").show(); // Menampilkan pesan error
+                return;
+            } else {
+                $("#specializationError").hide(); // Menyembunyikan pesan error jika valid
+            }
+
+            // Lanjutkan jika validasi berhasil
             if ($("#frmSpesialisasi").valid()) {
                 $.ajax({
                     url: "/Profile/CreateSpecializationDoctor",
                     type: "post",
                     data: $("#frmSpesialisasi").serialize(),
                     dataType: "json",
-                    //beforeSend: () => { },
                     success: function (response) {
                         if (response.statusCode == 200 || response.statusCode == 201) {
-                            
-                                location.reload(); 
+                            location.reload();
                         } else {
-                            alert(response.statusCose + " - " + response.message)
+                            alert(response.statusCode + " - " + response.message);
                         }
                     },
                     error: function (errResponse) {
@@ -63,14 +72,20 @@
             }
             return false;
         });
+
         $("#frmSpesialisasi").submit(function (e) {
-            //desable from submit function
-            e.preventDefault();
+            e.preventDefault(); // Mencegah form untuk disubmit
         });
+
         $("#frmSpesialisasi").validate({
             rules: {
-                Name: {
+                SpecializationId: {
                     required: true
+                }
+            },
+            messages: {
+                SpecializationId: {
+                    required: "Nama Spesialisasi belum dipilih."
                 }
             }
         });

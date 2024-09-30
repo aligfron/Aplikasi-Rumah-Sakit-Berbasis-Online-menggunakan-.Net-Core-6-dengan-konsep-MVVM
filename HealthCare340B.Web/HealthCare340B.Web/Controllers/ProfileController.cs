@@ -89,6 +89,7 @@ namespace HealthCare340B.Web.Controllers
             }
             ViewBag.Title = "Profil";
             ViewBag.imgFolder = imageFolder;
+            ViewBag.Specialization = await specialization.getByFilter("");
             ViewBag.Role = HttpContext.Session.GetString("userRoleCode")!;
 
             ViewBag.Breadcrumb = new List<BreadcrumbItem>
@@ -257,6 +258,7 @@ namespace HealthCare340B.Web.Controllers
             try
             {
                 data.ModifiedBy = long.Parse(HttpContext.Session.GetString("userId")!);
+                ViewBag.Specialization = await specialization.getByFilter("");
                 response = await profile.EditSpecializationDoctorAsync(data);
                 if (response.StatusCode == HttpStatusCode.OK)
                 {

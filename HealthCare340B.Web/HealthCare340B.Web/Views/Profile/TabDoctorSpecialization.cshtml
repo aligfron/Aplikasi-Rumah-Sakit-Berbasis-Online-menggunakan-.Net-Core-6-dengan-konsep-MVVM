@@ -2,20 +2,13 @@
 {
     @if (Model.SpecializationName.Count > 0)
     {
-        bool isFirst = true;
-
         foreach (VMTCurrentDoctorSpecialization specialization in Model.SpecializationName)
         {
-            if (isFirst)
-            {
-                <p class="text-small">Nama Spesialisasi: @specialization.Specialization</p>
-
-                <button class="btn btn-success position-absolute" data-id="@specialization.Id" style="bottom: 30px; right: 30px;" title="Edit" data-bs-toggle="modal" data-bs-target="#staticModal">
-                    <i class="bi bi-pencil-fill"></i> Ubah Spesialisasi
-                </button>
-
-                isFirst = false;
-            }
+            <h5>Nama Spesialisasi: @specialization.Specialization</h5>
+            
+            <button class="btn btn-success position-absolute" data-id="@specialization.Id" style="bottom: 30px; right: 30px;" title="Edit" data-bs-toggle="modal" data-bs-target="#staticModal">
+                <i class="bi bi-pencil-fill"></i> Ubah Spesialisasi
+            </button>
         }
     }
     else
@@ -37,14 +30,3 @@ else
         <i class="bi bi-plus-circle"></i> Tambah Spesialisasi
     </button>
 }
-<script>
-    $(".btn-primary").click(function (e) {
-        $("#staticModalBody").html("");
-        $("#staticModalBody").load("/Profile/CreateSpeDoctor/" + $(this).data("id"));
-    });
-
-    $(".btn-success").click(function (e) {
-        $("#staticModalBody").html("");
-        $("#staticModalBody").load("/Profile/EditSpecializationDoctor/" + $(this).data("id"));
-    });
-</script>

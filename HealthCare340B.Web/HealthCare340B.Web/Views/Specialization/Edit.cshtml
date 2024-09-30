@@ -1,7 +1,7 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
-@model VMMSpecialization?
+@model List<VMMSpecialization>?
 @{
     Layout = null;
 }
@@ -14,10 +14,14 @@
                 <form id="frmSpesialisasi">
                     <div class="card-title row">
                         <div class="col-4">Full Name <span class="text-danger"> * </span></div>
-                        <div class="col-8"><input type="text" class="form-control" name="Name" value="@Model.Name" /></div>
+                        <div class="col-8">
+                            <input type="text" class="form-control" name="Name" value="@ViewBag.dataname" id="spesialisasiName" />
+                            <span id="nameError" class="text-danger" style="display:none;"></span>
+                        </div>
+
                     </div>
-                    
-                    <input type="hidden" name="Id" value="@Model.Id" />
+
+                    <input type="hidden" name="Id" value="@ViewBag.dataid" />
                 </form>
             }
             else
@@ -31,13 +35,43 @@
     </div>
     <div class="card-footer d-flex justify-content-end">
         <button type="button" class="btn btn-success" id="btnSave">Save</button>
+        &nbsp;
+        <button class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
     </div>
 </div>
 <script>
     $(document).ready(() => {
         $("#staticModalLabel").text("@ViewBag.Title");
         $("#btnSave").click(function (e) {
+            var inputName = $("#spesialisasiName").val().trim();
+            var existingNames = [];
+
+            // Menambahkan nama yang ada ke dalam array
+            @if (Model != null)
+            {
+                foreach (var spesialisasi in Model)
+                {
+                    <text>existingNames.push("@spesialisasi.Name"); </text>
+                }
+            }
+
+                    // Memeriksa apakah inputName sudah ada dalam existingNames
+                    var isNameExists = false;
+            for (var i = 0; i < existingNames.length; i++) {
+                if (existingNames[i] === inputName) {
+                    isNameExists = true;
+                    break;
+                }
+            }
+
+            if (isNameExists) {
+                $("#nameError").text("Nama Belum diubah atau Nama sudah ada di database, Silakan masukkan nama lain.").show(); // Menampilkan pesan error
+                return;
+            } else {
+                $("#nameError").hide(); // Menyembunyikan pesan error jika nama valid
+            }
             if ($("#frmSpesialisasi").valid()) {
+            // Lanjutkan jika nama valid
                 $.ajax({
                     url: "/Specialization/Edit",
                     type: "post",
@@ -66,9 +100,20 @@
         $("#frmSpesialisasi").validate({
             rules: {
                 Name: {
-                    required: true
+                    required: true,
+                    normalizer: function (value) {
+                        return $.trim(value); // Menghapus spasi di awal dan akhir
+                    },
+                    minlength: 1 // Menghindari inputan kosong setelah trim
                 }
-            }
+            },
+            messages: {
+                Name: {
+                    required: "Nama tidak boleh kosong.",
+                    minlength: "Nama tidak boleh kurang dari 1"
+                }
+            },
+            errorClass: "text-danger"
         });
     });
 </script>

@@ -14,7 +14,7 @@
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="#" id="breadcrumbProfile">Profile</a></li> <!-- Menambahkan link pada Profile -->
+                        <li class="breadcrumb-item"><a href="#" id="breadcrumbProfile">Profile</a></li>
                         <li class="breadcrumb-item active" aria-current="page" id="breadcrumbCurrent">Profile</li>
                     </ol>
                 </nav>
@@ -40,7 +40,7 @@
                                     <input type="hidden" name="ImagePath" value="@Model.ImagePath" />
                                 </div>
                             </form>
-
+                            <span id="fotoError" class="text-danger" style="display:none;"></span>
                             <button type="button" id="saveImageBtn" class="btn btn-primary mt-3 d-none">Simpan Gambar</button>
                             <button type="button" id="cancelImageBtn" class="btn btn-danger mt-3 d-none">Cancel</button>
 
@@ -199,15 +199,27 @@
         const reader = new FileReader();
         const file = event.target.files[0];
 
-        reader.onload = function () {
-            const output = document.getElementById('profileImage');
-            output.src = reader.result; // Ubah source image menjadi hasil file yang diunggah
-        };
-
         if (file) {
+            const fileType = file.type;
+            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']; // Tambahkan jenis gambar yang diizinkan di sini
+
+            if (!validImageTypes.includes(fileType)) {
+                document.getElementById('cancelImageBtn').classList.remove('d-none'); // Tampilkan tombol cancel
+                $("#fotoError").text("File yang anda pilih bukan gambar, silahkan pilih ulang").show();
+                event.target.value = ''; // Kosongkan input file
+                document.getElementById('saveImageBtn').classList.add('d-none'); // Sembunyikan tombol simpan
+                return; 
+            }
+
+            reader.onload = function () {
+                const output = document.getElementById('profileImage');
+                output.src = reader.result;
+            };
+
             reader.readAsDataURL(file); // Mulai membaca file gambar
 
             // Tampilkan tombol "Simpan Gambar" setelah gambar berhasil diunggah
+            document.getElementById('fotoError').classList.add('d-none');
             document.getElementById('saveImageBtn').classList.remove('d-none');
             document.getElementById('cancelImageBtn').classList.remove('d-none');
         }
@@ -263,6 +275,7 @@
     $("#frmFoto").submit(function (e) {
         e.preventDefault()
         let formData = new FormData($("#frmFoto")[0])
+
         if ($(this).valid()) {
             $.ajax({
                 url: "/Profile/Edit",

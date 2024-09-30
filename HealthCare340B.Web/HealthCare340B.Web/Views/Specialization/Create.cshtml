@@ -1,7 +1,4 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-
+﻿@model List<VMMSpecialization>?
 @{
     Layout = null;
 }
@@ -11,7 +8,10 @@
         <form id="frmSpesialisasi">
             <div class="card-title row">
                 <div class="col-4">Full Name <span class="text-danger"> * </span></div>
-                <div class="col-8"><input type="text" class="form-control" name="Name" /></div>
+                <div class="col-8">
+                    <input type="text" class="form-control" name="Name" id="spesialisasiName" />
+                    <span id="nameError" class="text-danger" style="display:none;"></span> <!-- Tempat untuk menampilkan pesan error -->
+                </div>
             </div>
         </form>
     </div>
@@ -20,48 +20,84 @@
     </div>
 </div>
 
-
 <script>
     $(document).ready(() => {
         $("#staticModalLabel").text("@ViewBag.Title");
+
         $("#btnSave").click(function (e) {
+            var inputName = $("#spesialisasiName").val().trim();
+            var existingNames = [];
+
+            // Menambahkan nama yang ada ke dalam array
+            @if (Model != null)
+            {
+                foreach (var spesialisasi in Model)
+                {
+                    <text>existingNames.push("@spesialisasi.Name"); </text>
+                }
+            }
+
+                // Memeriksa apakah inputName sudah ada dalam existingNames
+                var isNameExists = false;
+            for (var i = 0; i < existingNames.length; i++) {
+                if (existingNames[i] === inputName) {
+                    isNameExists = true;
+                    break;
+                }
+            }
+
+            if (isNameExists) {
+                $("#nameError").text("Nama sudah ada di database. Silakan masukkan nama lain.").show(); // Menampilkan pesan error
+                return;
+            } else {
+                $("#nameError").hide(); // Menyembunyikan pesan error jika nama valid
+            }
+
+            // Lanjutkan jika nama valid
             if ($("#frmSpesialisasi").valid()) {
-                $.ajax({
-                    url: "/Specialization/Create",
-                    type: "post",
-                    data: $("#frmSpesialisasi").serialize(),
-                    dataType: "json",
-                    //beforeSend: () => { },
-                    success: function (response) {
-                        if (response.statusCode == 200 || response.statusCode == 201) {
-                                location.reload(); 
-                        } else {
-                            alert(response.statusCose + " - " + response.message)
-                        }
-                    },
-                    error: function (errResponse) {
-                        console.error(errResponse);
+            $.ajax({
+                url: "/Specialization/Create",
+                type: "post",
+                data: $("#frmSpesialisasi").serialize(),
+                dataType: "json",
+                success: function (response) {
+                    if (response.statusCode == 200 || response.statusCode == 201) {
+                        location.reload();
+                    } else {
+                        alert(response.statusCose + " - " + response.message);
                     }
-                });
+                },
+                error: function (errResponse) {
+                    console.error(errResponse);
+                }
+            });
             } else {
                 console.error("Spesialisasi data is not valid");
             }
             return false;
         });
+
         $("#frmSpesialisasi").submit(function (e) {
             e.preventDefault();
         });
+
         $("#frmSpesialisasi").validate({
             rules: {
                 Name: {
-                    required: true
+                    required: true,
+                    normalizer: function (value) {
+                        return $.trim(value); // Menghapus spasi di awal dan akhir
+                    },
+                    minlength: 1 // Menghindari inputan kosong setelah trim
                 }
-
+            },
+            messages: {
+                Name: {
+                    required: "Nama tidak boleh kosong.",
+                    minlength: "Nama tidak boleh kurang dari 1"
+                }
             },
             errorClass: "text-danger"
-        });
-        $("#btnReset").click(() => {
-            $("#frmSpesialisasi")[0].reset();
         });
     });
 </script>

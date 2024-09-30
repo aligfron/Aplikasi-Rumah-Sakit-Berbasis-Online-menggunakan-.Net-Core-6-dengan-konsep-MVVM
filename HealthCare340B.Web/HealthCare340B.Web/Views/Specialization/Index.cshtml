@@ -30,28 +30,29 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <div class="d-flex justify-content-between">
-                        <button id="btnAdd" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#staticModal"><i class="fas fa-plus"></i><b> Tambah</b></button>
-                        <form id="frmpage" method="get" asp-controller="Specialization" asp-action="Index">
-                            <div class="input-group mx-5">
-
+                    <div class="d-flex flex-wrap justify-content-between">
+                        <button id="btnAdd" class="btn btn-success mb-2" data-bs-toggle="modal" data-bs-target="#staticModal">
+                            <i class="fas fa-plus"></i><b> Tambah</b>
+                        </button>
+                        <form id="frmpage" method="get" asp-controller="Specialization" asp-action="Index" class="d-flex flex-wrap mx-md-5 mb-2">
+                            <div class="input-group">
                                 <span class="input-group-text">Show</span>
                                 <input class="form-control" type="number" id="pageSize" name="currPageSize" value="@ViewBag.PageSize" />
-                                <span class="input-group-text"> Entris</span>
-
+                                <span class="input-group-text"> Entries</span>
                             </div>
                             <input type="hidden" name="filter" value="@ViewBag.filter" />
                             <input type="hidden" name="pageNumber" value="@(Model.PageIndex)" />
                         </form>
-                        <form id="frmCategoryfilter" asp-controller="Specialization" asp-action="Index">
+                        <form id="frmCategoryfilter" asp-controller="Specialization" asp-action="Index" class="d-flex flex-wrap mb-2">
                             <div class="input-group">
-                                <span class="input-group-text">Search : </span>
+                                <span class="input-group-text">Search:</span>
                                 <input class="form-control" type="text" id="filter" name="filter" value="@ViewBag.filter" />
                                 <button type="submit" class="btn btn-success input-group-text"><i class="fas fa-search"></i></button>
                             </div>
                         </form>
                     </div>
                 </div>
+
                 <div class="card-content">
                     <div class="table-responsive">
                         <div class="card-body">
@@ -59,14 +60,14 @@
                             <table class="table table-striped mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="col-2 text-center align-middle">ID</th>
+                                        <th class="col-2 text-center align-middle">No</th>
                                         <th class="col-6 text-center align-middle">Name</th>
                                         <th class="col-4 text-center align-middle">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @{
-                                        int no = 1;
+                                        int no = (Model.PageIndex - 1) * ViewBag.PageSize + 1; // Menghitung nomor berdasarkan halaman saat ini
                                     }
 
                                     @{
@@ -81,7 +82,7 @@
                                                     <td class="text-center align-middle">
                                                         <div class="btn-group" role="group">
                                                             <button data-id="@spesialisasi.Id" class="btn btn-primary" title="Edit" data-bs-toggle="modal" data-bs-target="#staticModal"><i class="fas fa-edit"></i></button>
-                                                            <button data-id="@spesialisasi.Id" class="btn btn-danger" title="Delete" data-bs-toggle="modal" data-bs-target="#staticModal"><i class="fas fa-trash-alt"></i></button>
+                                                            <button data-id="@spesialisasi.Id" data-page="@Model.PageIndex" data-size="@ViewBag.PageSize" class="btn btn-danger" title="Delete" data-bs-toggle="modal" data-bs-target="#staticModal"><i class="fas fa-trash-alt"></i></button>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -96,6 +97,7 @@
                                         }
                                     }
                                 </tbody>
+
                             </table>
                         </div>
                     </div>
@@ -149,6 +151,13 @@
     });
     $(".btn-danger").click(function (e) {
         $("#staticModalBody").html("");
-        $("#staticModalBody").load("/Specialization/Delete/" + $(this).data("id"));
+
+        // Ambil ID, Page Number, dan Page Size dari atribut data
+        var id = $(this).data("id");
+        var pageNumber = $(this).data("page");
+        var pageSize = $(this).data("size");
+
+        // Kirim ID, Page Number, dan Page Size ke modal delete
+        $("#staticModalBody").load("/Specialization/Delete/" + id + "?pageNumber=" + pageNumber + "&currPageSize=" + pageSize);
     });
 </script>
