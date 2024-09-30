@@ -8,11 +8,11 @@
     <div class="card mb-0">
         <div class="card-body">
             <div class="input-group mb-3">
-                <label class="input-group-text col-3" for="txtEmail">E-Mail</label>
+                <label class="input-group-text col-3 text-white-600" for="txtEmail">E-Mail</label>
                 <input id="txtEmail" type="email" class="form-control col-9" name="Email" />
             </div>
             <div class="input-group">
-                <label class="input-group-text col-3" for="txtPassword">Password</label>
+                <label class="input-group-text col-3 text-white-600" for="txtPassword">Password</label>
                 <input id="txtPassword" type="password" class="form-control col-9" name="Password" />
                 <input id="loginAttempt" type="Number" name="LoginAttempt" value="0" hidden></input>
             </div>
@@ -37,6 +37,11 @@
 
 <script>
     $("#staticModalLabel").text("@ViewBag.Title");
+
+    $("#btnForgot").click(function () {
+        $("#staticModalLgBody").html("");
+        $("#staticModalLgBody").load("/User/Update/");
+    });
 
     $("#btnDaftar").click(function () {
         $("#staticModalLgBody").html("");

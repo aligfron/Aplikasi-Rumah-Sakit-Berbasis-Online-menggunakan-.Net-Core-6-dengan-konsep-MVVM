@@ -1,4 +1,5 @@
-﻿using HealthCare340B.Web.Models;
+﻿using HealthCare340B.ViewModel;
+using HealthCare340B.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -8,18 +9,29 @@ namespace HealthCare340B.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly string imageFolder;
-
+        private readonly HomeModel home;
         public HomeController(ILogger<HomeController> logger, IConfiguration _config)
         {
             _logger = logger;
             imageFolder = _config["ImageFolder"];
+            home = new HomeModel(_config);
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             ViewBag.imgFolder = imageFolder;
+            List<VMMMenuRole> dataCoba = new List<VMMMenuRole>();
+            try
+            {
+                dataCoba = await home.GetByFilter("");
+                ViewBag.dataCoba = dataCoba;
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
 
-            return View();
+            return View(dataCoba);
         }
 
         public IActionResult Privacy()

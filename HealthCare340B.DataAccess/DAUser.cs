@@ -112,46 +112,6 @@ namespace HealthCare340B.DataAccess
             }
             return response!;
         }
-        /*public VMResponse<List<VMMUser>> GetByfilter(string filter) 
-        {
-            VMResponse<List<VMMUser?>> response = new VMResponse<List<VMMUser?>>();
-            try
-            {
-                response.data = (
-                    from u in db.MUsers
-                    where u.IsDelete == false && 
-                    select new VMMUser()
-                    {
-                        Id = u.Id,
-                        BiodataId = u.BiodataId,
-                        RoleId = u.RoleId,
-                        Email = u.Email,
-                        Password = u.Password,
-                        LoginAttempt = u.LoginAttempt,
-                        IsLocked = u.IsLocked,
-                        LastLogin = u.LastLogin,
-                        CreatedBy = u.CreatedBy,
-                        CreatedOn = u.CreatedOn,
-                        ModifiedBy = u.ModifiedBy,
-                        ModifiedOn = u.ModifiedOn,
-                        DeletedBy = u.DeletedBy,
-                        DeletedOn = u.DeletedOn,
-                        IsDelete = false,
-                    }
-                    ).FirstOrDefault();
-                response.statusCode = (response.data != null) ?
-                        HttpStatusCode.OK :
-                        HttpStatusCode.NotFound;
-                response.message = (response.data != null) ?
-                    $"{HttpStatusCode.OK} - User succesfully fetched!"
-                    : $"{HttpStatusCode.NotFound} - User does not exist!";
-            }
-            catch (Exception ex) 
-            {
-            }
-        }*/
-
-
         public VMResponse<VMMUser> Create(VMMUser data) 
         {
             VMResponse<VMMUser> response = new VMResponse<VMMUser> ();
@@ -272,12 +232,15 @@ namespace HealthCare340B.DataAccess
                     }
                     if (existingData.IsLocked==true)
                     {
+                        existingData.LoginAttempt = 5;
                         response.StatusCode = HttpStatusCode.Locked;
                         response.Message = $"{HttpStatusCode.Forbidden} - Account is locked due to multiple failed login attempts.";
                         response.Data = existingData;
+                        return response;
                     }
                     if (existingData.Password != data.Password)
                     {
+
                         existingData.LoginAttempt++;
                         existingData.IsLocked = false;
                         if (existingData.LoginAttempt >= 5)

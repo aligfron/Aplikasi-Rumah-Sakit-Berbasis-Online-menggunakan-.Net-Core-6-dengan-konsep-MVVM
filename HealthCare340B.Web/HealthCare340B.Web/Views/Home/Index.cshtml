@@ -4,7 +4,26 @@
 
 <div class="container">
     <div class="row">
-        @for (int i = 0; i < 10; i++)
+        @if (Model != null)
+        {
+            @foreach (var menu in ViewBag.dataCoba as List<VMMMenuRole>)
+            {
+                @if (menu.ParentId != null && menu.RoleId == null)
+                {
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <a href="@menu.Url">
+                                    <i class="fas @menu.BigIcon text-center" style="font-size: 50px;"></i>
+                                    <p class="menu-name">@menu.Name</p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        }
+        @*@for (int i = 0; i < 10; i++)
         {
             <div class="col-md-3">
                 <div class="card">
@@ -14,6 +33,6 @@
                     </div>
                 </div>
             </div>
-        }
+        }*@
     </div>
 </div>
