@@ -25,6 +25,7 @@ namespace HealthCare340B.DataAccess
             try
             {
                 var query = from m in db.MSpecializations
+                            where m.IsDelete == false
                             select new VMMSpecialization
                             {
                                 Id = m.Id,

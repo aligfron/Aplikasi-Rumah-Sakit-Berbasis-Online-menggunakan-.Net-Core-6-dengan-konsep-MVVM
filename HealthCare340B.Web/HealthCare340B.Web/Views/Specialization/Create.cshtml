@@ -25,6 +25,7 @@
         $("#staticModalLabel").text("@ViewBag.Title");
 
         $("#btnSave").click(function (e) {
+            trimAndCleanInput("#spesialisasiName");
             var inputName = $("#spesialisasiName").val().trim();
             var existingNames = [];
 
@@ -36,7 +37,6 @@
                     <text>existingNames.push("@spesialisasi.Name"); </text>
                 }
             }
-
                 // Memeriksa apakah inputName sudah ada dalam existingNames
                 var isNameExists = false;
             for (var i = 0; i < existingNames.length; i++) {
@@ -45,7 +45,6 @@
                     break;
                 }
             }
-
             if (isNameExists) {
                 $("#nameError").text("Nama sudah ada di database. Silakan masukkan nama lain.").show(); // Menampilkan pesan error
                 return;

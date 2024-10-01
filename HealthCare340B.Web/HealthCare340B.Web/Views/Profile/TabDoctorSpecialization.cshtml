@@ -30,3 +30,14 @@ else
         <i class="bi bi-plus-circle"></i> Tambah Spesialisasi
     </button>
 }
+<script>
+    $(".btn-primary").click(function (e) {
+        $("#staticModalBody").html("");
+        $("#staticModalBody").load("/Profile/CreateSpeDoctor/" + $(this).data("id"));
+    });
+
+    $(".btn-success").click(function (e) {
+        $("#staticModalBody").html("");
+        $("#staticModalBody").load("/Profile/EditSpecializationDoctor/" + $(this).data("id"));
+    });
+</script>

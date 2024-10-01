@@ -43,6 +43,7 @@
     $(document).ready(() => {
         $("#staticModalLabel").text("@ViewBag.Title");
         $("#btnSave").click(function (e) {
+            trimAndCleanInput("#spesialisasiName");
             var inputName = $("#spesialisasiName").val().trim();
             var existingNames = [];
 

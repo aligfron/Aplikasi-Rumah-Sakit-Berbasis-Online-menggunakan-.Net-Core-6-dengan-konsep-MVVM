@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using HealthCare340B.ViewModel;
 using HealthCare340B.DataModel;
+using HealthCare340B.Web.AddOns;
 
 namespace HealthCare340B.Web.Controllers
 {
@@ -13,6 +14,7 @@ namespace HealthCare340B.Web.Controllers
         private readonly DoctorTreatmentModel doctorTreatment;
         private readonly string imageFolder;
         private int? doctorId = null;
+        private ProfileModel profile;
 
         public DoctorController(IConfiguration _config, IWebHostEnvironment _webHostEnv)
         {
@@ -21,6 +23,7 @@ namespace HealthCare340B.Web.Controllers
             specialization = new SpecializationModel(_config);
             doctorTreatment = new DoctorTreatmentModel(_config);
             imageFolder = _config["ImageFolder"];
+            profile = new ProfileModel(_config, _webHostEnv);
         }
 
         private bool isDoctorInSession()
@@ -59,7 +62,7 @@ namespace HealthCare340B.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ResultSearchDoctor(VMMDoctor dataFilter)
         {
-            List<VMMDoctor> data = await doctor.GetByFilter(
+            List<VMMDoctor>? data = await doctor.GetByFilter(
                 dataFilter.MedicalFacilityName?.Trim(),
                 dataFilter.Fullname?.Trim(),
                 dataFilter.Specialization?.Trim(),
@@ -122,6 +125,24 @@ namespace HealthCare340B.Web.Controllers
             return false;
         }
 
+        //punya ali
 
+        public async Task<IActionResult> DetailDoctor()
+        {
+            ViewBag.Title = "Profil";
+            ViewBag.imgFolder = imageFolder;
+            ViewBag.Specialization = await specialization.getByFilter("");
+            ViewBag.Role = HttpContext.Session.GetString("userRoleCode")!;
+
+            ViewBag.Breadcrumb = new List<BreadcrumbItem>
+            {
+                new BreadcrumbItem { Name = "Beranda", Controller = "Home", Action = "Index" },
+                new BreadcrumbItem { Name = "Profile", IsActive = true }
+            };
+            int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
+            VMMDoctor? GetDoctorByBiodataId = await profile.GetDoctorByBiodataId(bioId);
+            VMMDoctor? data = await profile.GetByIdProfilDokter(GetDoctorByBiodataId!.Id);
+            return View(data);
+        }
     }
 }

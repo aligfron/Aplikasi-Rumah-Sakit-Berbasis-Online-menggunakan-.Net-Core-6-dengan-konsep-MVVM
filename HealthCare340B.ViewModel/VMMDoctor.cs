@@ -36,12 +36,20 @@ namespace HealthCare340B.ViewModel
         public List<VMTCurrentDoctorSpecialization>? SpecializationName { get; set; }
         //Riwayat Praktek
         public List<VMTDoctorOffice>? DoctorOffice { get; set; }
-        
+        public List<VMTDoctorOffice>? MaxEndDate { get; set; }
+        public List<VMTDoctorOffice>? MinStarDate { get; set; }
+
         //pendidikan
         public List<VMMDoctorEducation>? InstitutionName { get; set; }
+
         //janji
         
         public List<VMTAppointment>? Appointment { get; set; }
+        //jadwal praktek
+        public List<VMMMedicalFacilitySchedule>? JadwalPraktek { get; set; }
+
+        //harga konsul mulai 
+        public List<VMTDoctorOfficeTreatmentPrice>? HargaKonsulMulai { get; set; }
 
         public string? LastEducationEndYear { get; set; }
 
