@@ -1,4 +1,5 @@
 ﻿using HealthCare340B.ViewModel;
+using HealthCare340B.Web.AddOns;
 using HealthCare340B.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -194,21 +195,24 @@ namespace HealthCare340B.Web.Controllers
         {
             List<VMMMedicalFacilitySchedule>? response = await appointment.GetMedicalFacilitySchedule(medFacId, doctorId);
 
-            List<DateTime>? emptySlotDateTime = null;
+            List<DateTime>? emptySlotDateTime = new List<DateTime>();
             if (response != null)
                 emptySlotDateTime = await appointment.GetEmptySlotDate(response);
 
             List<string>? emptyHourSlot = new List<string>();
             DateTime dateChoice = DateTime.Parse(date);
 
-            foreach (DateTime dateTime in emptySlotDateTime)
+            if(emptySlotDateTime != null && emptySlotDateTime.Count > 0)
             {
-                if (dateTime.Date == dateChoice.Date)
+                foreach (DateTime dateTime in emptySlotDateTime)
                 {
-                    emptyHourSlot.Add(dateTime.Hour.ToString() + ":" + dateTime.Minute.ToString());
+                    if (dateTime.Date == dateChoice.Date)
+                    {
+                        emptyHourSlot.Add(dateTime.Hour.ToString() + ":" + dateTime.Minute.ToString());
+                    }
                 }
             }
-
+           
             List<VMAppointmentSchedule> listSch = new List<VMAppointmentSchedule>();
 
             if (emptyHourSlot.Count > 0)
@@ -293,6 +297,17 @@ namespace HealthCare340B.Web.Controllers
                 throw new Exception(e.Message);
             }
         }
+        public IActionResult Check()
+        {
+            ViewBag.Title = "Cek Ketersediaan Jadwal";
+            return View();
+        }
+
+        public IActionResult EmptySlot()
+        {
+            ViewBag.Title = "Cek Ketersediaan Jadwal";
+            return View();
+        }
 
         [HttpPost]
         public async Task<VMResponse<VMTAppointment>> Create(long custId, long dofId, long dosId, long dotId, string appDate)
@@ -312,13 +327,59 @@ namespace HealthCare340B.Web.Controllers
                     CreatedBy = long.Parse(HttpContext.Session.GetString("userId")!)
                 };
 
-                return await appointment.Create(data);
+                VMResponse<VMTAppointment> response = await appointment.Create(data);
+                HttpContext.Session.SetString("successMsg", "Janji berhasil dibuat!");
+                return response;
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                VMResponse<VMTAppointment> response = new VMResponse<VMTAppointment>
+                {
+                    Message = e.Message
+                };
+                return response;
             }
            
+        }
+
+        public async Task<IActionResult> RencanaKedatangan()
+        {
+            List<VMMCustomerMember> dataMember = new List<VMMCustomerMember>();
+            try
+            {
+                dataMember = await customerMember.GetAll((long)HttpContext.Session.GetInt32("userBiodataId")!);
+            }
+            catch
+            {
+                dataMember = new List<VMMCustomerMember>();
+            }
+
+            long userCustId = await appointment.GetCustId((long)HttpContext.Session.GetInt32("userBiodataId")!);
+            List<long> custId = new List<long>();
+            custId.Add(userCustId);
+
+            if (dataMember.Count > 0)
+            {
+                foreach(VMMCustomerMember member in dataMember)
+                {
+                    custId.Add(member.Id);
+                }
+            }
+
+            ViewBag.Breadcrumb = new List<BreadcrumbItem>
+            {
+                new BreadcrumbItem { Name = "Beranda", Controller = "Home", Action = "Index" },
+                new BreadcrumbItem { Name = "Profile", Controller = "Profile", Action = "Index" },
+                new BreadcrumbItem { Name = "Appointment", IsActive = true }
+            };
+
+
+            List<VMTAppointment>? dataAppointment = await appointment.GetByCustomerId(custId);
+
+            ViewBag.Role = HttpContext.Session.GetString("userRoleCode");
+            ViewBag.OrderBy = "Asc";
+
+            return View(dataAppointment);
         }
     }
 }

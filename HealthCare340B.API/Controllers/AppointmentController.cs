@@ -19,6 +19,30 @@ namespace HealthCare340B.API.Controllers
         }
 
         [HttpPost("[action]")]
+        public async Task<ActionResult> GetCustomerId(List<long>? custId)
+        {
+            try
+            {
+                if (custId == null || custId.Count < 1)
+                    throw new ArgumentNullException();
+                VMResponse<List<VMTAppointment>?> response = await Task.Run(() => appointment.GetByCustomerId(custId!));
+                if (response.Data != null && response.Data.Count > 0)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    Console.WriteLine("No Appointments Found!");
+                    return NoContent();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"{HttpStatusCode.BadRequest}");
+            }
+        }
+
+        [HttpPost("[action]")]
         public async Task<ActionResult> GetEmptySlotDate(List<VMMMedicalFacilitySchedule> data)
         {
             try

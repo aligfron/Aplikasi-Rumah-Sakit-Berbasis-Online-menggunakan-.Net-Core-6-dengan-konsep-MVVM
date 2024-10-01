@@ -443,5 +443,43 @@ namespace HealthCare340B.Web.Models
 
             return apiResponse;
         }
+
+        public async Task<List<VMTAppointment>?> GetByCustomerId(List<long> custId)
+        {
+            VMResponse<List<VMTAppointment>>? apiResponse = new VMResponse<List<VMTAppointment>>();
+
+            try
+            {
+                jsonData = JsonConvert.SerializeObject(custId);
+                content = new StringContent(    // Create a blank HttpRequest Document
+                    jsonData,               // Put the Request Body (data)
+                    Encoding.UTF8,          // Assign the Request body's character set
+                    "application/json"      // Assain the Request body's format / Content-Type
+                    );
+
+                apiResponse =
+                 JsonConvert.DeserializeObject<VMResponse<List<VMTAppointment>>>(     // Convert the Json string to a class
+                     await httpClient.PostAsync($"{apiUrl}Appointment/GetByCustomerId", content)    // Call the API
+                     .Result                                                     // Read the Result
+                     .Content                                                    // Get the Content Result
+                     .ReadAsStringAsync()                                        // Convert the content as string
+                 );
+
+                if (apiResponse != null)
+                {
+                    return apiResponse.Data;
+                }
+                else
+                {
+                    return new List<VMTAppointment>();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+
+            
+        }
     }
 }

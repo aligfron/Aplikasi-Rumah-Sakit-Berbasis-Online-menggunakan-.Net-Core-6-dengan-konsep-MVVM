@@ -20,6 +20,65 @@ namespace HealthCare340B.DataAccess
             db = _db;
         }
 
+        public VMResponse<List<VMTAppointment>?> GetByCustomerId(List<long> custId)
+        {
+            VMResponse<List<VMTAppointment>?> response = new VMResponse<List<VMTAppointment>?>();
+
+            response.Data = new List<VMTAppointment>();
+
+            try
+            {
+                foreach (long id in custId)
+                {
+                    List<VMTAppointment>? data = (
+                        from a in db.TAppointments
+                        where a.CustomerId == id && a.IsDelete == false
+                        select new VMTAppointment
+                        {
+                            Id = a.Id,
+                            CustomerId = a.CustomerId,
+                            DoctorOfficeId = a.DoctorOfficeId,
+                            DoctorOfficeScheduleId = a.DoctorOfficeScheduleId,
+                            DoctorOfficeTreatmentId = a.DoctorOfficeTreatmentId,
+                            AppointmentDate = a.AppointmentDate,
+                            CreatedBy = a.CreatedBy,
+                            CreatedOn = a.CreatedOn,
+                            ModifiedBy = a.ModifiedBy,
+                            ModifiedOn = a.ModifiedOn,
+                            DeletedBy = a.DeletedBy,
+                            DeletedOn = a.DeletedOn,
+                            IsDelete = a.IsDelete
+                        }
+                        ).ToList();
+                        
+                    if (data != null && data.Count > 0)
+                    {
+                        foreach (VMTAppointment resQuery in data)
+                        {
+                            response.Data.Add(resQuery);
+                        }
+                    }
+                }
+
+                if (response.Data.Count > 0)
+                {
+                    response.StatusCode = HttpStatusCode.OK;
+                    response.Message = $"{HttpStatusCode.OK} - Appointments successfully fetch!";
+                }
+                else
+                {
+                    response.StatusCode = HttpStatusCode.NoContent;
+                    response.Message = $"{HttpStatusCode.NoContent} - No Appointments Found!";
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Something's wrong - {e.Message}");
+            }
+
+            return response;
+        }
+
         public List<DateTime>? GetEmptySlotDate(List<VMMMedicalFacilitySchedule> data)
         {
             List<DateTime> excludedDate = new List<DateTime>();

@@ -106,7 +106,7 @@
                                             else
                                             {
                                                 <span class="text-muted">Offline</span>
-                                                <button class="btn btn-success mt-2">Buat Janji</button>
+                                                <button id="btnAppointment" data-id="@doctor.Id" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticModal">Buat Janji</button>
                                             }
                                         </div>
                                     </div>
@@ -131,5 +131,10 @@
     $("#researchBtn").click(function (e) {
         $("#staticModalBody").html("")
         $("#staticModalBody").load("/Doctor/SearchDoctor")
+    });
+
+    $("#btnAppointment").click(function (e) {
+        $("#staticModalBody").html(spinner);
+        $("#staticModalBody").load("/Appointment/Create/" + $(this).attr("data-id"));
     });
 </script>
