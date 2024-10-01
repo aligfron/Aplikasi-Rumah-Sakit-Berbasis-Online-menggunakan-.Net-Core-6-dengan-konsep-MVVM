@@ -1,0 +1,183 @@
+﻿@*
+For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model Pagination<VMTAppointmentDone>?;
+@{
+    Layout = "_ProfilLayout";
+}
+
+<div class="page-title">
+    <div class="row">
+        <div class="col-12 col-md-6 order-md-1 order-last">
+            <h3>@ViewData["Title"]</h3>
+            <p class="text-subtitle text-muted"></p>
+        </div>
+    </div>
+</div>
+<section class="section">
+    <div class="d-flex justify-content-between mb-5">
+        <form id="frmAppointmentHistoryFilter" asp-controller="AppointmentHistory" asp-action="Index">
+            <div class="input-group">
+                <input class="form-control" type="text" id="filter" name="Filter" value="@ViewBag.Filter" placeholder="Cari nama pasien atau nama dokter" style="width: 280px;" />
+                <button type="submit" class="btn btn-primary input-group-text"><i class="fas fa-search"></i></button>
+            </div>
+        </form>
+
+        <div class="col-sm-3">
+            <div class="input-group">
+                <span class="input-group-text">Urutkan</span>
+                <select id="orderBy" name="OrderBy" class="form-select">
+                    <option value="appointment_date">Tanggal Kedatangan</option>
+                    <option value="name">Nama</option>
+                    <option value="created_on">Tanggal dibuat</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-end text-center mb-1">
+        <button class="btn text-primary" id="sortButton">
+            @(ViewBag.OrderDirection == "asc" ? "A-Z" : "Z-A")
+        </button>
+        <p class="mx-1 my-0 text-primary">|</p>
+        <div class="col-1">
+            <form id="frmPageSize">
+                <input class="form-control text-center text-primary" type="text" id="pageSize" name="currPageSize" value="@ViewBag.PageSize" />
+            </form>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Count > 0)
+    {
+        @foreach (var item in Model)
+        {
+            <div class="card border-primary mb-3" style="border: 1px solid;">
+                <div class="card-body pb-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="mb-0">@item.CustomerFullname</h6>
+                            <p class="mb-0 text-muted">@item.AppointmentDate?.ToString("dd MMMM yyyy"), @item.MedicalFacilityName</p>
+                            <p class="mb-0 text-muted">@item.DoctorFullname - @item.DoctorTreatmentName</p>
+                        </div>
+
+                        <div class="btn-group mb-1">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-primary" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item" href="#">Beri Ulasan</a>
+                                    <a class="dropdown-item" href="#">Beri Penilaian</a>
+                                    <a class="dropdown-item" href="#">Cek Status</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a class="text-white d-block btnDetail" data-id="@item.Id" data-bs-toggle="collapse" href="#collapse-@item.Id" role="button" aria-expanded="false" aria-controls="collapse-@item.Id" style="text-decoration: none;">
+                    <div class="align-items-center bg-primary" style="border-top: 1px solid #435ebe; border-bottom-left-radius: 7px; border-bottom-right-radius: 7px;">
+                        <div class="mx-2 px-1 py-2">
+                            <span class="text-white mx-2 px-1" id="btnText-@item.Id">
+                                Lihat detail kedatangan
+                            </span>
+                        </div>
+                    </div>
+                </a>
+                <div class="collapse" id="collapse-@item.Id">
+                    <div class="card card-body border-primary mb-0">
+                        <div class="row">
+                            <div class="col-7">
+                                <!-- Kolom pertama: Diagnosa -->
+                                <h6>Diagnosa</h6>
+                                <p class="mb-0">
+                                    @item.Diagnosis
+                                </p>
+                            </div>
+                            @if (item.Prescriptions != null && item.Prescriptions.Count > 0)
+                            {
+                                <div class="col-5">
+                                    <!-- Kolom kedua: Resep Digital -->
+                                    <h6>Resep Digital</h6>
+                                    <p class="mb-0">
+                                        @item.Prescriptions.Count
+                                    </p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+    <div class="d-flex align-items-center justify-content-end text-end">
+        <p class="mx-5 my-0">Menampilkan @Model.StartItem - @Model.EndItem dari @Model.TotalData</p>
+        <button id="btnPrev" class="btn btn-outline-primary mx-1 my-0" @(!Model.HasPreviousPage ? "disabled" : "") title="Sebelumnya...">
+            Sebelumnya
+        </button>
+        <button id="btnNext" class="btn btn-outline-primary mx-1 my-0" @(!Model.HasNextPage ? "disabled" : "") title="Selanjutnya...">
+            Selanjutnya
+        </button>
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
+        $("#orderBy").val("@ViewBag.OrderBy");
+
+        function RefreshPage(filter, pageNumber, currPageSize, orderBy, orderDirection) {
+            location.href = `/AppointmentHistory?filter=${filter}&pageNumber=${pageNumber}&currPageSize=${currPageSize}&orderBy=${orderBy}&orderDirection=${orderDirection}`;
+        }
+
+        $("#frmPageSize").submit(function (e) {
+            e.preventDefault();
+            RefreshPage("@ViewBag.Filter", "@Model.PageIndex", $("#pageSize").val(), "@ViewBag.OrderBy", "@ViewBag.OrderDirection");
+        });
+
+        $("#frmAppointmentHistoryFilter").submit(function (e) {
+            e.preventDefault();
+            RefreshPage($("#filter").val(), "@Model.PageIndex", "@ViewBag.PageSize", "@ViewBag.OrderBy", "@ViewBag.OrderDirection");
+        });
+
+        $("#btnPrev").click(function (e) {
+            RefreshPage("@ViewBag.Filter", "@(Model.PageIndex <= 1 ? Model.PageIndex : Model.PageIndex - 1)", "@ViewBag.PageSize", "@ViewBag.OrderBy", "@ViewBag.OrderDirection");
+        });
+
+        $("#btnNext").click(function (e) {
+            RefreshPage("@ViewBag.Filter", "@(Model.PageIndex >= Model.TotalPages ? Model.PageIndex : Model.PageIndex + 1)", "@ViewBag.PageSize", "@ViewBag.OrderBy", "@ViewBag.OrderDirection");
+        });
+
+        $("#orderBy").change(function () {
+            RefreshPage("@ViewBag.Filter", "@Model.PageIndex", "@ViewBag.PageSize", $(this).val(), "@ViewBag.OrderDirection");
+        });
+
+        $("#sortButton").click(function () {
+            var orderBy = $("#orderBy").val(); // Mendapatkan nilai dropdown
+            if (!orderBy) {
+                alert("Pilih kolom yang akan diurutkan");
+                return;
+            }
+
+            currentOrderDirection = "@ViewBag.OrderDirection" === 'asc' ? 'desc' : 'asc';
+
+            $(this).text(currentOrderDirection === 'asc' ? 'A-Z' : 'Z-A');
+
+            RefreshPage("@ViewBag.Filter", "@Model.PageIndex", "@ViewBag.PageSize", orderBy, currentOrderDirection);
+        });
+
+        $(".btnDetail").click(function (e) {
+            var id = $(this).data("id");
+            var collapseElement = $("#collapse-" + id);
+            var btnTextElement = $("#btnText-" + id);
+
+            // Toggle text after collapse animation completes
+            collapseElement.on('shown.bs.collapse', function () {
+                btnTextElement.text("Tutup detail kedatangan");
+            });
+
+            collapseElement.on('hidden.bs.collapse', function () {
+                btnTextElement.text("Lihat detail kedatangan");
+            });
+        });
+    });
+</script>

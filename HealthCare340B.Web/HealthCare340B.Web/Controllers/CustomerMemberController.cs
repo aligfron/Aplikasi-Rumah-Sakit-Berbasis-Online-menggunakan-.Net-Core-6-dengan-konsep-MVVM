@@ -12,21 +12,21 @@ namespace HealthCare340B.Web.Controllers
         private readonly CustomerMemberModel _customerMemberModel;
         private readonly BloodGroupModel _bloodGroupModel;
         private readonly CustomerRelationModel _customerRelationModel;
+        private readonly string _imageFolder;
 
         private string? _userId;
         private string? _roleCode;
 
         private readonly int _pageSize;
-        private readonly string _imageFolder;
 
         public CustomerMemberController(IConfiguration configuration)
         {
             _customerMemberModel = new CustomerMemberModel(configuration);
             _bloodGroupModel = new BloodGroupModel(configuration);
             _customerRelationModel = new CustomerRelationModel(configuration);
+            _imageFolder = configuration["ImageFolder"];
 
             _pageSize = int.Parse(configuration["PageSize"]);
-            _imageFolder = configuration["ImageFolder"];
         }
 
         private bool isInSession()
@@ -80,33 +80,23 @@ namespace HealthCare340B.Web.Controllers
             //Process data Order
             if (!string.IsNullOrEmpty(orderBy))
             {
-                if (orderDirection == "asc")
+                if (orderBy == "name")
                 {
-                    if (orderBy == "name")
-                    {
-                        data = data?.OrderBy(d => d.Fullname).ToList();
-                    }
-                    else if (orderBy == "age")
-                    {
-                        data = data?.OrderBy(d => d.Age).ToList();
-                    }
+                    data = orderDirection == "asc"
+                        ? data?.OrderBy(d => d.Fullname).ToList()
+                        : data?.OrderByDescending(d => d.Fullname).ToList();
                 }
-                else if (orderDirection == "desc")
+                else if (orderBy == "age")
                 {
-                    if (orderBy == "name")
-                    {
-                        data = data?.OrderByDescending(d => d.Fullname).ToList();
-                    }
-                    else if (orderBy == "age")
-                    {
-                        data = data?.OrderByDescending(d => d.Age).ToList();
-                    }
+                    data = orderDirection == "asc"
+                        ? data?.OrderBy(d => d.Age).ToList()
+                        : data?.OrderByDescending(d => d.Age).ToList();
                 }
             }
 
             ViewBag.Title = "Daftar Pasien";
+            ViewBag.Role = HttpContext.Session.GetString("userRoleCode");
             ViewBag.imgFolder = _imageFolder;
-            ViewBag.Role = "ROLE_PASIEN";
             ViewBag.Filter = filter;
             ViewBag.PageSize = currPageSize ?? _pageSize;
             ViewBag.OrderBy = orderBy ?? "name";
@@ -350,9 +340,9 @@ namespace HealthCare340B.Web.Controllers
                     long parentBiodataId = long.Parse(HttpContext.Session.GetInt32("userBiodataId")!.ToString()!);
 
                     // Pisahkan string IDs yang dipisahkan koma menjadi array
-                    List<long> idArray = ids.Split(',').Select(long.Parse).ToList();
+                    List<long> idList = ids.Split(',').Select(long.Parse).ToList();
 
-                    foreach (long i in idArray)
+                    foreach (long i in idList)
                     {
                         try
                         {

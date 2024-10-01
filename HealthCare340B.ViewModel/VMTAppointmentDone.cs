@@ -11,8 +11,10 @@ namespace HealthCare340B.ViewModel
         public long Id { get; set; }
         public long? AppointmentId { get; set; }
 
+        public long? CustomerId { get; set; }
         public string? CustomerFullname { get; set; }
         public DateTime? AppointmentDate { get; set; }
+        public long? DoctorOfficeId { get; set; }
         public string? MedicalFacilityName { get; set; }
         public string? DoctorFullname { get; set; }
         public string? DoctorTreatmentName { get; set; }

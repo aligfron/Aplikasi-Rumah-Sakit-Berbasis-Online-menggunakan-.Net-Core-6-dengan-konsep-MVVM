@@ -19,7 +19,7 @@
         <form id="frmCustomerMemberFilter" asp-controller="CustomerMember" asp-action="Index">
             <div class="input-group">
                 <input class="form-control" type="text" id="filter" name="Filter" value="@ViewBag.Filter" placeholder="Cari nama pasien" />
-                <button type="submit" class="btn btn-secondary input-group-text"><i class="fas fa-search"></i></button>
+                <button type="submit" class="btn btn-primary input-group-text"><i class="fas fa-search"></i></button>
             </div>
         </form>
         <div class="col-sm-3">
@@ -39,21 +39,21 @@
         </button>
 
         <div class="d-flex align-items-center justify-content-end text-center">
-            <button class="btn" id="sortButton">
+            <button class="btn text-primary" id="sortButton">
                 @(ViewBag.OrderDirection == "asc" ? "A-Z" : "Z-A")
             </button>
-            <p class="mx-1 my-0">|</p>
+            <p class="mx-1 my-0 text-primary">|</p>
             <div class="col-sm-2">
                 <form id="frmPageSize">
-                    <input class="form-control text-center" type="text" id="pageSize" name="currPageSize" value="@ViewBag.PageSize" />
+                    <input class="form-control text-center text-primary" type="text" id="pageSize" name="currPageSize" value="@ViewBag.PageSize" />
                 </form>
             </div>
-            <p class="mx-1 my-0">|</p>
-            <button id="btnAdd" class="btn icon icon-left" title="Tambah..." data-bs-toggle="modal" data-bs-target="#staticModal">
+            <p class="mx-1 my-0 text-primary">|</p>
+            <button id="btnAdd" class="btn icon icon-left text-primary" title="Tambah..." data-bs-toggle="modal" data-bs-target="#staticModal">
                 <i class="fas fa-plus"></i> Tambah
             </button>
-            </div>
         </div>
+    </div>
 
     <div class="table-responsive ">
         <table class="table table-hover">
@@ -77,16 +77,16 @@
                             </td>
                             <td>
                                 <div>
-                                    <p class="mb-0"><b>@item.Fullname</b></p>
+                                    <h6 class="mb-0"><b>@item.Fullname</b></h6>
                                     <p class="mb-0">@item.CustomerRelationName, @item.Age Tahun</p>
                                     <p class="mb-0">@item.TotalChat Chat Online, @item.TotalAppointment Janji Dokter</p>
                                 </div>
                             </td>
                             <td style="text-align: right;">
-                                <button data-id="@item.Id" class="btn btnEdit icon icon-left" title="Ubah.." data-bs-toggle="modal" data-bs-target="#staticModal">
+                                <button data-id="@item.Id" class="btn text-primary btnEdit icon icon-left" title="Ubah.." data-bs-toggle="modal" data-bs-target="#staticModal">
                                     <i class="fas fa-pencil-alt"></i> Ubah
                                 </button>
-                                <button data-id="@item.Id" class="btn btnDelete icon icon-left" title="Hapus..." data-bs-toggle="modal" data-bs-target="#staticModal">
+                                <button data-id="@item.Id" class="btn text-primary btnDelete icon icon-left" title="Hapus..." data-bs-toggle="modal" data-bs-target="#staticModal">
                                     <i class="fas fa-trash"></i> Hapus
                                 </button>
                             </td>
@@ -105,10 +105,10 @@
 
     <div class="d-flex align-items-center justify-content-end text-end">
         <p class="mx-5 my-0">Menampilkan @Model.StartItem - @Model.EndItem dari @Model.TotalData</p>
-        <button id="btnPrev" class="btn btn-outline-secondary mx-1 my-0" @(!Model.HasPreviousPage ? "disabled" : "") title="Sebelumnya...">
+        <button id="btnPrev" class="btn btn-outline-primary mx-1 my-0" @(!Model.HasPreviousPage ? "disabled" : "") title="Sebelumnya...">
             Sebelumnya
         </button>
-        <button id="btnNext" class="btn btn-outline-secondary mx-1 my-0" @(!Model.HasNextPage ? "disabled" : "") title="Selanjutnya...">
+        <button id="btnNext" class="btn btn-outline-primary mx-1 my-0" @(!Model.HasNextPage ? "disabled" : "") title="Selanjutnya...">
             Selanjutnya
         </button>
     </div>
