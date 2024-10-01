@@ -37,8 +37,8 @@ namespace HealthCare340B.Web.Models
                     JsonConvert.DeserializeObject<VMResponse<List<VMMMenuRole>>?>(
                         await httpClient.GetStringAsync(
                             (string.IsNullOrEmpty(filter))
-                            ? $"{apiUrl}Menu"
-                            : $"{apiUrl}Menu/GetByFilter/{filter}"
+                            ? $"{apiUrl}MenuRole"
+                            : $"{apiUrl}MenuRole/GetByFilter/{filter}"
                         )
                     );
 

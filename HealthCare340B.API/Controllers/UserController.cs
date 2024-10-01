@@ -32,7 +32,7 @@ namespace HealthCare340B.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost]
+        /*[HttpPost]
         public async Task<ActionResult> Create(VMMUser data) 
         {
             try
@@ -57,30 +57,9 @@ namespace HealthCare340B.API.Controllers
                 return BadRequest(ex.Message);
             }
 
-        }
+        }*/
 
-        [HttpPut]
-        public async Task<ActionResult> Update(VMMUser data) 
-        {
-            try
-            {
-                VMResponse<VMMUser> response = await Task.Run(() => user.Update(data));
-                if (response.Data != null)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    Console.WriteLine("UserController.Update: " + response.Message);
-                    return BadRequest(response);
-                }
-            }
-            catch (Exception ex) 
-            {
-                Console.WriteLine("UserController.Update: " + ex.Message);
-                return BadRequest(ex.Message);
-            }
-        }
+        
         [HttpPut("login")]
         public async Task<ActionResult> Login(VMMUser data)
         {
