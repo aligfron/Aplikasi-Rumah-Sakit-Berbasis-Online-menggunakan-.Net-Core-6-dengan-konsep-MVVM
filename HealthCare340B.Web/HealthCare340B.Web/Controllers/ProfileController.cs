@@ -194,7 +194,9 @@ namespace HealthCare340B.Web.Controllers
 
             return View(data);
         }
-
+        [HttpPost]
+        public async Task<VMResponse<VMMBiodataAddress>?> EditAlamatAsync(VMMBiodataAddress data)
+            => (await profile.UpdateAsync(data));
 
         [HttpGet("/Profile/TabAlamat")]
         public async Task<IActionResult> TabAlamat(string? filter, int? pageNumber, int? currentPageSize, string? orderBy)
@@ -241,18 +243,168 @@ namespace HealthCare340B.Web.Controllers
             ViewBag.BioAddressId = string.IsNullOrEmpty(orderBy) ? "id_desc" : "";
             ViewBag.OrderRecipient = (orderBy == "recipient") ? "recipient_desc" : "recipient";
             ViewBag.OrderLabel = (orderBy == "label") ? "label_desc" : "label";
-            ViewBag.PageSize = currentPageSize ?? 10; // default page size
+            ViewBag.PageSize = currentPageSize ?? 10;
             ViewBag.OrderBy = orderBy;
             ViewBag.Filter = filter;
 
-
             return View(Pagination<VMMBiodataAddress>.Create(data ?? new List<VMMBiodataAddress>(), pageNumber ?? 1, ViewBag.PageSize));
         }
-        [HttpPost]
-        public async Task<VMResponse<VMMBiodataAddress>?> EditAlamatAsync(VMMBiodataAddress data)
-            => (await profile.UpdateAsync(data));
 
-        
+        [HttpGet("/Profile/MultipleDeleteAlamat/{id}")]
+        public async Task<IActionResult> MultipleDeleteAlamat(string id)
+        {
+            ViewBag.Title = "Hapus Pasien";
+
+            List<string> IdsStr = id.Split(",").ToList();
+            List<long> memberId = new List<long>();
+
+            foreach(var item in IdsStr)
+            {
+                memberId.Add(long.Parse(item));
+            }
+
+            List<VMMBiodataAddress> data = new List<VMMBiodataAddress>();
+            foreach(var item in memberId)
+            {
+                VMMBiodataAddress bioAddress = await profile.GetByIdAlamat((int)item);
+                data.Add(bioAddress);
+            }
+
+
+            return View(data);
+        }
+
+
+        [HttpPost]
+        public async Task<VMResponse<List<VMMBiodataAddress>>?> MultipleDeleteAsync(string ids)
+        {
+            List<string> IdsStr = ids.Split(",").ToList();
+            List<long> memberId = new List<long>();
+
+            foreach (var item in IdsStr)
+            {
+                memberId.Add(long.Parse(item));
+            }
+
+
+            int bioUserId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
+
+            if (bioUserId == 0)
+            {
+                throw new Exception("Biodata User ID is not found");
+            }
+
+            var request = new VMMBiodataAddress.MultipleDeleteRequest
+            {
+                Ids = memberId,
+                UserId = bioUserId
+            };
+
+            return await profile.MultipleDeleteAsync(request);
+        }
+
+
+        [HttpGet("/Profile/TabProfile")]
+        public async Task<IActionResult> TabProfile(int id)
+        {
+            ViewBag.Title = "Profile Pasien";
+            VMMCustomer? data = new VMMCustomer();
+            try
+            {
+                int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
+                data = await profile.GetCustomerByBioId(bioId);
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+
+            if (data == null )
+            {
+                ViewBag.Message = "Tidak ada Profil Customer ditemukan berdasarkan pencarian Anda.";
+                data = new VMMCustomer();
+            }
+            return View(data);
+        }
+
+        public async Task<IActionResult> EditProfile()
+        {
+            ViewBag.Title = "Edit Profile";
+            VMMCustomer? data = new VMMCustomer();
+            try
+            {
+                int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
+                data = await profile.GetCustomerByBioId(bioId);
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+
+            if (data == null)
+            {
+                ViewBag.Message = "Tidak ada Profil Customer ditemukan berdasarkan pencarian Anda.";
+                data = new VMMCustomer();
+            }
+
+            return View(data);
+        }
+
+        [HttpPost]
+        public async Task<VMResponse<VMMCustomer>?> EditProfileAsync(VMMCustomer data)
+            => (await profile.UpdateProfileAsync(data));
+
+        public async Task<IActionResult> EditEmail()
+        {
+            ViewBag.Title = "Edit Email";        
+            VMMCustomer? data = new VMMCustomer();
+            try
+            {
+                int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
+                data = await profile.GetCustomerByBioId(bioId);
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+
+            if (data == null)
+            {
+                ViewBag.Message = "Tidak ada Profil Customer ditemukan berdasarkan pencarian Anda.";
+                data = new VMMCustomer();
+            }
+            return View(data);
+        }
+
+
+        public async Task<IActionResult> EditPassword()
+        {
+            ViewBag.Title = "Edit Password";
+            VMMCustomer? data = new VMMCustomer();
+            try
+            {
+                int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
+                data = await profile.GetCustomerByBioId(bioId);
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+
+            if (data == null)
+            {
+                ViewBag.Message = "Tidak ada Profil Customer ditemukan berdasarkan pencarian Anda.";
+                data = new VMMCustomer();
+            }
+            return View(data);
+        }
+        public async Task<IActionResult> OTPEmail()
+        {
+            ViewBag.Title = "Kirim OTP";
+            return View();
+        }
+
+
         //ali
         public async Task<IActionResult> CreateSpeDoctor(int id)
         {

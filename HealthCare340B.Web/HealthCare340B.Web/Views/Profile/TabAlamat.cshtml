@@ -4,23 +4,30 @@
 }
 
 <div class="container my-3">
-    <div class="row mb-3">
-        <form class="w-50" id="frmBioAddressFilter" method="get">
-            <div class="input-group">
-                <input class="form-control" type="text" id="Filter" name="filter" value="@ViewBag.Filter" placeholder="Masukkan Nama penerima atau alamat" />
-                <input type="hidden" name="tab" value="alamat" />
-                <button type="submit" id="btnSearch" class="btn btn-primary input-group-text"><i class="fas fa-search"></i></button>
-            </div>
-        </form>
-        <div class="col-auto">
-            <select class="form-select" name="orderBy" onchange="this.form.submit()">
-                <option value="" selected>Urutkan</option>
-                <option value="label">Label Ascending</option>
-                <option value="label_desc">Label Descending</option>
-                <option value="recipient">Recipient Ascending</option>
-                <option value="recipient_desc">Recipient Descending</option>
-                <option value="id_desc">ID Descending</option>
-            </select>
+    <div class="row mb-3 align-items-center">
+        <div class="col">
+            <form class="d-flex align-items-center" id="frmBioAddressFilter" method="get">
+                <div class="input-group">
+                    <input class="form-control" type="text" id="Filter" name="filter" value="@ViewBag.Filter" placeholder="Masukkan Nama penerima atau alamat" />
+                    <input type="hidden" name="tab" value="alamat" />
+                    <button type="submit" id="btnSearch" class="btn btn-primary input-group-text"><i class="fas fa-search"></i></button>
+                </div>
+                <select class="form-select ms-1" name="orderBy" onchange="this.form.submit()" style="width: 200px;">
+                    <option value="" selected>Urutkan</option>
+                    <option value="label">Label</option>
+                    <option value="recipient">Recipient</option>
+                </select>
+                <input type="hidden" name="orderBy" value="@ViewBag.OrderBy">
+                <button id="btnAdd" data-bs-toggle="modal" data-bs-target="#staticModal" class="btn btn-success ms-2"><i class="fas fa-plus"></i></button>
+                <button id="btnDeleteSelected" data-bs-toggle="modal" data-bs-target="#staticModal" class="btn btn-danger ms-2"><i class="fas fa-trash"></i></button>
+                <div class="d-flex align-items-center ms-2">
+                    <input class="form-control page-size-input" type="text" id="pageSize" name="currentPageSize" value="@ViewBag.PageSize" style="width: 50px;" />
+                </div>
+            </form>
+            <form id="frmBioAddressPageSize" method="get" action="/Profile/TabAlamat" class="d-none">
+                <input id="pageNumber" type="hidden" name="pageNumber" value="@Model.PageIndex" />
+                <input id="orderBy" type="hidden" name="orderBy" value="@ViewBag.OrderBy" />
+            </form>
         </div>
     </div>
 
@@ -34,7 +41,7 @@
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="ms-2 me-auto">
                             <div class="d-flex align-items-center mb-2">
-                                <input type="checkbox" class="form-check-input me-2">
+                                <input type="checkbox" class="form-check-input me-2 select" data-id="@bioAddress.Id">
                                 <span class="fw-bold">@bioAddress.Label</span>
                             </div>
                             <p class="mb-1 text-muted">@bioAddress.Recipient, @bioAddress.RecipientPhoneNumber</p>
@@ -55,74 +62,117 @@
     </ul>
 
     <div class="row mt-3">
-        <div class="col" role="group">
-            <a asp-controller="Profile" asp-action="TabAlamat" asp-route-currentPageSize="@ViewBag.PageSize"
-               asp-route-filter="@ViewBag.Filter" asp-route-orderBy="@ViewBag.OrderBy"
-               asp-route-pageNumber="@(!Model.HasPreviousPage ? Model.PageIndex : Model.PageIndex - 1)"
-               class="btn btn-secondary @(!Model.HasPreviousPage ? "disabled" : "")" title="Previous Page...">
-                <i class="fas fa-backward"></i>
-            </a>
-            <a class="btn btn-secondary @(!Model.HasNextPage ? "disabled" : "")" title="Next Page..."
-               asp-controller="Profile" asp-action="TabAlamat" asp-route-currentPageSize="@ViewBag.PageSize"
-               asp-route-filter="@ViewBag.Filter" asp-route-orderBy="@ViewBag.OrderBy"
-               asp-route-pageNumber="@(!Model.HasNextPage ? Model.PageIndex : Model.PageIndex + 1)">
-                <i class="fas fa-forward"></i>
-            </a>
+        <div class="col-lg-11 d-flex align-items-center">
+            <div role="group" class="btn-group">
+                <a asp-controller="Profile" asp-action="TabAlamat" asp-route-currentPageSize="@ViewBag.PageSize"
+                   asp-route-filter="@ViewBag.Filter" asp-route-orderBy="@ViewBag.OrderBy"
+                   asp-route-pageNumber="@(!Model.HasPreviousPage ? Model.PageIndex : Model.PageIndex - 1)"
+                   class="btn btn-secondary @(!Model.HasPreviousPage ? "disabled" : "")" title="Previous Page...">
+                    <i class="fas fa-backward"></i>
+                </a>
+                <a class="btn btn-secondary @(!Model.HasNextPage ? "disabled" : "")" title="Next Page..."
+                   asp-controller="Profile" asp-action="TabAlamat" asp-route-currentPageSize="@ViewBag.PageSize"
+                   asp-route-filter="@ViewBag.Filter" asp-route-orderBy="@ViewBag.OrderBy"
+                   asp-route-pageNumber="@(!Model.HasNextPage ? Model.PageIndex : Model.PageIndex + 1)">
+                    <i class="fas fa-forward"></i>
+                </a>
+            </div>
+            <div class="ml-3">
+                Page @Model.PageIndex of @Model.TotalPages (Total Data: @Model.TotalData)
+            </div>
         </div>
-        <div class="col-lg-11">Page @Model.PageIndex of @Model.TotalPages (Total Data: @Model.TotalData)</div>
     </div>
 </div>
 
 <script>
-
-    // function RefreshPage(filter, pageNumber, pageSize, orderBy) {
-    //     location.href = `/Profile/IndexCustomerProfile?filter=${filter}&pageNumber=${pageNumber}&currPageSize=${pageSize}&orderBy=${orderBy}`;
-    // }
-
-    // $("th a").click(function (e) {
-    //     let orderBy = $(this).data("orderby");
-
-    //     RefreshPage("@ViewBag.Filter", "@Model.PageIndex", "@ViewBag.PageSize", orderBy);
-    // });
-
-
     $(".btnDeleteId").click(function (e) {
-        $("#staticModalBody").html("")
-        $("#staticModalBody").load("/Profile/DeleteAlamat/" + $(this).data("id"))
+        $("#staticModalBody").html("");
+        $("#staticModalBody").load("/Profile/DeleteAlamat/" + $(this).data("id"));
     });
 
     $("#btnAdd").click(function (e) {
-        $("#staticModalBody").html("")
-        $("#staticModalBody").load("/Profile/CreateAlamat")
+        e.preventDefault();
+        console.log("test modal create alamat");
+        $("#staticModalBody").html("");
+        $("#staticModalBody").load("/Profile/CreateAlamat");
     });
 
     $(".btnEdit").click(function (e) {
-        console.log($(this).data("id"))
-        $("#staticModalBody").html("")
-        $("#staticModalBody").load("/Profile/EditAlamat/" + $(this).data("id"))
+        console.log($(this).data("id"));
+        $("#staticModalBody").html("");
+        $("#staticModalBody").load("/Profile/EditAlamat/" + $(this).data("id"));
+    });
+
+    let selectedIds = [];
+
+    $(".select").change(function (e) {
+        let Ids = selectedIds.map(m => m).indexOf($(this).data("id"));
+
+        if (Ids < 0) {
+            selectedIds.push($(this).data("id"));
+        } else if (!$(this).prop("checked")) {
+            selectedIds.splice(Ids, 1);
+        }
+
+        if (selectedIds.length > 0) {
+            $("#btnDeleteSelected").removeClass("disabled").attr("disabled", false);
+        } else {
+            $("#btnDeleteSelected").addClass("disabled").attr("disabled", true);
+        }
+    });
+
+
+    $("#btnDeleteSelected").click(function (e) {
+        e.preventDefault();
+
+        if (selectedIds.length > 0) {
+            console.log("Deleting IDs: ", selectedIds);
+            $("#staticModalBody").html("");
+            $("#staticModalBody").load("/Profile/MultipleDeleteAlamat/" + selectedIds.join(","));
+
+        } else {
+            alert("Please select at least one address to delete.");
+        }
+    });
+
+    $("#frmBioAddressPageSize").submit(function (e) {
+        e.preventDefault();
+        console.log($(this))
+        let filter = $("#Filter").val();
+        let pageNumber = $("#pageNumber").val();
+        let currentPageSize = $("#pageSize").val();
+        let orderBy = $("#orderBy").val();
+        $.ajax({
+            url: "/Profile/TabAlamat",
+            type: "get",
+            data: { "filter": filter, "pageNumber": pageNumber, "currentPageSize": currentPageSize, "orderBy": orderBy },
+            success: function (response) {
+                console.log(response);
+                $("#alamat").html(response);
+            },
+            error: function (errResponse) {
+                console.error(errResponse);
+            }
+        });
     });
 
     $(document).ready(function () {
         $("#btnSearch").click(function (e) {
-            e.preventDefault()
-            console.log("button search click")
-            let filter = $("#Filter").val()
+            e.preventDefault();
+            console.log("button search click");
+            let filter = $("#Filter").val();
             $.ajax({
                 url: "/Profile/TabAlamat",
                 type: "get",
-                data: {"filter" : filter},
+                data: { "filter": filter },
                 success: function (response) {
-                    console.log(response)
-                    $("#alamat").html(response)
+                    console.log(response);
+                    $("#alamat").html(response);
                 },
                 error: function (errResponse) {
                     console.error(errResponse);
-                    debugger;
                 }
             });
         });
     });
-    
-
-
 </script>

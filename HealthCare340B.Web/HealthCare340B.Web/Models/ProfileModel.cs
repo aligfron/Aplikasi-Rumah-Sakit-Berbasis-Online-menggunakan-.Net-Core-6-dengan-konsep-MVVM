@@ -434,6 +434,112 @@ namespace HealthCare340B.Web.Models
             return data;
         }
 
+        public async Task<VMMCustomer?> GetByIdCustomerProfile(int id)
+        {
+            VMMCustomer? data = null;
+
+            try
+            {
+                VMResponse<VMMCustomer>? apiResponse =
+                    JsonConvert.DeserializeObject<VMResponse<VMMCustomer>?>(
+                        await httpClient.GetStringAsync($"{apiUrl}TabProfile/GetById/{id}")
+                    );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode == HttpStatusCode.OK)
+                        data = apiResponse.Data;
+                    else
+                        throw new Exception(apiResponse.Message);
+                }
+                else
+                {
+                    throw new Exception("TabProfile API cannot be reached!");
+                }
+
+            }
+            catch (Exception e)
+            {
+                //Logging
+                throw new Exception($"ProfileModel.GetByIdAlamat: {e.Message}");
+            }
+
+            return data;
+        }
+
+
+        public async Task<VMMCustomer?> GetCustomerByBioId(int bioId)
+        {
+            VMMCustomer? data = null;
+
+            try
+            {
+                VMResponse<VMMCustomer>? apiResponse =
+                    JsonConvert.DeserializeObject<VMResponse<VMMCustomer>?>(
+                        await httpClient.GetStringAsync($"{apiUrl}TabProfile/GetCustomerByBioId/{bioId}")
+                    );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode == HttpStatusCode.OK)
+                        data = apiResponse.Data;
+                    else
+                        throw new Exception(apiResponse.Message);
+                }
+                else
+                {
+                    throw new Exception("TabProfile API cannot be reached!");
+                }
+
+            }
+            catch (Exception e)
+            {
+                //Logging
+                throw new Exception($"ProfileModel.GetByIdAlamat: {e.Message}");
+            }
+
+            return data;
+        }
+
+        public async Task<VMResponse<VMMCustomer>?> UpdateProfileAsync(VMMCustomer data)
+        {
+            VMResponse<VMMCustomer>? apiResponse = new VMResponse<VMMCustomer>();
+            try
+            {
+                jsonData = JsonConvert.SerializeObject(data);
+                content = new StringContent(
+                    jsonData,
+                    Encoding.UTF8,
+                    "application/json");
+
+                apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMCustomer>?>(
+                    await httpClient.PutAsync($"{apiUrl}TabProfile/Update", content)
+                    .Result
+                        .Content
+                        .ReadAsStringAsync()
+
+                );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("TabProfile API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"ProfileModel.UpdateProfileAsync: {e.Message}");
+
+            }
+            return apiResponse;
+        }
+
 
 
         public async Task<VMResponse<VMMBiodataAddress>?> UpdateAsync(VMMBiodataAddress data)
@@ -502,6 +608,52 @@ namespace HealthCare340B.Web.Models
             catch (Exception e)
             {
                 throw new Exception($"VariantModel.DeleteAsync: {e.Message}");
+            }
+
+            return apiResponse;
+        }
+
+        public class MultipleDeleteRequest
+        {
+            public List<long> Ids { get; set; }
+            public long UserId { get; set; }
+        }
+
+        public async Task<VMResponse<List<VMMBiodataAddress>>?> MultipleDeleteAsync(VMMBiodataAddress.MultipleDeleteRequest requestData)
+        {
+            VMResponse<List<VMMBiodataAddress>>? apiResponse = new VMResponse<List<VMMBiodataAddress>>();
+            try
+            {
+                jsonData = JsonConvert.SerializeObject(requestData);
+                content = new StringContent(
+                    jsonData,
+                    Encoding.UTF8,
+                    "application/json");
+
+                apiResponse = JsonConvert.DeserializeObject<VMResponse<List<VMMBiodataAddress>>?>(
+                    await httpClient.PutAsync($"{apiUrl}TabAlamat/MultipleDelete", content)
+                    .Result
+                        .Content
+                        .ReadAsStringAsync()
+
+                );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("TabAlamat API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"ProfileModel.MultipleDeleteAsync: {e.Message}");
+
             }
 
             return apiResponse;

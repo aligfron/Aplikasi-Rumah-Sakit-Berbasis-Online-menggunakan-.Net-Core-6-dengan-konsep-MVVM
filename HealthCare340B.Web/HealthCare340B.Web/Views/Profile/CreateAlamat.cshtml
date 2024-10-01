@@ -129,7 +129,7 @@
                     if (response.statusCode == 200 || response.statusCode == 201) {
                         alert(response.statusCode + " - " + response.message);
 
-                        location.reload();
+                        $("#alamat").html(response)
                     }
                     else {
                         alert(response.statusCode + " - " + response.message);

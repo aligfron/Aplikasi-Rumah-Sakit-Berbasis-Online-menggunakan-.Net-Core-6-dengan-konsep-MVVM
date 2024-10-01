@@ -328,18 +328,15 @@ namespace HealthCare340B.DataAccess
 
         }
 
-        public VMResponse<VMMBiodataAddress> MultipleDelete(List<long> ids, List<long> userIds)
+        public VMResponse<VMMBiodataAddress> MultipleDelete(List<long> ids, long userId)
         {
             VMResponse<VMMBiodataAddress> response = new VMResponse<VMMBiodataAddress>();
             using (IDbContextTransaction dbTran = db.Database.BeginTransaction())
             {
                 try
                 {
-                    for (int i = 0; i < ids.Count; i++)
+                    foreach (var id in ids)
                     {
-                        long id = ids[i];
-                        long userId = (i < userIds.Count) ? userIds[i] : 0; 
-
                         var existingData = GetById((int)id).Data;
                         if (existingData != null)
                         {

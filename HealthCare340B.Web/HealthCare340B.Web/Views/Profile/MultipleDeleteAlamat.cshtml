@@ -1,17 +1,20 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@model int
+﻿@model List<VMMBiodataAddress>
 @{
     Layout = null;
 }
+
 <div class="card">
     <div class="card-body">
         <i class="fas fa-exclamation-triangle fa-align-left float-xxl-start text-danger h1 me-3"></i>
-        <span>apakah anda yakin ingin menghapus Biodata Alamat dengan ID = </span>
-        <span>@Model?
-        </span>
-        <span>Anda tidak dapat mengembalikan alamat yang sudah dihapus</span>
+        <span>Apakah Anda yakin ingin menghapus Biodata Alamat dengan Alamat berikut?</span>
+        <ul>
+            @foreach (var bioAddress in Model)
+            {
+                <li>@bioAddress.Address</li>
+            }
+        </ul>
+
+        <span>Anda tidak dapat mengembalikan alamat yang sudah dihapus.</span>
     </div>
     <div class="card-footer d-flex justify-content-end">
         <button id="btnDelete" class="btn btn-danger">Confirm</button>
@@ -24,13 +27,15 @@
     $("#staticModalLabel").text("@ViewBag.Title");
 
     $(document).on("click", "#btnDelete", function (e) {
+        e.preventDefault();
         console.log("Delete button clicked");
+        var ids = @Html.Raw(Json.Serialize(Model.Select(m => m.Id).ToList()));
+        console.log("Deleting IDs: ", ids);
         $.ajax({
-            url: "/Profile/Delete",
+            url: "/Profile/MultipleDelete",
             type: "post",
             data: {
-                "id": @Model,
-                "userId": 1,
+                'ids':ids.join(",")
             },
             dataType: "json",
             success: function (response) {
@@ -44,5 +49,4 @@
             }
         });
     });
-
 </script>

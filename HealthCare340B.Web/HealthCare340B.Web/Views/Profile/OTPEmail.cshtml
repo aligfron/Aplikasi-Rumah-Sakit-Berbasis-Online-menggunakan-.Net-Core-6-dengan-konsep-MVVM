@@ -1,0 +1,28 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = null;
+}
+
+<div class="card">
+    <div class="card-body">
+        <form>
+            <div class="form-group">
+                <label style="font-weight : bold" for="otp">Masukkan kode OTP yang telah dikirimkan ke email anda</label>
+                <input type="text" class="form-control" id="otp" value="123987">
+                <small style="font-size : 0.875rem" class="text-danger">* Kode OTP kadaluarsa, silakan kirim ulang OTP</small>
+            </div>
+            <div class="form-group">
+                <small style="font-size:0.875rem" class="text-muted">Kirim ulang kode OTP dalam 01:30</small>
+            </div>
+        </form>
+        <div class="modal-footer">
+            <button style="width : 150px" type="button" class="btn btn-primary btn-custom">Konfirmasi OTP</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#staticModalLabel").text("@ViewBag.Title");
+</script>

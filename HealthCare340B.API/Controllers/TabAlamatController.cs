@@ -17,8 +17,8 @@ namespace HealthCare340B.API.Controllers
         }
         public class MultipleDeleteRequest
         {
-            public List<long> Ids { get; set; } = new List<long>(); // List of address IDs to be deleted
-            public List<long> UserIds { get; set; } = new List<long>(); // List of User IDs performing the delete
+            public List<long> Ids { get; set; }
+            public long UserId { get; set; }
         }
 
         [HttpGet("[action]")]
@@ -159,23 +159,26 @@ namespace HealthCare340B.API.Controllers
             }
         }
 
-        [HttpDelete("[action]")]
-        public async Task<ActionResult> MultipleDelete(MultipleDeleteRequest deleteRequest)
+        [HttpPut("[action]")]
+        public async Task<ActionResult> MultipleDelete(VMMBiodataAddress.MultipleDeleteRequest deleteRequest)
         {
             try
             {
-                if (deleteRequest.Ids == null || deleteRequest.UserIds == null || deleteRequest.Ids.Count == 0)
+                // Validasi permintaan
+                if (deleteRequest.Ids == null || deleteRequest.Ids.Count == 0)
                 {
-                    return BadRequest("Invalid request. Please provide at least one ID and User ID.");
+                    return BadRequest("Invalid request. Please provide at least one ID.");
                 }
 
-                if (deleteRequest.Ids.Count != deleteRequest.UserIds.Count)
+                if (deleteRequest.UserId <= 0)
                 {
-                    return BadRequest("Mismatch between number of IDs and User IDs.");
+                    return BadRequest("Invalid User ID.");
                 }
 
-                VMResponse<VMMBiodataAddress> response = await Task.Run(() => tabAlamat.MultipleDelete(deleteRequest.Ids, deleteRequest.UserIds));
+                // Memanggil metode MultipleDelete di tabAlamat
+                VMResponse<VMMBiodataAddress> response = await Task.Run(() => tabAlamat.MultipleDelete(deleteRequest.Ids, deleteRequest.UserId));
 
+                // Mengembalikan hasil berdasarkan status kode
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     return Ok(response);

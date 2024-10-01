@@ -32,12 +32,23 @@
 
 <script>
     $(document).ready(function () {
-        console.log("Document is ready");
+        console.log("Document Alamat is ready");
         $("#alamat").load('/Profile/TabAlamat', function (response, status, xhr) {
             if (status == "error") {
                 console.log("Error: " + xhr.status + " " + xhr.statusText);
             } else {
                 console.log("TabAlamat content loaded successfully.");
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        console.log("Document Profile is ready");
+        $("#profil").load('/Profile/TabProfile', function (response, status, xhr) {
+            if (status == "error") {
+                console.log("Error: " + xhr.status + " " + xhr.statusText);
+            } else {
+                console.log("TabProfile content loaded successfully.");
             }
         });
     });

@@ -50,5 +50,11 @@ namespace HealthCare340B.ViewModel
             Location = location.Name;
         }
 
+        public class MultipleDeleteRequest
+        {
+            public List<long> Ids { get; set; }
+            public long UserId { get; set; }
+        }
+
     }
 }

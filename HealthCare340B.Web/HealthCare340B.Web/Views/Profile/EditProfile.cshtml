@@ -1,0 +1,137 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model VMMCustomer
+@{
+
+    Layout = null;
+
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+
+
+    // Remove the prefix +62 or leading 0 from the MobilePhone for display purposes
+    string displayMobilePhone = @Model.MobilePhone;
+    if (displayMobilePhone.StartsWith("+62"))
+    {
+        displayMobilePhone = displayMobilePhone.Substring(3);
+    }
+    else if (displayMobilePhone.StartsWith("0"))
+    {
+        displayMobilePhone = displayMobilePhone.Substring(1);
+    }
+}
+
+<div class="container mt-2">
+    <div class="card" id="cardEditProfile">
+        <div class="card-body">
+            <form id="frmUpdateProfile">
+                <div class="form-group">
+                    <label style="font-weight: bold;" for="fullName">Nama Lengkap*</label>
+                    <input class="form-control" type="text" name="Fullname" value="@Model.Fullname" />
+                </div>
+                <div class="form-group">
+                    <label for="birthDate">Tanggal Lahir</label>
+                    <div class="input-group">
+                        <input style="border-right: 0;" type="text" name="Dob" class="form-control date" id="birthDate" value="@Model.Dob?.ToString("dd/MM/yyyy")">
+                        <div class="input-group-append">
+                            <span class="input-group-text" style="background-color: white;"><i class="fas fa-calendar-alt"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="phoneNumber">Nomor Handphone</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span style="background-color: white;" class="input-group-text">+62</span>
+                        </div>
+                        <input type="text" class="form-control" name="MobilePhone" id="phoneNumber" value="@displayMobilePhone">
+                    </div>
+                </div>
+
+                <input type="hidden" name="ModifiedBy" value="1" />
+                <input type="hidden" name="Id" value="@Model.Id" />
+
+                <div class="form-group d-flex justify-content-between mt-2">
+                    <button type="button" class="btn btn-outline-primary" style="width: 100px;">Batal</button>
+                    <button id="btnSave" type="submit" class="btn btn-primary" style="width: 100px;">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#staticModalLabel").text("@ViewBag.Title");
+    $(document).ready(function () {
+        $(".date").datepicker({
+            dateFormat: "dd/mm/yy",
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-100:+0", // Allows selecting dates from 100 years ago to the current year
+            maxDate: 0
+        });
+
+        $("#frmUpdateProfile").validate({
+            rules: {
+                Fullname: {
+                    required: true,
+                    maxlength: 100,
+                    minlength: 3
+                },
+                Dob: {
+                    date: true
+                },
+                MobilePhone: {
+                    digits: true,
+                    minlength: 10,
+                    maxlength: 15
+                }
+            },
+            errorClass: "text-danger"
+        });
+
+        $("#btnSave").click(function (e) {
+            e.preventDefault();
+
+            if ($("#frmUpdateProfile").valid()) {
+                // Append +62 prefix to the mobile phone number
+                let mobilePhone = $("#phoneNumber").val();
+                if (!mobilePhone.startsWith("+62")) {
+                    mobilePhone = "+62" + mobilePhone;
+                    $("#phoneNumber").val(mobilePhone);
+                }
+
+                console.log("form valid");
+                console.log($("#frmUpdateProfile").serialize());
+                $.ajax({
+                    url: "/Profile/EditProfile",
+                    type: "post",
+                    data: $("#frmUpdateProfile").serialize(),
+                    dataType: "json",
+                    beforeSend: () => { },
+                    success: function (response) {
+                        if (response.statusCode == 200 || response.statusCode == 201) {
+                            alert(response.statusCode + "-" + response.message);
+                            location.reload();
+                        } else {
+                            alert(response.statusCode + "-" + response.message);
+                        }
+                    },
+                    error: function (errResponse) {
+                        console.error(errResponse);
+                        debugger;
+                    }
+                });
+            } else {
+                console.error("Form profile data is not valid");
+            }
+        });
+
+        $("#btnReset").click(() => {
+            $("#frmUpdateProfile")[0].reset();
+        });
+    });
+</script>
