@@ -48,7 +48,7 @@
                             {
                                 <p>Anda Belum Menambahkan Spesialisasi</p>
                             }
-                            @if (Model.MaxEndDate.Count > 0 && Model.MinStarDate.Count > 0)
+                            @if (Model.MaxEndDate.Count > 0)
                             {
                                 int maxYear = 0;
                                 List<int> tampungNilai = new List<int>();
@@ -83,13 +83,29 @@
                             {
                                 <p>Data Tahun tidak tersedia</p> 
                             }
-
-
-                                
                             
                         </div>
                         <div class="col-4 text-center">
                             <button class="btn btn-primary">Chat Dokter</button>
+
+                            @if (Model.HargaKonsulMulai.Count > 0)
+                            {
+                                int i = 0;
+                                foreach (VMTDoctorOfficeTreatmentPrice chatdokter in Model.HargaKonsulMulai)
+                                {
+                                    if (i == 0)
+                                    {
+                                        <p class="mt-3">Rp. @String.Format("{0:N0}", chatdokter.Price)</p>
+                                    }
+                                    i++;
+                                }
+                            }
+
+                            else
+                            {
+                                <p class="mt-3">Tidak Membuka layanan Online</p>
+                            }
+                            
                         </div>
                     </div>
 
@@ -99,16 +115,16 @@
                             <h5 class="mt-1">Tindakan Medis</h5>
                             @if (Model.TreatmentName.Count > 0)
                             {
-                                <div style="border: 2px solid #d3d3d3; border-radius: 5px; padding: 10px; margin-top: 10px;">
+                                <div style="border: 1px solid #d3d3d3; border-radius: 5px; padding: 10px; margin-top: 10px;">
                                     @foreach (VMTDoctorTreatment tindakanmedis in Model.TreatmentName)
                                     {
-                                        <p class="fs-6 text-small mb-0 ps-3">- @tindakanmedis.Name</p>
+                                        <p class="fs-6 text-small mb-0">- @tindakanmedis.Name</p>
                                     }
                                 </div>
                             }
                             else
                             {
-                                <div style="border: 2px solid #d3d3d3; border-radius: 5px; padding: 10px; text-align: center; margin-top: 10px;">
+                                <div style="border: 1px solid #d3d3d3; border-radius: 5px; padding: 10px; text-align: center; margin-top: 10px;">
                                     <p>Anda Belum Menambahkan Tindakan Medis</p>
                                 </div>
                             }
@@ -117,13 +133,13 @@
                             <h5 class="mt-1">Riwayat Praktek</h5>
                             @if (Model.DoctorOffice.Count > 0)
                             {
-                                <div style="border: 2px solid #d3d3d3; border-radius: 5px; padding: 10px;  margin-top: 10px;">
+                                <div style="border: 1px solid #d3d3d3; border-radius: 5px; padding: 10px;  margin-top: 10px;">
                                     @foreach (VMTDoctorOffice riwayarpraktek in Model.DoctorOffice)
                                     {
                                         <div class="d-flex justify-content-between">
                                             <div>
                                                 <p class="mb-0">@riwayarpraktek.LocationName</p>
-                                                <p class="text-muted small mb-0">@riwayarpraktek.Specialization</p>
+                                                <p class="text-muted small mb-0  ps-3">- @riwayarpraktek.Specialization</p>
                                             </div>
                                             <div>
                                                 <p class="small text-muted">
@@ -140,7 +156,7 @@
                             }
                             else
                             {
-                                <div style="border: 2px solid #d3d3d3; border-radius: 5px; padding: 10px; text-align: center; margin-top: 10px;">
+                                <div style="border: 1px solid #d3d3d3; border-radius: 5px; padding: 10px; text-align: center; margin-top: 10px;">
                                     <p>Anda Belum Menambahkan Riwayat Praktek</p>
                                 </div>
                             }
@@ -148,13 +164,13 @@
                             <h5 class="mt-1">Pendidikan</h5>
                             @if (Model.InstitutionName.Count > 0)
                             {
-                                <div style="border: 2px solid #d3d3d3; border-radius: 5px; padding: 10px;  margin-top: 10px;">
+                                <div style="border: 1px solid #d3d3d3; border-radius: 5px; padding: 10px;  margin-top: 10px;">
                                     @foreach (VMMDoctorEducation pendidikan in Model.InstitutionName)
                                     {
                                         <div class="d-flex justify-content-between">
                                             <div>
                                                 <p class="mb-0">@pendidikan.InstitutionName</p>
-                                                <p class="text-muted small mb-0">- @pendidikan.Major</p>
+                                                <p class="text-muted small mb-0  ps-3">- @pendidikan.Major</p>
                                             </div>
                                             <div>
                                                 <p class="small text-muted">
@@ -162,13 +178,12 @@
                                                 </p>
                                             </div>
                                         </div>
-                                        <br />
                                     }
                                 </div>
                             }
                             else
                             {
-                                <div style="border: 2px solid #d3d3d3; border-radius: 5px; padding: 10px; text-align: center; margin-top: 10px;">
+                                <div style="border: 1px solid #d3d3d3; border-radius: 5px; padding: 10px; text-align: center; margin-top: 10px;">
                                     <p>Anda Belum Menambahkan Pendidikan</p>
                                 </div>
                             }
@@ -184,23 +199,64 @@
                                     if(riwayarpraktek.EndDate.Value.Year == DateTime.Now.Year){
                                     <div style="border: 2px solid var(--bs-primary); border-radius: 5px; padding: 10px;  margin-top: 10px;">
                                         <div class="row">
-                                            <div class="col-9">
+                                            <div class="col-6">
                                                 <p class="mb-0">@riwayarpraktek.LocationName</p>
-                                                <p class="text-muted small mb-0">@riwayarpraktek.Specialization</p>
+
+                                                    <p class="ps-3 text-muted small mb-0">@riwayarpraktek.MedicalFacilityName</p>
+                                                    <p class="fs-6 ps-3 text-muted small mb-0"><i class="bi bi-geo-alt-fill"></i> @riwayarpraktek.FullAddress</p>
+                                                
                                             </div>
-                                            <div class="col-3 text-center">
-                                                <p class="small text-muted">
+                                                <div class="col-2">
+                                                    
+                                                </div>
+                                            <div class="col-4 text-center"> 
+                                                <p class="small text-muted"></p>
                                                     Konsultasi Mulai dari<br />
-                                                    Rp
-                                                </p>
+                                                    @if (riwayarpraktek.HargaKonsulMulai.Count > 0)
+                                                    {
+                                                        @foreach (VMTDoctorOfficeTreatmentPrice hargakonsulmulai in riwayarpraktek.HargaKonsulMulai)
+                                                        {
+                                                            <p>Rp. @String.Format("{0:N0}", hargakonsulmulai.PriceStartFrom)</p>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <p>Data Belum Ada</p>
+                                                    }
                                             </div>
                                         </div>
                                         <a href="javascript:void(0);" onclick="toggleSchedule('scheduleDetails-@riwayarpraktek.Id')" style="text-decoration: none;">
                                             <i class="bi bi-caret-down-fill"></i> Lihat Jadwal Praktek
                                         </a>
-                                        <div id="scheduleDetails-@riwayarpraktek.Id" style="display: none;">
-                                            <p>Jadwal praktek belum tersedia.</p>
-                                        </div>
+                                            <div id="scheduleDetails-@riwayarpraktek.Id" style="display: none;">
+                                                <br />
+                                                @if (riwayarpraktek.JadwalPraktek.Count > 0)
+                                                {
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            @foreach (VMMMedicalFacilitySchedule jadwal in riwayarpraktek.JadwalPraktek)
+                                                            {
+
+                                                                <div class="row">
+                                                                    <div class="col-6 text-center"><p>@jadwal.Day</p></div>
+                                                                    <div class="col-6 text-center">@jadwal.TimeScheduleStart - @jadwal.TimeScheduleEnd</div>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                        <div class="col-2">
+                                                        </div>
+                                                        <div class="col-4 d-flex justify-content-center align-items-center">
+                                                            <button class="btn btn-primary">Buat Janji</button>
+                                                        </div>
+
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <p>Jadwal praktek belum tersedia.</p>
+                                                }
+
+                                            </div>
                                     </div>
                                     }
                                 }                            
@@ -242,5 +298,24 @@
         } else {
             scheduleElement.style.display = "none";
         }
+        
     }
+    $(document).ready(function () {
+        $('#toggleSchedule').on('click', function (e) {
+            e.preventDefault();
+
+            var scheduleDetails = $('#scheduleDetails');
+            var toggleText = $('#toggleSchedule');
+
+            // Toggle visibility of the schedule
+            scheduleDetails.toggle();
+
+            // Change text and icon accordingly
+            if (scheduleDetails.is(':visible')) {
+                toggleText.html('<i class="bi bi-caret-up"></i> Sembunyikan Jadwal Praktek');
+            } else {
+                toggleText.html('<i class="bi bi-caret-down"></i> Lihat Jadwal Praktek');
+            }
+        });
+    });
 </script>

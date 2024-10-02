@@ -42,9 +42,10 @@ namespace HealthCare340B.ViewModel
         //pendidikan
         public List<VMMDoctorEducation>? InstitutionName { get; set; }
 
-        //janji
-        
+        //janji        
         public List<VMTAppointment>? Appointment { get; set; }
+        //obrolan
+        public List<VMTCustomerChat>? Obrolan { get; set; }
         //jadwal praktek
         public List<VMMMedicalFacilitySchedule>? JadwalPraktek { get; set; }
 

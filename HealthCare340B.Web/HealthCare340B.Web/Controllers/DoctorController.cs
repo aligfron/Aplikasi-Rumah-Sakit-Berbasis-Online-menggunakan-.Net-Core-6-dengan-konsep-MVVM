@@ -127,7 +127,7 @@ namespace HealthCare340B.Web.Controllers
 
         //punya ali
 
-        public async Task<IActionResult> DetailDoctor()
+        public async Task<IActionResult> DetailDoctor(int? id)
         {
             ViewBag.Title = "Profil";
             ViewBag.imgFolder = imageFolder;
@@ -135,14 +135,40 @@ namespace HealthCare340B.Web.Controllers
             ViewBag.Role = HttpContext.Session.GetString("userRoleCode")!;
 
             ViewBag.Breadcrumb = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem { Name = "Beranda", Controller = "Home", Action = "Index" },
+        new BreadcrumbItem { Name = "Profil", IsActive = true }
+    };
+
+            VMMDoctor? data = null;
+
+            if (id == null)
             {
-                new BreadcrumbItem { Name = "Beranda", Controller = "Home", Action = "Index" },
-                new BreadcrumbItem { Name = "Profile", IsActive = true }
-            };
-            int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
-            VMMDoctor? GetDoctorByBiodataId = await profile.GetDoctorByBiodataId(bioId);
-            VMMDoctor? data = await profile.GetByIdProfilDokter(GetDoctorByBiodataId!.Id);
+                int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
+                if (bioId == 0)
+                {
+                    return NotFound("Biodata ID not found in session.");
+                }
+
+                VMMDoctor? GetDoctorByBiodataId = await profile.GetDoctorByBiodataId(bioId);
+                if (GetDoctorByBiodataId == null)
+                {
+                    return NotFound("Doctor not found for the given Biodata ID.");
+                }
+
+                data = await profile.GetByIdProfilDokter(GetDoctorByBiodataId.Id);
+            }
+            else
+            {
+                data = await profile.GetByIdProfilDokter(id.Value);
+                if (data == null)
+                {
+                    return NotFound("Doctor not found for the given ID.");
+                }
+            }
+
             return View(data);
         }
+
     }
 }

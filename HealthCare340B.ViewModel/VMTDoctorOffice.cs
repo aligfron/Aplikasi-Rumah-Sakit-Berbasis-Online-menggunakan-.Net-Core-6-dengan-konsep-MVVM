@@ -24,7 +24,10 @@ namespace HealthCare340B.ViewModel
         public long? DeletedBy { get; set; }
         public DateTime? DeletedOn { get; set; }
         public bool IsDelete { get; set; }
-
+        public List<VMMMedicalFacilitySchedule>? JadwalPraktek { get; set; }
+        public string? FullAddress { get; set; }
+        public string? MedicalFacilityName { get; set; }
+        public List<VMTDoctorOfficeTreatmentPrice>? HargaKonsulMulai { get; set; }
         public VMTDoctorOffice() { }
         public VMTDoctorOffice(TDoctorOffice doctorOffice, MMedicalFacility mMedicalFacility, MLocation mLocation )
         {

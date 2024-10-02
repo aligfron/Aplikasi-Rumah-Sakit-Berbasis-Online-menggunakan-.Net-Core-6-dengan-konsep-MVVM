@@ -1,5 +1,4 @@
-﻿@if (Model.SpecializationName != null)
-{
+﻿
     @if (Model.SpecializationName.Count > 0)
     {
         foreach (VMTCurrentDoctorSpecialization specialization in Model.SpecializationName)
@@ -20,16 +19,7 @@
             <i class="bi bi-plus-circle"></i> Tambah Spesialisasi
         </button>
     }
-}
-else
-{
-    <h5>Anda Belum Menambahkan Spesialisasi</h5>
-    <p style="font-size: smaller;">*Silahkan isi spesialisasi pada tombol tambah</p>
 
-    <button class="btn btn-primary position-absolute" data-id="@Model.Id" style="bottom: 30px; right: 30px;" title="Edit" data-bs-toggle="modal" data-bs-target="#staticModal">
-        <i class="bi bi-plus-circle"></i> Tambah Spesialisasi
-    </button>
-}
 <script>
     $(".btn-primary").click(function (e) {
         $("#staticModalBody").html("");

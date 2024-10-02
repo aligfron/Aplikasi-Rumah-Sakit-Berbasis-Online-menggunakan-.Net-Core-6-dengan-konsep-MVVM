@@ -80,7 +80,7 @@
                                         <p class="text-secondary">@doctor.Specialization</p>
                                         <p class="text-danger">Pengalaman: @doctor.ExperienceYears tahun</p>
                                         <p><i class="fas fa-hospital"></i> @doctor.MedicalFacilityName</p>
-                                        <button class="btn btn-outline-info mt-2">Lihat info lebih banyak</button>
+                                        <button class="btn btn-outline-info mt-2" data-id="@doctor.Id" id="DetailDocter">Lihat info lebih banyak</button>
                                     </div>
                                     <!-- Right side for doctor actions -->
                                     <div class="col-md-4 text-center">
@@ -137,4 +137,9 @@
         $("#staticModalBody").html(spinner);
         $("#staticModalBody").load("/Appointment/Create/" + $(this).attr("data-id"));
     });
+    $("#DetailDocter").click(function (e) {
+        var doctorId = $(this).attr("data-id");  // Mengambil nilai dari atribut data-id
+        window.location.href = "/Doctor/DetailDoctor/" + doctorId;  // Mengarahkan ke halaman detail berdasarkan doctorId
+    });
+
 </script>

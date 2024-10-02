@@ -10,7 +10,6 @@
     <div class="page-title">
         <div class="row">
             <div class="col-12 col-md-12 order-md-1 order-last text-start">
-                <!-- Tambahkan text-start untuk merapikan teks ke kiri -->
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
@@ -28,7 +27,6 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex justify-content-center align-items-center flex-column">
-                            <!-- Avatar dengan Icon Edit -->
                             <form id="frmFoto" enctype="multipart/form-data">
                                 <div class="avatar avatar-2xl position-relative">
                                     <img id="profileImage" src="~/@ViewBag.imgFolder/@(Model.ImagePath ?? "blank-profile-picture.png")" alt="Avatar" class="rounded-circle">
@@ -68,9 +66,15 @@
                             }
 
 
-                            <i class="bi bi-star-fill text-warning mb-0"></i>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-star-fill text-warning mb-0"></i>
+                                <i class="bi bi-star-fill text-warning mb-0"></i>
+                                <i class="bi bi-star-fill text-warning mb-0"></i>
+                                <i class="bi bi-star-fill text-warning mb-0"></i>
+                                <i class="bi bi-star-fill text-warning mb-0"></i>
+                            </div>
 
-                            <!-- Navbar-like Tab Navigation -->
+
                             <ul class="nav nav-tabs flex-column mt-3 w-100" id="myTab1" role="tablist">
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link w-100 text-start d-flex justify-content-between align-items-center" id="Janji-tab" data-bs-toggle="tab" data-bs-target="#Janji" type="button" role="tab" aria-controls="Janji" aria-selected="true">
@@ -87,7 +91,18 @@
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link w-100 text-start" id="Obrolan-tab" data-bs-toggle="tab" data-bs-target="#Obrolan" type="button" role="tab" aria-controls="Obrolan" aria-selected="false">Obrolan / Konsultasi</button>
+                                    <button class="nav-link w-100 text-start d-flex justify-content-between align-items-center" id="Obrolan-tab" data-bs-toggle="tab" data-bs-target="#Obrolan" type="button" role="tab" aria-controls="Obrolan" aria-selected="false">
+                                        Obrolan / Konsultasi <span class="badge bg-primary ms-2">
+                                            @{
+                                                int obrolanCount = 0;
+                                                foreach (VMTCustomerChat obrolan in Model.Obrolan)
+                                                {
+                                                    obrolanCount++;
+                                                }
+                                                @obrolanCount
+                                            }
+                                        </span>
+                                    </button>
                                 </li>
                             </ul>
                         </div>
@@ -102,7 +117,7 @@
                             {
                                 @foreach (VMTDoctorTreatment tindakanmedis in Model.TreatmentName)
                                 {
-                                    <p class="fs-6 text-small mb-0 ps-3">- @tindakanmedis.Name</p>
+                                    <p class="fs-6 text-small mb-0">- @tindakanmedis.Name</p>
                                 }
                             }
                             else
@@ -120,7 +135,7 @@
                                     <div class="d-flex justify-content-between">
                                         <div>
                                             <p class="mb-0">@riwayarpraktek.LocationName</p>
-                                            <p class="text-muted small mb-0">@riwayarpraktek.Specialization</p>
+                                            <p class="text-muted small mb-0  ps-3">-@riwayarpraktek.Specialization</p>
                                         </div>
                                         <div>
                                             <p class="small text-muted">
@@ -148,7 +163,7 @@
                                     <div class="d-flex justify-content-between">
                                         <div>
                                             <p class="mb-0">@pendidikan.InstitutionName</p>
-                                            <p class="text-muted small mb-0">- @pendidikan.Major</p>
+                                            <p class="text-muted small mb-0  ps-3">- @pendidikan.Major</p>
                                         </div>
                                         <div>
                                             <p class="small text-muted">
@@ -156,7 +171,6 @@
                                             </p>
                                         </div>
                                     </div>
-                                    <br />
                                 }
                             }
                             else
