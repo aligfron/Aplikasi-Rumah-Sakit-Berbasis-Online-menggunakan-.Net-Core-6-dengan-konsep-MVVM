@@ -250,12 +250,15 @@ namespace HealthCare340B.DataAccess
 
 
 
-        public async Task GenerateOTP(string email)
+        public VMResponse<VMTToken> GenerateOTP(string email)
         {
+            VMResponse<VMTToken> response = new VMResponse<VMTToken>();
             var userExist = GetByEmail(email).Data;
             if (userExist != null)
             {
-                throw new Exception("Email already register");
+                response.StatusCode = HttpStatusCode.NotFound;
+                response.Message = $"{HttpStatusCode.NotFound} - Email not found";
+                return response;
             }
             var OTP = new Random().Next(1000000, 9999999).ToString();
             var Expire = DateTime.Now.AddMinutes(10);
@@ -286,6 +289,10 @@ namespace HealthCare340B.DataAccess
                     dbTran.Rollback();
                 }
             }
+            response.Data = GetByOTP(OTP).Data;
+            response.StatusCode = HttpStatusCode.Created;
+            response.Message = $"{HttpStatusCode.Created} - OTP created";
+            return response;
         }
 
         public VMResponse<VMTToken> VerifyOTP(string OTP)

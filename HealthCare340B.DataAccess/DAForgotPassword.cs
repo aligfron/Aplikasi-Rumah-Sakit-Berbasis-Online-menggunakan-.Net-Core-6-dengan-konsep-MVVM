@@ -210,6 +210,7 @@ namespace HealthCare340B.DataAccess
             {
                 response.StatusCode = HttpStatusCode.NotFound;
                 response.Message =$"{HttpStatusCode.NotFound} - Email not found";
+                return response;
             }
             var OTP = new Random().Next(1000000, 9999999).ToString();
             var Expire = DateTime.Now.AddMinutes(10);
