@@ -95,7 +95,6 @@ namespace HealthCare340B.Web.Controllers
             }
 
             ViewBag.Title = "Daftar Pasien";
-            ViewBag.Role = HttpContext.Session.GetString("userRoleCode");
             ViewBag.imgFolder = _imageFolder;
             ViewBag.Filter = filter;
             ViewBag.PageSize = currPageSize ?? _pageSize;

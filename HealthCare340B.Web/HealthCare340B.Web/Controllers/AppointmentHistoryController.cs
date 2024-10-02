@@ -94,7 +94,6 @@ namespace HealthCare340B.Web.Controllers
             }
 
             ViewBag.Title = "Riwayat Kedatangan";
-            ViewBag.Role = HttpContext.Session.GetString("userRoleCode");
             ViewBag.imgFolder = _imageFolder;
             ViewBag.Filter = filter;
             ViewBag.PageSize = currPageSize ?? _pageSize;

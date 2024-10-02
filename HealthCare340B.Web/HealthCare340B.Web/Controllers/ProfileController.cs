@@ -118,7 +118,6 @@ namespace HealthCare340B.Web.Controllers
             }
             ViewBag.Title = "Profil";
             ViewBag.imgFolder = imageFolder;
-            ViewBag.Role = HttpContext.Session.GetString("userRoleCode")!;
 
             ViewBag.Breadcrumb = new List<BreadcrumbItem>
             {

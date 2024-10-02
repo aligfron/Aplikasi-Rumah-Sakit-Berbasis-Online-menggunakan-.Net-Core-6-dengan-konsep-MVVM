@@ -4,7 +4,7 @@
 @{
 }
 
-@if (ViewBag.Role == "ROLE_PASIEN")
+@if (@Context.Session.GetString("userRoleCode") == "ROLE_PASIEN")
 {
     <div class="row">
         <div class="col-12">
