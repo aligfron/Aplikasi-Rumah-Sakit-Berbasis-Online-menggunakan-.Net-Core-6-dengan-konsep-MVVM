@@ -1,16 +1,9 @@
-﻿using DinkToPdf;
-using DinkToPdf.Contracts;
-using HealthCare340B.DataModel;
-using HealthCare340B.ViewModel;
+﻿using HealthCare340B.ViewModel;
 using HealthCare340B.Web.AddOns;
 using HealthCare340B.Web.Models;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using System;
+using SelectPdf;
+using System.Drawing;
 
 namespace HealthCare340B.Web.Controllers
 {
@@ -24,18 +17,12 @@ namespace HealthCare340B.Web.Controllers
 
         private readonly int _pageSize;
 
-        private readonly IConverter _converter;
-        private IWebHostEnvironment _webHostEnvironment;
-
-        public AppointmentHistoryController(IConfiguration configuration, IConverter converter, IWebHostEnvironment environment)
+        public AppointmentHistoryController(IConfiguration configuration)
         {
             _appointmentHistoryModel = new AppointmentHistoryModel(configuration);
             _imageFolder = configuration["ImageFolder"];
 
             _pageSize = int.Parse(configuration["PageSize"]);
-
-            _converter = converter;
-            _webHostEnvironment = environment;
         }
 
         private bool isInSession()
@@ -188,35 +175,59 @@ namespace HealthCare340B.Web.Controllers
                 HttpContext.Session.SetString("errMsg", ex.Message);
             }
 
-            //// Render Partial View ke string
-            //string htmlContent = await Render.ViewToStringAsync(this, "PrescriptionPdf", data, true);
+            //return View(data);
 
-            //// Konfigurasi untuk konversi ke PDF
-            //var pdf = new HtmlToPdfDocument()
-            //{
-            //    GlobalSettings =
-            //    {
-            //        ColorMode = ColorMode.Color,
-            //        Orientation = Orientation.Portrait,
-            //        PaperSize = new PechkinPaperSize("80", "200"),
-            //        Margins = new MarginSettings { Top = 10 },
-            //    },
-            //    Objects =
-            //    {
-            //        new ObjectSettings()
-            //        {
-            //            PagesCount = true,
-            //            HtmlContent = htmlContent,
-            //            WebSettings = { DefaultEncoding = "utf-8" }
-            //        },
-            //    },
-            //};
+            // Set up the PDF converter with Blink rendering engine
+            HtmlToPdf converter = new HtmlToPdf();
+            converter.Options.RenderingEngine = RenderingEngine.Blink;
 
-            //var file = _converter.Convert(pdf);
+            // Set converter options
+            converter.Options.PdfPageSize = PdfPageSize.Custom;
 
-            //return File(file, "application/pdf", "resep-digital.pdf");
+            // Set lebar tetap (80mm), dan hitung tinggi berdasarkan jumlah obat
+            float pageWidth = 80 * 2.83465f;
+            float baseHeight = 77 * 2.83465f; // Tinggi awal untuk 1 obat
+            float additionalHeight = (96 - 77) * 2.83465f; // Tambahan tinggi per obat
 
-            return View(data);
+            // Jumlah obat
+            int numObat = data.Prescriptions!.Count;
+
+            // Hitung tinggi halaman dinamis
+            float pageHeight = baseHeight + (additionalHeight * (numObat - 1));
+
+            // Set ukuran halaman dinamis
+            converter.Options.PdfPageCustomSize = new SizeF(pageWidth, pageHeight);
+
+            // Tetap menggunakan orientasi portrait
+            converter.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
+
+            // Sesuaikan lebar halaman web agar sesuai dengan lebar 80mm (302px)
+            converter.Options.WebPageWidth = 302;
+
+            // Tinggi halaman web biarkan otomatis untuk menyesuaikan konten
+            converter.Options.WebPageHeight = 0; // Biarkan SelectPdf menghitung tinggi konten
+            converter.Options.WebPageFixedSize = false;
+
+            // Atur supaya konten pas secara horizontal (mengecilkan jika perlu)
+            converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.ShrinkOnly;
+
+            // Tidak menyesuaikan tinggi konten secara vertikal
+            converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.NoAdjustment;
+
+            // Render the view as HTML string
+            string htmlContent = await Render.ViewToStringAsync(this, "PrescriptionPdf", data, true);
+
+            // Convert HTML string to PDF
+            PdfDocument doc = converter.ConvertHtmlString(htmlContent);
+
+            // Save PDF to a byte array
+            byte[] pdf = doc.Save();
+
+            // Close the PDF document
+            doc.Close();
+
+            // Return the PDF file to the browser
+            return File(pdf, "application/pdf", "ResepDigital.pdf");
         }
     }
 }

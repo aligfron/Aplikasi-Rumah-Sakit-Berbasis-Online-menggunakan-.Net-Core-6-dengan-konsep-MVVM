@@ -1,5 +1,3 @@
-using DinkToPdf;
-
 namespace HealthCare340B.Web
 {
     public class Program
@@ -16,13 +14,6 @@ namespace HealthCare340B.Web
 
                 opt.IdleTimeout = TimeSpan.FromMinutes(30);
             });
-
-            // Register DinkToPdf converter
-            builder.Services.AddSingleton<DinkToPdf.Contracts.IConverter, SynchronizedConverter>(provider =>
-            {
-                return new SynchronizedConverter(new PdfTools());
-            });
-
 
             var app = builder.Build();
 
