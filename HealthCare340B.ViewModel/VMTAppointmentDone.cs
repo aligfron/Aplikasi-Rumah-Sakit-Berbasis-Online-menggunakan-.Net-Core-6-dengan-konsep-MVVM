@@ -13,10 +13,15 @@ namespace HealthCare340B.ViewModel
 
         public long? CustomerId { get; set; }
         public string? CustomerFullname { get; set; }
+        public int? CustomerAge { get; set; }
+        public string? CustomerGender { get; set; }
+
         public DateTime? AppointmentDate { get; set; }
         public long? DoctorOfficeId { get; set; }
         public string? MedicalFacilityName { get; set; }
+
         public string? DoctorFullname { get; set; }
+        public string? SpecializationName { get; set; }
         public string? DoctorTreatmentName { get; set; }
 
         public string Diagnosis { get; set; } = null!;

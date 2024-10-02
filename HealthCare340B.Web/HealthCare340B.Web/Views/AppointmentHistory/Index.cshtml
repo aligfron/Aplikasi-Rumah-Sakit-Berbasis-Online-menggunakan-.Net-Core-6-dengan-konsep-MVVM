@@ -98,9 +98,19 @@ For more information on enabling MVC for empty projects, visit https://go.micros
                                 <div class="col-5">
                                     <!-- Kolom kedua: Resep Digital -->
                                     <h6>Resep Digital</h6>
-                                    <p class="mb-0">
-                                        @item.Prescriptions.Count
-                                    </p>
+                                    <small class="fst-italic text-danger">Resep digital sudah tidak berlaku sejak tanggal 20 Juni 2020</small>
+                                    <ul class="list-group mb-1">
+                                        @foreach (var prescription in item.Prescriptions)
+                                        {
+                                            <li class="list-group-item list-group-item-info">
+                                                <h6 class="text-uppercase mb-0">@prescription.MedicalItemName</h6>
+                                                <small class="fw-light mb-0 d-block">@prescription.Dosage</small>
+                                                <small class="fw-light mb-0 d-block">@prescription.Directions</small>
+                                                <small class="fw-light mb-0 d-block">Waktu: @prescription.Time</small>
+                                            </li>
+                                        }
+                                    </ul>
+                                    <a data-id="@item.Id" class="btn btn-primary btnCetak w-100" data-bs-toggle="modal" data-bs-target="#staticModal">Cetak <i>(.pdf)</i></a>
                                 </div>
                             }
                         </div>
@@ -178,6 +188,11 @@ For more information on enabling MVC for empty projects, visit https://go.micros
             collapseElement.on('hidden.bs.collapse', function () {
                 btnTextElement.text("Lihat detail kedatangan");
             });
+        });
+
+        $(".btnCetak").click(function (e) {
+            $("#staticModalBody").html(spinner);
+            $("#staticModalBody").load("/AppointmentHistory/Print?appointmentId=" + $(this).data("id"));
         });
     });
 </script>

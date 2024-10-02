@@ -1,7 +1,16 @@
-﻿using HealthCare340B.ViewModel;
+﻿using DinkToPdf;
+using DinkToPdf.Contracts;
+using HealthCare340B.DataModel;
+using HealthCare340B.ViewModel;
 using HealthCare340B.Web.AddOns;
 using HealthCare340B.Web.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using System;
 
 namespace HealthCare340B.Web.Controllers
 {
@@ -15,12 +24,18 @@ namespace HealthCare340B.Web.Controllers
 
         private readonly int _pageSize;
 
-        public AppointmentHistoryController(IConfiguration configuration)
+        private readonly IConverter _converter;
+        private IWebHostEnvironment _webHostEnvironment;
+
+        public AppointmentHistoryController(IConfiguration configuration, IConverter converter, IWebHostEnvironment environment)
         {
             _appointmentHistoryModel = new AppointmentHistoryModel(configuration);
             _imageFolder = configuration["ImageFolder"];
 
             _pageSize = int.Parse(configuration["PageSize"]);
+
+            _converter = converter;
+            _webHostEnvironment = environment;
         }
 
         private bool isInSession()
@@ -75,21 +90,24 @@ namespace HealthCare340B.Web.Controllers
             {
                 if (orderBy == "appointment_date")
                 {
-                    data = orderDirection == "asc"
-                        ? data?.OrderBy(d => d.AppointmentDate).ToList()
-                        : data?.OrderByDescending(d => d.AppointmentDate).ToList();
+                    data =
+                        orderDirection == "asc"
+                            ? data?.OrderBy(d => d.AppointmentDate).ToList()
+                            : data?.OrderByDescending(d => d.AppointmentDate).ToList();
                 }
                 else if (orderBy == "name")
                 {
-                    data = orderDirection == "asc"
-                        ? data?.OrderBy(d => d.CustomerFullname).ToList()
-                        : data?.OrderByDescending(d => d.CustomerFullname).ToList();
+                    data =
+                        orderDirection == "asc"
+                            ? data?.OrderBy(d => d.CustomerFullname).ToList()
+                            : data?.OrderByDescending(d => d.CustomerFullname).ToList();
                 }
                 else if (orderBy == "created_on")
                 {
-                    data = orderDirection == "asc"
-                        ? data?.OrderBy(d => d.CreatedOn).ToList()
-                        : data?.OrderByDescending(d => d.CreatedOn).ToList();
+                    data =
+                        orderDirection == "asc"
+                            ? data?.OrderBy(d => d.CreatedOn).ToList()
+                            : data?.OrderByDescending(d => d.CreatedOn).ToList();
                 }
             }
 
@@ -124,6 +142,81 @@ namespace HealthCare340B.Web.Controllers
                     currPageSize ?? _pageSize
                 )
             );
+        }
+
+        public IActionResult Print(long appointmentId)
+        {
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+                return RedirectToAction("Index", "Auth");
+            }
+            if (!isInRole())
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
+
+            long data = appointmentId;
+
+            ViewBag.Title = "Cetak Resep";
+
+            return View(data);
+        }
+
+        public async Task<IActionResult> PrescriptionPdf(long appointmentId)
+        {
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+                return RedirectToAction("Index", "Auth");
+            }
+            if (!isInRole())
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
+
+            VMTAppointmentDone? data = new VMTAppointmentDone();
+
+            try
+            {
+                data = await _appointmentHistoryModel.GetByAppointmentId(appointmentId);
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+
+            //// Render Partial View ke string
+            //string htmlContent = await Render.ViewToStringAsync(this, "PrescriptionPdf", data, true);
+
+            //// Konfigurasi untuk konversi ke PDF
+            //var pdf = new HtmlToPdfDocument()
+            //{
+            //    GlobalSettings =
+            //    {
+            //        ColorMode = ColorMode.Color,
+            //        Orientation = Orientation.Portrait,
+            //        PaperSize = new PechkinPaperSize("80", "200"),
+            //        Margins = new MarginSettings { Top = 10 },
+            //    },
+            //    Objects =
+            //    {
+            //        new ObjectSettings()
+            //        {
+            //            PagesCount = true,
+            //            HtmlContent = htmlContent,
+            //            WebSettings = { DefaultEncoding = "utf-8" }
+            //        },
+            //    },
+            //};
+
+            //var file = _converter.Convert(pdf);
+
+            //return File(file, "application/pdf", "resep-digital.pdf");
+
+            return View(data);
         }
     }
 }

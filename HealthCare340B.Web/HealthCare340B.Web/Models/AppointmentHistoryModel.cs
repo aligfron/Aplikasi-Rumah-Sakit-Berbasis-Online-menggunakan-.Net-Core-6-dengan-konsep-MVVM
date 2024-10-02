@@ -101,5 +101,45 @@ namespace HealthCare340B.Web.Models
             return data;
 
         }
+
+        public async Task<VMTAppointmentDone> GetByAppointmentId(long appointmentId)
+        {
+            VMTAppointmentDone? data = null;
+
+            try
+            {
+                VMResponse<VMTAppointmentDone>? apiResponse = JsonConvert.DeserializeObject<
+                    VMResponse<VMTAppointmentDone>
+                >(
+                    await _httpClient
+                        .GetAsync($"{_apiUrl}AppointmentDone/GetByAppointmentId/{appointmentId}")
+                        .Result.Content.ReadAsStringAsync()
+                );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode == HttpStatusCode.OK)
+                    {
+                        data = apiResponse.Data;
+                    }
+                    else
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Prescription API could not be reached");
+                }
+            }
+            catch (Exception e)
+            {
+                // Logging
+                Console.WriteLine("AppointmentHistoryModel.GetByAppointmentId: " + e.Message);
+                throw new Exception("AppointmentHistoryModel.GetByAppointmentId: " + e.Message);
+            }
+
+            return data;
+        }
     }
 }

@@ -68,5 +68,31 @@ namespace HealthCare340B.API.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpGet("[action]/{appointmentId}")]
+        public async Task<ActionResult> GetByAppointmentId(long appointmentId)
+        {
+            try
+            {
+                VMResponse<VMTAppointmentDone> response = await Task.Run(() => _appointmentDone.GetByAppointmentId(appointmentId));
+
+                if (response.Data != null)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    Console.WriteLine("AppointmentDoneController.GetByAppointmentId: " + response.Message);
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception e)
+            {
+                // Console Logging
+                Console.WriteLine("AppointmentDoneController.GetByAppointmentId: " + e.Message);
+
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

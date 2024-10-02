@@ -1,4 +1,4 @@
-html {
+/*html {
   font-size: 14px;
 }
 
@@ -18,19 +18,19 @@ body {
 }
 
 .breadcrumb {
-    background-color: #F5F8FF; /* Light blue background */
-}
+    background-color: #F5F8FF;*/ /* Light blue background */
+/*}
 
 .breadcrumb a {
-    font-size: 16px; /* Adjust text size */
-    font-weight: 500; /* Optional: Make text slightly bolder */
-}
+    font-size: 16px;*/ /* Adjust text size */
+    /*font-weight: 500;*/ /* Optional: Make text slightly bolder */
+/*}
 
 .breadcrumb .breadcrumb-item.active {
     font-size: 16px;
     font-weight: 500;
-    color: #007bff; /* Make the active breadcrumb text blue */
-}
+    color: #007bff;*/ /* Make the active breadcrumb text blue */
+/*}
 
 .no-border {
     border: 0;
@@ -99,18 +99,18 @@ body {
 }
 
 .input-group-text {
-    height: calc(1.5em + .75rem + 2px); /* Samakan dengan tinggi form-control */
-    width: 40px; /* Sesuaikan lebar sesuai keinginan */
-    display: flex;
-    align-items: center; /* Vertikal center */
-    justify-content: center; /* Horizontal center */
-    padding: 0; /* Menghilangkan padding bawaan */
-}
+    height: calc(1.5em + .75rem + 2px);*/ /* Samakan dengan tinggi form-control */
+    /*width: 40px;*/ /* Sesuaikan lebar sesuai keinginan */
+    /*display: flex;
+    align-items: center;*/ /* Vertikal center */
+    /*justify-content: center;*/ /* Horizontal center */
+    /*padding: 0;*/ /* Menghilangkan padding bawaan */
+/*}
 
 .input-group-text i {
-    font-size: 1rem; /* Sesuaikan ukuran ikon */
-}
+    font-size: 1rem;*/ /* Sesuaikan ukuran ikon */
+/*}
 
 .page-size-input {
-    width: 5px; /* Adjust this value as needed */
-}
+    width: 5px;*/ /* Adjust this value as needed */
+/*}*/

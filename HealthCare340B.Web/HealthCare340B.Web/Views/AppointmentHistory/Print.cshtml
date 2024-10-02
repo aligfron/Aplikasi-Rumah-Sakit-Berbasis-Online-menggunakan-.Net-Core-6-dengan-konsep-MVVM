@@ -1,0 +1,44 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model long?;
+@{
+    Layout = null;
+}
+
+<div class="card mb-0">
+    <div class="card-body mb-3">
+        <p>Resep digital hanya berlaku selama 2 x 24 jam setelah resep diberikan</p>
+    </div>
+
+    <div class="card-footer d-flex justify-content-center">
+        <button class="btn btn-outline-secondary me-5" data-bs-dismiss="modal" aria-label="Close">Batal</button>
+        &nbsp;
+        <button id="btnPrint" class="btn btn-primary">Cetak</button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#staticModalLabel").text("@ViewBag.Title");
+
+        $("#btnPrint").click(function (e) {
+            window.open("/AppointmentHistory/PrescriptionPdf?appointmentId=" + @Model, '_blank');
+            @*$.ajax({
+                url: "/AppointmentHistory/UpdateAttemp",
+                type: "POST",
+                data: {
+                    appointmentId: @Model
+                },
+                dataType: "json",
+                beforeSend: () => {
+
+                },
+                success: location.reload(),
+                error: function (errResponse) {
+                    console.error(errResponse);
+                }
+            });*@
+        });
+    });
+</script>
