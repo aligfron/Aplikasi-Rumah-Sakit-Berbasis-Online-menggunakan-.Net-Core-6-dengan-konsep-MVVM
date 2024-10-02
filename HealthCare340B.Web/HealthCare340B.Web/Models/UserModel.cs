@@ -69,7 +69,6 @@ namespace HealthCare340B.Web.Models
                 {
                     if (apiResponse.StatusCode != HttpStatusCode.OK)
                     {
-                        
                         throw new Exception(apiResponse.Message);
                     }
                     if (apiResponse.Data.IsLocked == true)
