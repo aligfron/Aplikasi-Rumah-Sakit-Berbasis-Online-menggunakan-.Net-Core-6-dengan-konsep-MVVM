@@ -1,4 +1,7 @@
-﻿@model Pagination<VMMBiodataAddress>
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model Pagination<VMMBiodataAddress>
 @{
     Layout = null;
 }
@@ -12,24 +15,23 @@
                     <input type="hidden" name="tab" value="alamat" />
                     <button type="submit" id="btnSearch" class="btn btn-primary input-group-text"><i class="fas fa-search"></i></button>
                 </div>
-                <select class="form-select ms-1" name="orderBy" onchange="this.form.submit()" style="width: 200px;">
-                    <option value="" selected>Urutkan</option>
-                    <option value="label">Label</option>
-                    <option value="recipient">Recipient</option>
+
+                <select id="orderByForm" class="form-select ms-1" name="orderBy"  style="width: 200px;">
+                    <option value="id" selected=@(ViewBag.OrderBy == "id")>Urutkan</option>
+                    <option value="label" selected=@(ViewBag.OrderBy == "label")>Label A-Z</option>
+                    <option value="label_desc" selected=@(ViewBag.OrderBy == "label_desc")>Label Z-A</option>
+                    <option value="recipient" selected=@(ViewBag.OrderBy == "recipient")>Recipient A-Z</option>
+                    <option value="recipient_desc" selected=@(ViewBag.OrderBy == "recipient_desc")>Recipient Z-A</option>
                 </select>
-                <input type="hidden" name="orderBy" value="@ViewBag.OrderBy">
+                
+                <!-- Tombol tambah dan hapus -->
                 <button id="btnAdd" data-bs-toggle="modal" data-bs-target="#staticModal" class="btn btn-success ms-2"><i class="fas fa-plus"></i></button>
                 <button id="btnDeleteSelected" data-bs-toggle="modal" data-bs-target="#staticModal" class="btn btn-danger ms-2"><i class="fas fa-trash"></i></button>
-                <div class="d-flex align-items-center ms-2">
-                    <input class="form-control page-size-input" type="text" id="pageSize" name="currentPageSize" value="@ViewBag.PageSize" style="width: 50px;" />
-                </div>
-            </form>
-            <form id="frmBioAddressPageSize" method="get" action="/Profile/TabAlamat" class="d-none">
-                <input id="pageNumber" type="hidden" name="pageNumber" value="@Model.PageIndex" />
-                <input id="orderBy" type="hidden" name="orderBy" value="@ViewBag.OrderBy" />
             </form>
         </div>
-    </div>
+    </div> 
+</div>
+
 
     <ul class="list-group">
         @if (Model != null)
@@ -63,17 +65,36 @@
 
     <div class="row mt-3">
         <div class="col-lg-11 d-flex align-items-center">
+        <!-- Form untuk mengubah ukuran halaman -->
+        <form id="frmBioAddressPageSize" method="get" action="/Profile/TabAlamat">
+            <div class="d-flex align-items-center ms-2">
+                <input class="form-control page-size-input" type="text" id="pageSize" name="currentPageSize" value="@ViewBag.PageSize" style="width: 50px;" />
+            </div>
+            <input id="pageNumber" type="hidden" name="pageNumber" value="@Model.PageIndex" />
+            <input id="orderBy" type="hidden" name="orderBy" value="@ViewBag.OrderBy" />
+        </form>
             <div role="group" class="btn-group">
-                <a asp-controller="Profile" asp-action="TabAlamat" asp-route-currentPageSize="@ViewBag.PageSize"
-                   asp-route-filter="@ViewBag.Filter" asp-route-orderBy="@ViewBag.OrderBy"
-                   asp-route-pageNumber="@(!Model.HasPreviousPage ? Model.PageIndex : Model.PageIndex - 1)"
-                   class="btn btn-secondary @(!Model.HasPreviousPage ? "disabled" : "")" title="Previous Page...">
+                <!-- Tombol Previous -->
+                <a id="btnPrev"
+                   class="btn btn-secondary @(Model.HasPreviousPage ? "" : "disabled")"
+                   href="javascript:void(0)"
+                   data-filter="@ViewBag.Filter"
+                   data-pagenumber="@(Model.PageIndex - 1)"
+                   data-currentpagesize="@ViewBag.PageSize"
+                   data-orderby="@ViewBag.OrderBy"
+                @(Model.HasPreviousPage ? "" : "disabled")>
                     <i class="fas fa-backward"></i>
                 </a>
-                <a class="btn btn-secondary @(!Model.HasNextPage ? "disabled" : "")" title="Next Page..."
-                   asp-controller="Profile" asp-action="TabAlamat" asp-route-currentPageSize="@ViewBag.PageSize"
-                   asp-route-filter="@ViewBag.Filter" asp-route-orderBy="@ViewBag.OrderBy"
-                   asp-route-pageNumber="@(!Model.HasNextPage ? Model.PageIndex : Model.PageIndex + 1)">
+
+                <!-- Tombol Next -->
+                <a id="btnNext"
+                   class="btn btn-secondary @(Model.HasNextPage ? "" : "disabled")"
+                   href="javascript:void(0)"
+                   data-filter="@ViewBag.Filter"
+                   data-pagenumber="@(Model.PageIndex + 1)"
+                   data-currentpagesize="@ViewBag.PageSize"
+                   data-orderby="@ViewBag.OrderBy"
+                @(Model.HasNextPage ? "" : "disabled")>
                     <i class="fas fa-forward"></i>
                 </a>
             </div>
@@ -82,85 +103,165 @@
             </div>
         </div>
     </div>
+
 </div>
 
 <script>
-    $(".btnDeleteId").click(function (e) {
-        $("#staticModalBody").html("");
-        $("#staticModalBody").load("/Profile/DeleteAlamat/" + $(this).data("id"));
-    });
+    $(document).ready(function () {
+        let selectedIds = [];
 
-    $("#btnAdd").click(function (e) {
-        e.preventDefault();
-        console.log("test modal create alamat");
-        $("#staticModalBody").html("");
-        $("#staticModalBody").load("/Profile/CreateAlamat");
-    });
-
-    $(".btnEdit").click(function (e) {
-        console.log($(this).data("id"));
-        $("#staticModalBody").html("");
-        $("#staticModalBody").load("/Profile/EditAlamat/" + $(this).data("id"));
-    });
-
-    let selectedIds = [];
-
-    $(".select").change(function (e) {
-        let Ids = selectedIds.map(m => m).indexOf($(this).data("id"));
-
-        if (Ids < 0) {
-            selectedIds.push($(this).data("id"));
-        } else if (!$(this).prop("checked")) {
-            selectedIds.splice(Ids, 1);
-        }
-
-        if (selectedIds.length > 0) {
-            $("#btnDeleteSelected").removeClass("disabled").attr("disabled", false);
-        } else {
-            $("#btnDeleteSelected").addClass("disabled").attr("disabled", true);
-        }
-    });
-
-
-    $("#btnDeleteSelected").click(function (e) {
-        e.preventDefault();
-
-        if (selectedIds.length > 0) {
-            console.log("Deleting IDs: ", selectedIds);
+        // Fungsi untuk delete item individual
+        $(".btnDeleteId").click(function () {
             $("#staticModalBody").html("");
-            $("#staticModalBody").load("/Profile/MultipleDeleteAlamat/" + selectedIds.join(","));
+            $("#staticModalBody").load("/Profile/DeleteAlamat/" + $(this).data("id"));
+        });
 
-        } else {
-            alert("Please select at least one address to delete.");
+        // Fungsi untuk menambahkan alamat
+        $("#btnAdd").click(function (e) {
+            e.preventDefault();
+            console.log("test modal create alamat");
+            $("#staticModalBody").html("");
+            $("#staticModalBody").load("/Profile/CreateAlamat");
+        });
+
+        // Fungsi untuk edit alamat
+        $(".btnEdit").click(function () {
+            console.log($(this).data("id"));
+            $("#staticModalBody").html("");
+            $("#staticModalBody").load("/Profile/EditAlamat/" + $(this).data("id"));
+        });
+
+        // Fungsi untuk handle pagination
+        function handlePagination(button) {
+            let filter = button.data("filter");
+            let pageNumber = button.data("pagenumber");
+            let currentPageSize = button.data("currentpagesize");
+            let orderBy = button.data("orderby");
+
+            if (button.hasClass("disabled")) {
+                return;
+            }
+
+            $.ajax({
+                url: "/Profile/TabAlamat",
+                type: "get",
+                data: {
+                    "filter": filter,
+                    "pageNumber": pageNumber,
+                    "currentPageSize": currentPageSize,
+                    "orderBy": orderBy
+                },
+                success: function (response) {
+                    console.log(response);
+                    $("#alamat").html(response);
+                },
+                error: function (errResponse) {
+                    console.error(errResponse);
+                }
+            });
         }
-    });
 
-    $("#frmBioAddressPageSize").submit(function (e) {
-        e.preventDefault();
-        console.log($(this))
-        let filter = $("#Filter").val();
-        let pageNumber = $("#pageNumber").val();
-        let currentPageSize = $("#pageSize").val();
-        let orderBy = $("#orderBy").val();
-        $.ajax({
-            url: "/Profile/TabAlamat",
-            type: "get",
-            data: { "filter": filter, "pageNumber": pageNumber, "currentPageSize": currentPageSize, "orderBy": orderBy },
-            success: function (response) {
-                console.log(response);
-                $("#alamat").html(response);
-            },
-            error: function (errResponse) {
-                console.error(errResponse);
+        // Event handler untuk tombol Previous pada pagination
+        $("#btnPrev").click(function (e) {
+            e.preventDefault();
+            handlePagination($(this));
+        });
+
+        $("#btnNext").click(function (e) {
+            e.preventDefault();
+            handlePagination($(this));
+        });
+
+        $("#orderByForm").change(function (e) {
+            e.preventDefault();
+            let filter = $("#Filter").val();
+            let pageNumber = $("#pageNumber").val();
+            let currentPageSize = $("#pageSize").val();
+            let orderBy = $(this).val();
+            console.log("orderby : " + orderBy )
+            $.ajax({
+                url: "/Profile/TabAlamat",
+                type: "get",
+                data: {
+                    "filter": filter,
+                    "pageNumber": pageNumber,
+                    "currentPageSize": currentPageSize,
+                    "orderBy": orderBy
+                },
+                success: function (response) {
+                    console.log(response,"string");
+                    $("#alamat").html(response);
+                },
+                error: function (errResponse) {
+                    console.error(errResponse);
+                }
+            });
+        });
+
+        // Fungsi untuk menangani pemilihan checkbox
+        $(".select").change(function () {
+            let Ids = selectedIds.map(m => m).indexOf($(this).data("id"));
+
+            if (Ids < 0) {
+                selectedIds.push($(this).data("id"));
+            } else if (!$(this).prop("checked")) {
+                selectedIds.splice(Ids, 1);
+            }
+
+            if (selectedIds.length > 0) {
+                $("#btnDeleteSelected").removeClass("disabled").attr("disabled", false);
+            } else {
+                $("#btnDeleteSelected").addClass("disabled").attr("disabled", true);
             }
         });
-    });
 
-    $(document).ready(function () {
+        // Fungsi untuk delete beberapa item terpilih
+        $("#btnDeleteSelected").click(function (e) {
+            e.preventDefault();
+
+            if (selectedIds.length > 0) {
+                console.log("Deleting IDs: ", selectedIds);
+                $("#staticModalBody").html("");
+                $("#staticModalBody").load("/Profile/MultipleDeleteAlamat/" + selectedIds.join(","));
+            } else {
+                alert("Please select at least one address to delete.");
+            }
+        });
+
+        // Event handler untuk perubahan ukuran halaman (pageSize)
+        $("#frmBioAddressPageSize").submit(function (e) {
+            e.preventDefault();
+            console.log($(this));
+            let filter = $("#Filter").val();
+            let pageNumber = $("#pageNumber").val();
+            let currentPageSize = $("#pageSize").val();
+            let orderBy = $("#orderBy").val();
+
+            $.ajax({
+                url: "/Profile/TabAlamat",
+                type: "get",
+                data: {
+                    "filter": filter,
+                    "pageNumber": pageNumber,
+                    "currentPageSize": currentPageSize,
+                    "orderBy": orderBy
+                },
+                success: function (response) {
+                    console.log(response);
+                    $("#alamat").html(response);
+                },
+                error: function (errResponse) {
+                    console.error(errResponse);
+                }
+            });
+        });
+
+        // Event handler untuk pencarian
         $("#btnSearch").click(function (e) {
             e.preventDefault();
             console.log("button search click");
             let filter = $("#Filter").val();
+
             $.ajax({
                 url: "/Profile/TabAlamat",
                 type: "get",

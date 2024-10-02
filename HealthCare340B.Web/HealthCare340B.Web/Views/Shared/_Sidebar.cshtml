@@ -80,6 +80,18 @@
                             <span>Detail Doctor</span>
                         </a>
                     </li>
+                    <li class="sidebar-item">
+                        <a  id="btnCariDokter" class='sidebar-link' data-bs-toggle="modal" data-bs-target="#staticModal">
+                            <i class="bi bi-hexagon-fill"></i>
+                            <span>Cari Dokter</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a id="btnCariObat" class='sidebar-link' data-bs-toggle="modal" data-bs-target="#staticModal">
+                            <i class="bi bi-hexagon-fill"></i>
+                            <span>Cari Obat</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         }
@@ -87,8 +99,14 @@
 </div>
 
 <script>
-    $("#btnDashboard").click(function (e) {
+    $("#btnCariDokter").click(function (e) {
         $("#staticModalBody").html("")
         $("#staticModalBody").load("/Doctor/SearchDoctor")
     })
+
+    $("#btnCariObat").click(function (e) {
+        $("#staticModalBody").html("")
+        $("#staticModalBody").load("/MedicalItem/SearchMedicalItem")
+    })
+
 </script>

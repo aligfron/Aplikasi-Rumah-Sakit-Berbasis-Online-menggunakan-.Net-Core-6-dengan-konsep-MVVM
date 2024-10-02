@@ -1,0 +1,115 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model List<VMMMedicalItem>
+@{
+    Layout = "_HasilDokterView";
+}
+
+<div class="container mt-3">
+    <!-- Breadcrumb -->
+    <div class="p-2 rounded" style="background-color: #F5F8FF;">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a asp-controller="Home" asp-action="Index" class="text-dark">
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="breadcrumb-item active text-dark" aria-current="page">
+                    <span>Cari Obat</span>
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Hasil Pencarian -->
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h5 class="text-secondary">Hasil Pencarian berdasarkan kata kunci:</h5>
+                <p class="text-muted" style="font-size: 20px;">
+                    @if (!string.IsNullOrEmpty(ViewBag.CategoryName))
+                    {
+                        <span>Category: @ViewBag.CategoryName</span>
+
+                        <br />
+                    }
+                    @if (ViewBag.Segmentation != null)
+                    {
+                        if (ViewBag.Segmentation == true)
+                        {
+                            <span>Hanya cari obat bebas (tanpa resep)</span>
+
+                            <br />
+                        }
+                        else
+                        {
+                            <span>Cari Semua Obat (termasuk obat keras)</span>
+
+                            <br />
+                        }
+                    }
+                    @if (ViewBag.PriceMax != null)
+                    {
+                        <span>Price Max: @ViewBag.PriceMax</span>
+
+                        <br />
+                    }
+                    @if (ViewBag.PriceMin != null)
+                    {
+                        <span>Price Min: @ViewBag.PriceMin</span>
+
+                        <br />
+                    }
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-outline-primary mt-2" id="researchBtn" data-bs-toggle="modal" data-bs-target="#staticModal">Ulangi Pencarian</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daftar Medical Item -->
+    @if (Model != null && Model.Any())
+    {
+        <p>Jumlah Medical Item ditemukan: @Model.Count</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+            @foreach (var item in Model)
+            {
+                <div style="border: 1px solid #ccc; padding: 20px; width: 45%;">
+                    <h3>@item.Name</h3>
+                    <p>@item.Packaging</p>
+                    <p>Rp @item.PriceMin - Rp @item.PriceMax</p>
+                    <p>@item.Indication</p>
+                    <button class="btn btn-primary">Tambah ke Keranjang</button>
+                    <button class="btn btn-secondary">Detail</button>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>Tidak ada medical item ditemukan.</p>
+    }
+
+    <!-- Pagination -->
+    <div style="margin-top: 20px;">
+        <span>Menampilkan 1 - 4 dari @Model.Count</span>
+        <button class="btn btn-outline-primary">Sebelumnya</button>
+        <button class="btn btn-outline-primary">Selanjutnya</button>
+    </div>
+
+    <!-- Keranjang -->
+    <div style="margin-top: 20px;">
+        <span>1 Produk | Estimasi Harga: Rp 48.000</span>
+        <button class="btn btn-success">Keranjang Saya</button>
+    </div>
+</div>
+
+<script>
+    $("#researchBtn").click(function (e) {
+        $("#staticModalBody").html("")
+        $("#staticModalBody").load("/MedicalItem/SearchMedicalItem")
+    })
+</script>

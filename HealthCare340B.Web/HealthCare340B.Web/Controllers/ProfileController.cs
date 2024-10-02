@@ -159,6 +159,7 @@ namespace HealthCare340B.Web.Controllers
 
             //return (await profile.UpdateAsync(data));
         }
+
         [HttpGet("/Profile/DeleteAlamat/{id}")]
         public async Task<IActionResult> DeleteAlamat(int id)
         {
@@ -179,9 +180,11 @@ namespace HealthCare340B.Web.Controllers
 
             return View();
         }
+
         [HttpPost]
         public async Task<VMResponse<VMMBiodataAddress>?> CreateAsync(VMMBiodataAddress data)
            => await profile.CreateAsync(data);
+
 
         [HttpGet("/Profile/EditAlamat/{id}")]
         public async Task<IActionResult> EditAlamat(int id)
@@ -193,9 +196,11 @@ namespace HealthCare340B.Web.Controllers
 
             return View(data);
         }
+
         [HttpPost]
         public async Task<VMResponse<VMMBiodataAddress>?> EditAlamatAsync(VMMBiodataAddress data)
             => (await profile.UpdateAsync(data));
+
 
         [HttpGet("/Profile/TabAlamat")]
         public async Task<IActionResult> TabAlamat(string? filter, int? pageNumber, int? currentPageSize, string? orderBy)
@@ -239,15 +244,13 @@ namespace HealthCare340B.Web.Controllers
                 data = new List<VMMBiodataAddress>();
             }
 
-            ViewBag.BioAddressId = string.IsNullOrEmpty(orderBy) ? "id_desc" : "";
-            ViewBag.OrderRecipient = (orderBy == "recipient") ? "recipient_desc" : "recipient";
-            ViewBag.OrderLabel = (orderBy == "label") ? "label_desc" : "label";
             ViewBag.PageSize = currentPageSize ?? 10;
             ViewBag.OrderBy = orderBy;
             ViewBag.Filter = filter;
 
             return View(Pagination<VMMBiodataAddress>.Create(data ?? new List<VMMBiodataAddress>(), pageNumber ?? 1, ViewBag.PageSize));
         }
+
 
         [HttpGet("/Profile/MultipleDeleteAlamat/{id}")]
         public async Task<IActionResult> MultipleDeleteAlamat(string id)
@@ -257,13 +260,13 @@ namespace HealthCare340B.Web.Controllers
             List<string> IdsStr = id.Split(",").ToList();
             List<long> memberId = new List<long>();
 
-            foreach(var item in IdsStr)
+            foreach (var item in IdsStr)
             {
                 memberId.Add(long.Parse(item));
             }
 
             List<VMMBiodataAddress> data = new List<VMMBiodataAddress>();
-            foreach(var item in memberId)
+            foreach (var item in memberId)
             {
                 VMMBiodataAddress bioAddress = await profile.GetByIdAlamat((int)item);
                 data.Add(bioAddress);
@@ -272,7 +275,6 @@ namespace HealthCare340B.Web.Controllers
 
             return View(data);
         }
-
 
         [HttpPost]
         public async Task<VMResponse<List<VMMBiodataAddress>>?> MultipleDeleteAsync(string ids)
@@ -303,6 +305,7 @@ namespace HealthCare340B.Web.Controllers
         }
 
 
+
         [HttpGet("/Profile/TabProfile")]
         public async Task<IActionResult> TabProfile(int id)
         {
@@ -318,14 +321,13 @@ namespace HealthCare340B.Web.Controllers
                 HttpContext.Session.SetString("errMsg", ex.Message);
             }
 
-            if (data == null )
+            if (data == null)
             {
                 ViewBag.Message = "Tidak ada Profil Customer ditemukan berdasarkan pencarian Anda.";
                 data = new VMMCustomer();
             }
             return View(data);
         }
-
         public async Task<IActionResult> EditProfile()
         {
             ViewBag.Title = "Edit Profile";
@@ -349,13 +351,15 @@ namespace HealthCare340B.Web.Controllers
             return View(data);
         }
 
+
         [HttpPost]
         public async Task<VMResponse<VMMCustomer>?> EditProfileAsync(VMMCustomer data)
             => (await profile.UpdateProfileAsync(data));
 
+
         public async Task<IActionResult> EditEmail()
         {
-            ViewBag.Title = "Edit Email";        
+            ViewBag.Title = "Edit Email";
             VMMCustomer? data = new VMMCustomer();
             try
             {
@@ -374,6 +378,7 @@ namespace HealthCare340B.Web.Controllers
             }
             return View(data);
         }
+
 
 
         public async Task<IActionResult> EditPassword()
@@ -397,6 +402,7 @@ namespace HealthCare340B.Web.Controllers
             }
             return View(data);
         }
+
         public async Task<IActionResult> OTPEmail()
         {
             ViewBag.Title = "Kirim OTP";

@@ -13,12 +13,15 @@ namespace HealthCare340B.ViewModel
         public long? MedicalItemCategoryId { get; set; }
         public string? Composition { get; set; }
         public long? MedicalItemSegmentationId { get; set; }
+        public bool? isSegmentation { get; set; }
         public string? Manufacturer { get; set; }
         public string? Indication { get; set; }
         public string? Dosage { get; set; }
         public string? Directions { get; set; }
         public string? Contraindication { get; set; }
         public string? Caution { get; set; }
+        public string? CategoryName { get; set; }
+        public string? SegmentationName { get; set; }
         public string? Packaging { get; set; }
         public long? PriceMax { get; set; }
         public long? PriceMin { get; set; }
