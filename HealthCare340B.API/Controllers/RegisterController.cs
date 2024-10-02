@@ -3,6 +3,7 @@ using HealthCare340B.DataModel;
 using HealthCare340B.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static System.Net.WebRequestMethods;
 
 namespace HealthCare340B.API.Controllers
 {
@@ -10,11 +11,11 @@ namespace HealthCare340B.API.Controllers
     [Route("api/[controller]")]
     public class RegisterController : ControllerBase
     {
-        public DAUser? user;
+        public DARegister? user;
         private readonly HealthCare340BContext db;
         public RegisterController(HealthCare340BContext _db)
         {
-            user = new DAUser(_db);
+            user = new DARegister(_db);
             db = _db;
         }
         [HttpPost("[action]/{email?}")]
@@ -31,28 +32,42 @@ namespace HealthCare340B.API.Controllers
             }
         }
         [HttpPost("[action]")]
-        public async Task<ActionResult> VerifyOTP(string OTP) 
+        public async Task<ActionResult> VerifyOTP(string OTP)
         {
-            try 
+            try
             {
                 VMResponse<VMTToken> response = await Task.Run(() => user.VerifyOTP(OTP));
                 if (response.Data != null)
                 {
                     return Ok(response);
                 }
-                else 
+                else
                 {
                     return BadRequest("OTP is Wrong or Expired");
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-            
+
         }
-        [HttpPost]
-        public async Task<ActionResult> Register(VMMUser data) 
+        [HttpPost("[action]")]
+
+        public async Task<ActionResult> ConfirmPassword(string password, string confirmPassword) 
+        {
+            try
+            {
+                VMResponse<VMMUser> response = await Task.Run(() => user.ConfirmPassword(password,confirmPassword));
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("[action]")]
+        public async Task<ActionResult> Register(VMMUser data)
         {
             try
             {
@@ -67,12 +82,13 @@ namespace HealthCare340B.API.Controllers
                     return BadRequest(response);
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Console.WriteLine("UserController.Create: " + ex.Message);
                 return BadRequest(ex.Message);
             }
         }
-        
+
     }
+    
 }

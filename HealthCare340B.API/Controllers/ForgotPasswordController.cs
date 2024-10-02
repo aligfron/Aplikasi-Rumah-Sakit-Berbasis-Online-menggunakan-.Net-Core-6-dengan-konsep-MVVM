@@ -8,13 +8,13 @@ namespace HealthCare340B.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ForgotPasswordController:ControllerBase
+    public class ForgotPasswordController : ControllerBase
     {
-        public DAUser? user;
+        public DAForgotPassword? forgot;
         private readonly HealthCare340BContext db;
         public ForgotPasswordController(HealthCare340BContext _db)
         {
-            user = new DAUser(_db);
+            forgot = new DAForgotPassword(_db);
             db = _db;
         }
 
@@ -23,7 +23,7 @@ namespace HealthCare340B.API.Controllers
         {
             try
             {
-                await user.OTPForgotPassword(email);
+                VMResponse<VMTToken> response = await Task.Run(() => forgot.GenerateOTP(email));
                 return Created("", new { Message = "OTP successfully created." });
             }
             catch (Exception ex)
@@ -31,13 +31,12 @@ namespace HealthCare340B.API.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
-
         [HttpPost("[action]")]
         public async Task<ActionResult> VerifyOTP(string OTP)
         {
             try
             {
-                VMResponse<VMTToken> response = await Task.Run(() => user.VerifyForgotPassword(OTP));
+                VMResponse<VMTToken> response = await Task.Run(() => forgot.VerifyOTP(OTP));
                 if (response.Data != null)
                 {
                     return Ok(response);
@@ -54,13 +53,13 @@ namespace HealthCare340B.API.Controllers
 
         }
 
+        [HttpPost("[action]")]
 
-        [HttpPut("[action]")]
-        public async Task<ActionResult> EditPassword(VMMUser data) 
+        public async Task<ActionResult> ConfirmPassword(string password, string confirmPassword)
         {
             try
             {
-                VMResponse<VMMUser> response = await Task.Run(() => user.EditPassword(data));
+                VMResponse<VMMUser> response = await Task.Run(() => forgot.ConfirmPassword(password, confirmPassword));
                 return Ok(response);
             }
             catch (Exception ex)
@@ -68,5 +67,6 @@ namespace HealthCare340B.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        
     }
 }
