@@ -20,6 +20,58 @@ namespace HealthCare340B.DataAccess
             db = _db;
         }
 
+        public VMResponse<List<VMTAppointmentDone>?> GetAppointmentDone(List<VMTAppointment> dataApp)
+        {
+            VMResponse<List<VMTAppointmentDone>?> response = new VMResponse<List<VMTAppointmentDone>?>();
+
+            response.Data = new List<VMTAppointmentDone>();
+
+            try
+            {
+                foreach (VMTAppointment app in dataApp)
+                {
+                    VMTAppointmentDone? data = (
+                        from ad in db.TAppointmentDones
+                        where ad.AppointmentId == app.Id
+                        select new VMTAppointmentDone
+                        {
+                            Id = ad.Id,
+                            AppointmentId = ad.Id,
+                            Diagnosis = ad.Diagnosis,
+                            CreatedBy = ad.CreatedBy,
+                            CreatedOn = ad.CreatedOn,
+                            ModifiedBy = ad.ModifiedBy,
+                            ModifiedOn = ad.ModifiedOn,
+                            DeletedBy = ad.DeletedBy,
+                            DeletedOn = ad.DeletedOn,
+                            IsDelete = ad.IsDelete
+                        }
+                        ).FirstOrDefault();
+
+                    if (data != null)
+                    {
+                        response.Data.Add(data);
+                    }
+                }
+
+                if (response.Data != null)
+                {
+                    response.StatusCode = HttpStatusCode.OK;
+                    response.Message = $"{HttpStatusCode.OK} - Appointments successfully fetch!";
+                }
+                else
+                {
+                    response.StatusCode = HttpStatusCode.NoContent;
+                    response.Message = $"{HttpStatusCode.NoContent} - No Appointments Found!";
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Something's wrong - {e.Message}");
+            }
+            return response;
+        }
+
         public VMResponse<List<VMTAppointment>?> GetByCustomerId(List<long> custId)
         {
             VMResponse<List<VMTAppointment>?> response = new VMResponse<List<VMTAppointment>?>();
@@ -32,7 +84,14 @@ namespace HealthCare340B.DataAccess
                 {
                     List<VMTAppointment>? data = (
                         from a in db.TAppointments
-                        where a.CustomerId == id && a.IsDelete == false
+                        join c in db.MCustomers on a.CustomerId equals c.Id
+                        join b in db.MBiodata on c.BiodataId equals b.Id
+                        join dof in db.TDoctorOffices on a.DoctorOfficeId equals dof.Id
+                        join doc in db.MDoctors on dof.DoctorId equals doc.Id
+                        join mf in db.MMedicalFacilities on dof.MedicalFacilityId equals mf.Id
+                        join dot in db.TDoctorOfficeTreatments on a.DoctorOfficeTreatmentId equals dot.Id
+                        join dt in db.TDoctorTreatments on dot.DoctorTreatmentId equals dt.Id
+                        where a.CustomerId == id && a.IsDelete == false && a.AppointmentDate > DateTime.Now
                         select new VMTAppointment
                         {
                             Id = a.Id,
@@ -41,6 +100,11 @@ namespace HealthCare340B.DataAccess
                             DoctorOfficeScheduleId = a.DoctorOfficeScheduleId,
                             DoctorOfficeTreatmentId = a.DoctorOfficeTreatmentId,
                             AppointmentDate = a.AppointmentDate,
+                            CustomerName = b.Fullname,
+                            DoctorId = doc.Id,
+                            MedicalFacilityId = mf.Id,
+                            MedicalFacilityName = mf.Name,
+                            Treatment = dt.Name,
                             CreatedBy = a.CreatedBy,
                             CreatedOn = a.CreatedOn,
                             ModifiedBy = a.ModifiedBy,

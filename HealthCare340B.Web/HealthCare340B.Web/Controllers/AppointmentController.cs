@@ -342,7 +342,7 @@ namespace HealthCare340B.Web.Controllers
            
         }
 
-        public async Task<IActionResult> RencanaKedatangan()
+        public async Task<IActionResult> RencanaKedatangan(int? pageNumber, int? currPageSize, string? orderBy, string? ascDesc, string? filter)
         {
             List<VMMCustomerMember> dataMember = new List<VMMCustomerMember>();
             try
@@ -362,7 +362,7 @@ namespace HealthCare340B.Web.Controllers
             {
                 foreach(VMMCustomerMember member in dataMember)
                 {
-                    custId.Add(member.Id);
+                    custId.Add((long)member.CustomerId!);
                 }
             }
 
@@ -376,10 +376,130 @@ namespace HealthCare340B.Web.Controllers
 
             List<VMTAppointment>? dataAppointment = await appointment.GetByCustomerId(custId);
 
-            ViewBag.Role = HttpContext.Session.GetString("userRoleCode");
-            ViewBag.OrderBy = "Asc";
+            if (dataAppointment != null && dataAppointment.Count > 0)
+            {
+                foreach (VMTAppointment data in dataAppointment)
+                {
+                    VMMDoctor? dataDoctor = await appointment.GetDoctor((long)data.DoctorId!);
+                    data.DoctorName = dataDoctor!.Fullname;
+                }
+            }
 
-            return View(dataAppointment);
+            if (dataAppointment == null)
+                dataAppointment = new List<VMTAppointment>();
+            else
+            {
+                List<VMTAppointmentDone>? appDone = await appointment.GetAppointmentDone(dataAppointment);
+
+                List<VMTAppointment>? dataAppointmentCopy = new List<VMTAppointment>();
+                foreach (VMTAppointment data in dataAppointment)
+                {
+                    dataAppointmentCopy.Add(data);
+                }
+
+                if (string.IsNullOrEmpty(filter))
+                filter = "";
+
+                if (appDone != null && appDone.Count > 0) 
+                {
+                    foreach (VMTAppointmentDone app in appDone)
+                    {
+                        foreach (VMTAppointment data in dataAppointmentCopy)
+                        {
+                            if (app.AppointmentId == data.Id || (!data.CustomerName!.Contains(filter) && !data.DoctorName!.Contains(filter)))
+                                dataAppointment.Remove(data);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (VMTAppointment data in dataAppointmentCopy)
+                    {
+                        if (!data.CustomerName!.Contains(filter) && !data.DoctorName!.Contains(filter))
+                            dataAppointment.Remove(data);
+                    }
+                }
+
+                switch (orderBy)
+                {
+                    case "tanggalKedatangan":
+                        switch (ascDesc)
+                        {
+                            case "asc":
+                                dataAppointment = dataAppointment?.OrderBy(p => p.AppointmentDate).ToList();
+                                break;
+                            case "desc":
+                                dataAppointment = dataAppointment?.OrderByDescending(p => p.AppointmentDate).ToList();
+                                break;
+                            default:
+                                dataAppointment = dataAppointment?.OrderBy(p => p.AppointmentDate).ToList();
+                                break;
+                        }
+                        break;
+                    case "nama":
+                        switch (ascDesc)
+                        {
+                            case "asc":
+                                dataAppointment = dataAppointment?.OrderBy(p => p.CustomerName).ToList();
+                                break;
+                            case "desc":
+                                dataAppointment = dataAppointment?.OrderByDescending(p => p.CustomerName).ToList();
+                                break;
+                            default:
+                                dataAppointment = dataAppointment?.OrderBy(p => p.CustomerName).ToList();
+                                break;
+                        }
+                        break;
+                    case "tanggalDibuat":
+                        switch (ascDesc)
+                        {
+                            case "asc":
+                                dataAppointment = dataAppointment?.OrderBy(p => p.CreatedOn).ToList();
+                                break;
+                            case "desc":
+                                dataAppointment = dataAppointment?.OrderByDescending(p => p.CreatedOn).ToList();
+                                break;
+                            default:
+                                dataAppointment = dataAppointment?.OrderBy(p => p.CreatedOn).ToList();
+                                break;
+                        }
+                        break;
+                    default:
+                        switch (ascDesc)
+                        {
+                            case "asc":
+                                dataAppointment = dataAppointment?.OrderBy(p => p.AppointmentDate).ToList();
+                                break;
+                            case "desc":
+                                dataAppointment = dataAppointment?.OrderByDescending(p => p.AppointmentDate).ToList();
+                                break;
+                            default:
+                                dataAppointment = dataAppointment?.OrderBy(p => p.AppointmentDate).ToList();
+                                break;
+                        }
+                        break;
+                }
+            }
+
+            ViewBag.Filter = filter;
+            ViewBag.PageSize = (currPageSize ?? 5);
+            ViewBag.OrderBy = orderBy ?? "tanggalKedatangan";
+            ViewBag.AscDesc = ascDesc ?? "asc";
+
+            return View(Pagination<VMTAppointment>.Create(dataAppointment ?? new List<VMTAppointment>(), pageNumber ?? 1, ViewBag.PageSize));
+        }
+
+        public async Task<IActionResult> Update(long id, long doctorId, long custId, long medFacId, string medFacName)
+        {
+            VMMDoctor? dataDoctor = await appointment.GetDoctor(id);
+            ViewBag.AppointmentId = id;
+            ViewBag.DoctorId = doctorId;
+            ViewBag.CustomerId = custId;
+            ViewBag.ImgFolder = imageFolder;
+            //ViewBag.CustomerName = custName;
+            ViewBag.MedicalFacilityId = medFacId;
+            ViewBag.MedicalFacilityName = medFacName;
+            return View(dataDoctor);
         }
     }
 }

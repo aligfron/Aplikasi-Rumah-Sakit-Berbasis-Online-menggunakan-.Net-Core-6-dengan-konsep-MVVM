@@ -1,7 +1,7 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@ 
-@model List<VMTAppointment>?
+@model Pagination<VMTAppointment>
 @{
     Layout = "_ProfilLayout";
 }
@@ -24,30 +24,49 @@
         <div class="col-sm-12 col-md-7 col-lg-7">
             <div class="input-group">
                 <span class="col-3 input-group-text">Order By</span>
-                <select class="col-1 form-select">
-                    <option value="nama">Nama</option>
-                    <option value="tanggalKedatangan" selected>Tanggal Kedatangan</option>
-                    <option value="tanggalDibuat">Tanggal Dibuat</option>
-                </select>
-                <select id="orderByPaymentMethod" name="OrderByPaymentMethod" class="col-8 form-select">
-                    @if (ViewBag.OrderBy == "Desc")
+                <select id="orderBy" class="col-1 form-select">
+                    @if (ViewBag.OrderBy == "nama")
                     {
-                        <option value="Asc">Ascending</option>
-                        <option value="Desc" selected>Descending</option>
+                        <option value="nama" selected>Nama</option>
+                        <option value="tanggalKedatangan">Tanggal Kedatangan</option>
+                        <option value="tanggalDibuat">Tanggal Dibuat</option>
+                    }
+                    else if (ViewBag.OrderBy == "tanggalDibuat")
+                    {
+                        <option value="nama">Nama</option>
+                        <option value="tanggalKedatangan">Tanggal Kedatangan</option>
+                        <option value="tanggalDibuat" selected>Tanggal Dibuat</option>
                     }
                     else
                     {
-                        <option value="Asc" selected>Ascending</option>
-                        <option value="Desc">Descending</option>
+                        <option value="nama">Nama</option>
+                        <option value="tanggalKedatangan" selected>Tanggal Kedatangan</option>
+                        <option value="tanggalDibuat">Tanggal Dibuat</option>
+                    }                 
+                </select>
+                <select id="ascDesc" name="AscDesc" class="col-8 form-select">
+                    @if (ViewBag.AscDesc == "desc")
+                    {
+                        <option value="asc">Ascending</option>
+                        <option value="desc" selected>Descending</option>
+                    }
+                    else
+                    {
+                        <option value="asc" selected>Ascending</option>
+                        <option value="desc">Descending</option>
                     }
                 </select>
             </div>
         </div>
-        <form class="col-sm-12 col-md-5 col-lg-5" id="frmProductFilter" method="get" asp-controller="PaymentMethod" asp-action="Index">
+        <form class="col-sm-12 col-md-5 col-lg-5" id="frmProductFilter" method="get" asp-controller="Appointment" asp-action="RencanaKedatangan">
             <div class="input-group">
                 <span class="input-group-text">Search: </span>
                 <input class="form-control" type="text" id="filter" name="Filter" value="@ViewBag.filter" />
                 <button id="btnProductFilter" type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                <input name="currPageSize" type="hidden" value="@ViewBag.PageSize" />
+                <input name="pageNumber" type="hidden" value="@Model.PageIndex" />
+                <input name="orderBy" type="hidden" value="@ViewBag.OrderBy" />
+                <input name="ascDesc" type="hidden" value="@ViewBag.AscDesc" />
             </div>
         </form>
     </div>
@@ -59,10 +78,221 @@
 {
     foreach (VMTAppointment app in Model)
     {
-        <div class="card">
-            <div class="card-body">
-                <p>Test</p>
+        <div class="row d-flex justify-content-between" style="border: 2px solid rgb(0, 255, 255)">
+            <div class="col-1 d-flex justify-content-center">
+                <input data-id="@app.Id" type="checkbox" />
             </div>
+            <div class="col-7">
+                <div>
+                    <p>@app.CustomerName</p>
+                </div>
+                <div>
+                    <p>@(app.AppointmentDate?.ToString("dd MMMM yyyy")) - @app.MedicalFacilityName</p>
+                </div>
+                <div>
+                    <p>@app.DoctorName - @app.Treatment</p>
+                </div>
+            </div>
+            <div class="col-4 d-flex justify-content-center" style="text-align: center; vertical-align: middle;">
+                <div class="btn-group" style="text-align: center;">
+                   <button data-id="@app.Id" data-customerId="@app.CustomerId" data-customerName="@app.CustomerName" data-doctorId="@app.DoctorId" data-medFacId="@app.MedicalFacilityId" data-medFacName="@app.MedicalFacilityName" data-bs-toggle="modal" data-bs-target="#staticModal" class="btn btn-outline-info" style="height: 25%; margin-top: 50px;">Ubah</button>
+                    <button data-id="@app.CustomerId" data-doctorId="@app.DoctorId" data-medFacId="@app.MedicalFacilityId" class="btn btn-outline-danger" style="height: 25%; margin-top: 50px;">Batal</button>
+               </div>
+           </div>
         </div>
+        <text>&nbsp;</text>
     }
 }
+else
+{
+    <div>
+
+    </div>
+}
+
+&nbsp;
+
+<div class="row">
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">Page @Model.PageIndex of @Model.TotalPages</div>
+    <div class="col-xs-5 col-sm-5 col-md-5 col-lg-7 d-flex justify-content-center">
+        @if (Model.PageIndex == 1)
+        {
+            <nav aria-label="Page Navigation Example">
+                <ul class="pagination pagination-primary">
+                    <li class="page-item disabled">
+                        <a class="page-link"><i class="fas fa-backward"></i></a>
+                    </li>
+                    <li class="page-item active"> <a class="page-link">1</a></li>
+                    @for (int i = 1; i < @Model.TotalPages; i++)
+                    {
+                        @if (i == 3)
+                        {
+                            break;
+                        }
+                        <li class="page-item">
+                            <a class="page-link" asp-controller="Appointment" asp-action="RencanaKedatangan"
+                               asp-route-currPageSize="@ViewBag.PageSize"
+                               asp-route-filter="@ViewBag.Filter"
+                               asp-route-pageNumber="@(Model.PageIndex + i)" 
+                               asp-route-ascDesc="@ViewBag.AscDesc"
+                               asp-route-orderBy="@ViewBag.OrderBy">@(Model.PageIndex + i)</a>
+                        </li>
+
+                    }
+                    @if (Model.TotalPages != 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-controller="Appointment" asp-action="RencanaKedatangan"
+                               asp-route-currPageSize="@ViewBag.PageSize"
+                               asp-route-filter="@ViewBag.Filter"
+                               asp-route-pageNumber="@(Model.PageIndex + 1)" 
+                               asp-route-ascDesc="@ViewBag.AscDesc"
+                               asp-route-orderBy="@ViewBag.OrderBy"><i class="fas fa-forward"></i></a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <a class="page-link"><i class="fas fa-forward"></i></a>
+                        </li>
+                    }
+
+                </ul>
+            </nav>
+        }
+        else if (Model.PageIndex == Model.TotalPages)
+        {
+            <nav aria-label="...">
+                <ul class="pagination pagination-primary">
+                    <li class="page-item">
+                        <a class="page-link" asp-controller="Appointment" asp-action="RencanaKedatangan"
+                           asp-route-currPageSize="@ViewBag.PageSize"
+                           asp-route-filter="@ViewBag.Filter"
+                           asp-route-pageNumber="@(Model.PageIndex - 1)" 
+                           asp-route-ascDesc="@ViewBag.AscDesc"
+                           asp-route-orderBy="@ViewBag.OrderBy"><i class="fas fa-backward"></i></a>
+                    </li>
+                    @for (int i = 2; i > 0; i--)
+                    {
+                        @if (Model.PageIndex - i <= 0)
+                        {
+                            continue;
+                        }
+                        <li class="page-item">
+                            <a class="page-link" asp-controller="Appointment" asp-action="RencanaKedatangan"
+                               asp-route-currPageSize="@ViewBag.PageSize"
+                               asp-route-filter="@ViewBag.Filter"
+                               asp-route-pageNumber="@(Model.PageIndex - i)" 
+                               asp-route-ascDesc="@ViewBag.AscDesc"
+                               asp-route-orderBy="@ViewBag.OrderBy">@(Model.PageIndex - i)</a>
+                        </li>
+                    }
+                    <li class="page-item active"><a class="page-link">@Model.PageIndex</a></li>
+                    <li class="page-item disabled">
+                        <a class="page-link"><i class="fas fa-forward"></i></a>
+                    </li>
+                </ul>
+            </nav>
+        }
+        else
+        {
+            <nav aria-label="...">
+                <ul class="pagination pagination-primary">
+                    <li class="page-item">
+                        <a class="page-link" asp-controller="Appointment" asp-action="RencanaKedatangan"
+                           asp-route-currPageSize="@ViewBag.PageSize"
+                           asp-route-filter="@ViewBag.Filter"
+                           asp-route-pageNumber="@(Model.PageIndex - 1)" 
+                           asp-route-ascDesc="@ViewBag.AscDesc"
+                           asp-route-orderBy="@ViewBag.OrderBy"><i class="fas fa-backward"></i></a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" asp-controller="Appointment" asp-action="RencanaKedatangan"
+                           asp-route-currPageSize="@ViewBag.PageSize"
+                           asp-route-filter="@ViewBag.Filter"
+                           asp-route-pageNumber="@(Model.PageIndex - 1)" 
+                           asp-route-ascDesc="@ViewBag.AscDesc"
+                           asp-route-orderBy="@ViewBag.OrderBy">@(Model.PageIndex - 1)</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link">@Model.PageIndex</a></li>
+                    <li class="page-item">
+                        <a class="page-link" asp-controller="Appointment" asp-action="RencanaKedatangan"
+                           asp-route-currPageSize="@ViewBag.PageSize"
+                           asp-route-filter="@ViewBag.Filter"
+                           asp-route-pageNumber="@(Model.PageIndex + 1)" 
+                           asp-route-ascDesc="@ViewBag.AscDesc"
+                           asp-route-orderBy="@ViewBag.OrderBy">@(Model.PageIndex + 1)</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" asp-controller="Appointment" asp-action="RencanaKedatangan"
+                           asp-route-currPageSize="@ViewBag.PageSize"
+                           asp-route-filter="@ViewBag.Filter"
+                           asp-route-pageNumber="@(Model.PageIndex + 1)" 
+                           asp-route-ascDesc="@ViewBag.AscDesc"
+                           asp-route-orderBy="@ViewBag.OrderBy"><i class="fas fa-forward"></i></a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    </div>
+    <div class="col-xs-5 col-sm-5 col-md-5 col-lg-3 d-flex justify-content-end">
+        <form id="frmPageSize" method="get"
+              asp-controller="Appointment" asp-action="RencanaKedatangan">
+            <div class="input-group">
+                <span class="input-group-text">Show</span>
+                <input class="form-control" type="text" id="pageSize" name="currPageSize" value="@ViewBag.PageSize" />
+                <span class="input-group-text"> Entries</span>
+            </div>
+            <input name="filter" type="hidden" value="@ViewBag.Filter" />
+            <input name="pageNumber" type="hidden" value="1" />
+            <input name="orderBy" type="hidden" value="@ViewBag.OrderBy" />
+            <input name="ascDesc" type="hidden" value="@ViewBag.AscDesc" />
+        </form>
+
+    </div>
+</div>
+
+@if (string.IsNullOrEmpty(ViewBag.Filter))
+{
+    <script>
+        $("#orderBy").change(function (e) {
+            let orderValue = $(this).val();
+            location.href = `?pageNumber=${@Model.PageIndex}&currPageSize=${@ViewBag.PageSize}&orderBy=${orderValue}&ascDesc=@ViewBag.AscDesc`;
+        });
+
+        $("#ascDesc").change(function (e) {
+            let ascDescValue = $(this).val();
+            location.href = `?pageNumber=${@Model.PageIndex}&currPageSize=${@ViewBag.PageSize}&orderBy=@ViewBag.OrderBy&ascDesc=${ascDescValue}`;
+        });
+    </script>
+}
+else
+{
+    <script>
+        $("#orderBy").change(function (e) {
+            let orderValue = $(this).val();
+            location.href = `?filter=${@ViewBag.filter}&pageNumber=${@Model.PageIndex}&currPageSize=${@ViewBag.PageSize}&orderBy=${orderValue}&ascDesc=@ViewBag.AscDesc`;
+        });
+
+        $("#ascDesc").change(function (e) {
+            let ascDescValue = $(this).val();
+            location.href = `?filter=${@ViewBag.filter}&pageNumber=${@Model.PageIndex}&currPageSize=${@ViewBag.PageSize}&orderBy=@ViewBag.OrderBy&ascDesc=${ascDescValue}`;
+        });
+    </script>
+}
+
+<script>
+    $(".btn-outline-info").click(function (e) {
+        $("#staticModalBody").html(spinner);
+        var id = $(this).data("id");
+        var customerId = $(this).data("customerId");
+        var customerName = $(this).attr("data-customerName");
+        customerName = encodeURIComponent(customerName.trim());
+        var doctorId = $(this).attr("data-doctorId");
+        var medFacId = $(this).attr("data-medFacId");
+        var medFacName = $(this).attr("data-medFacName");
+        medFacName = encodeURIComponent(medFacName.trim());
+        debugger;
+        $("#staticModalBody").load(`/Appointment/Update?id=${id}&custId=${customerId}&doctorId=${doctorId}&medFacId=${medFacId}&medFacName=${medFacName}`);
+    })
+</script>

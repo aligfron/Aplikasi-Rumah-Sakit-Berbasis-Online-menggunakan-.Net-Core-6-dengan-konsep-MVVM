@@ -19,7 +19,7 @@ namespace HealthCare340B.API.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<ActionResult> GetCustomerId(List<long>? custId)
+        public async Task<ActionResult> GetByCustomerId(List<long>? custId)
         {
             try
             {
@@ -43,6 +43,28 @@ namespace HealthCare340B.API.Controllers
         }
 
         [HttpPost("[action]")]
+        public async Task<ActionResult> GetAppointmentDone(List<VMTAppointment> dataApp)
+        {
+            try
+            {
+                VMResponse<List<VMTAppointmentDone>?> response = await Task.Run(() => appointment.GetAppointmentDone(dataApp));
+                if (response.Data != null)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    Console.WriteLine("No appointments found!");
+                    return NoContent();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        [HttpPost("[action]")]
         public async Task<ActionResult> GetEmptySlotDate(List<VMMMedicalFacilitySchedule> data)
         {
             try
@@ -60,7 +82,7 @@ namespace HealthCare340B.API.Controllers
             }
             catch (Exception e)
             {
-                throw new Exception($"{HttpStatusCode.BadRequest}");
+                throw new Exception(e.Message);
             }
         }
 

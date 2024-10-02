@@ -24,23 +24,23 @@
             <div class="row mb-3">
                 <div class="col-4">Konsultasi Untuk<span class="text-danger">*</span></div>
                 <div class="col-8">
-                    <select id="member" name="Member" class="form-select">
-                        <option value="0">Sendiri</option>
+                    <select id="member" name="Member" class="form-select" disabled>
+                        <option value="@ViewBag.CustomerId">Test</option>
                     </select>
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col-4">Faskes<span class="text-danger">*</span></div>
                 <div class="col-8">
-                    <select id="medFac" name="MedFac" class="form-select">
-                        <option value="0">-- Select MedFac --</option>
+                    <select id="medFac" name="MedFac" class="form-select" disabled>
+                        <option value="@ViewBag.MedicalFacility">@ViewBag.MedicalFacilityName</option>
                     </select>
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col-4">Waktu Kedatangan<span class="text-danger">*</span></div>
                 <div class="col-8">
-                    <input id="date" name="AppointmentDate" type="datetime" size="29" disabled />
+                    <input id="date" name="AppointmentDate" type="datetime" size="29" />
                 </div>
             </div>
             <div class="row mb-3">
@@ -54,7 +54,7 @@
             <div class="row mb-3">
                 <div class="col-4">Tindakan<span class="text-danger">*</span></div>
                 <div class="col-8">
-                    <select id="tindakan" name="Tindakan" class="form-select" disabled>
+                    <select id="tindakan" name="Tindakan" class="form-select">
                         <option value="">-- Select Action --</option>
                     </select>
                 </div>
@@ -77,7 +77,7 @@
             url: "/Appointment/GetMemberById",
             data: {
                 biodataId: @Context.Session.GetInt32("userBiodataId")
-                },
+                        },
             beforeSend: () => { },
             success: function (response) {
                 //debugger;
@@ -110,7 +110,7 @@
             url: "/Appointment/GetMedFacByDoctorId",
             data: {
                 doctorId: @ViewBag.DoctorId
-                    },
+                            },
             beforeSend: () => { },
             success: function (response) {
                 //debugger;
@@ -192,7 +192,7 @@
                     data: {
                         medFacId: $("#medFac").val(),
                         doctorId: @ViewBag.DoctorId
-                                                                },
+                                                                        },
                     async: false,
                     beforeSend: () => { },
                     success: function (response) {
@@ -210,7 +210,7 @@
                     data: {
                         medFacId: $(this).val(),
                         doctorId: @ViewBag.DoctorId
-                                },
+                                        },
                     beforeSend: () => { },
                     success: function (response) {
                         //debugger;
@@ -270,7 +270,7 @@
                     data: {
                         medFacId: $(this).val(),
                         doctorId: @ViewBag.DoctorId
-                        },
+                                },
                     beforeSend: () => { },
                     success: function (response) {
                         //debugger;
@@ -358,7 +358,7 @@
                 data: {
                     medFacId: $("#medFac").val(),
                     doctorId: @ViewBag.DoctorId
-                },
+                        },
                 async: false,
                 beforeSend: () => { },
                 success: function (response) {
@@ -379,7 +379,7 @@
                     medFacId: $("#medFac").val(),
                     day: dateChoice.getDay(),
                     timeStart: $("#sesi").val()
-                    },
+                },
                 async: false,
                 beforeSend: () => { },
                 success: function (response) {
@@ -410,8 +410,8 @@
                     dotId: $("#tindakan").val(),
                     appDate: fullDate
                 },
-                beforeSend: () => { 
-                   
+                beforeSend: () => {
+
                 },
                 success: function (response) {
                     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -421,7 +421,7 @@
                     }
                     else {
                         $("#staticModalLgBody").html();
-                        $("#staticModalLgBody").load("/Appointment/EmptySlot/");                       
+                        $("#staticModalLgBody").load("/Appointment/EmptySlot/");
                         //$("#staticModalLg").modal("show");
                         $("#tindakan").val("");
                         $("#tindakan").empty();
@@ -442,3 +442,4 @@
         });
     });
 </script>
+

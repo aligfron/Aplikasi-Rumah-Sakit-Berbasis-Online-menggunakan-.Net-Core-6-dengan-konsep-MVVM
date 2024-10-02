@@ -478,8 +478,42 @@ namespace HealthCare340B.Web.Models
             {
                 throw new Exception(e.Message);
             }
+        }
 
-            
+        public async Task<List<VMTAppointmentDone>?> GetAppointmentDone(List<VMTAppointment> data)
+        {
+            VMResponse<List<VMTAppointmentDone>>? apiResponse = new VMResponse<List<VMTAppointmentDone>>();
+
+            try
+            {
+                jsonData = JsonConvert.SerializeObject(data);
+                content = new StringContent(    // Create a blank HttpRequest Document
+                    jsonData,               // Put the Request Body (data)
+                    Encoding.UTF8,          // Assign the Request body's character set
+                    "application/json"      // Assain the Request body's format / Content-Type
+                    );
+
+                apiResponse =
+                 JsonConvert.DeserializeObject<VMResponse<List<VMTAppointmentDone>>>(     // Convert the Json string to a class
+                     await httpClient.PostAsync($"{apiUrl}Appointment/GetAppointmentDone", content)    // Call the API
+                     .Result                                                     // Read the Result
+                     .Content                                                    // Get the Content Result
+                     .ReadAsStringAsync()                                        // Convert the content as string
+                 );
+
+                if (apiResponse != null)
+                {
+                    return apiResponse.Data;
+                }
+                else
+                {
+                    return new List<VMTAppointmentDone>();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
     }
 }
