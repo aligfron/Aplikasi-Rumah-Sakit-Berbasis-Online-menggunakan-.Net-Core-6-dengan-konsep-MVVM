@@ -37,6 +37,20 @@ namespace HealthCare340B.DataAccess
                     select c.Id
                 ).ToList();
 
+                // Add the parent customer id to the list of customer ids
+                long? parentCustomerId = (
+                    from c in _db.MCustomers
+                    where
+                        c.IsDelete == false
+                        && c.BiodataId == parentBiodataId
+                    select c.Id
+                ).FirstOrDefault();
+
+                if (parentCustomerId != null)
+                {
+                    customerIds.Add(parentCustomerId.Value);
+                }
+
                 List<VMTAppointmentDone> appointmentDones = (
                     from ad in _db.TAppointmentDones
                     join a in _db.TAppointments on ad.AppointmentId equals a.Id
@@ -64,33 +78,27 @@ namespace HealthCare340B.DataAccess
                 foreach (VMTAppointmentDone appointmentDone in appointmentDones)
                 {
                     appointmentDone.CustomerFullname = (
-                        from cm in _db.MCustomerMembers
-                        join c in _db.MCustomers on cm.CustomerId equals c.Id
+                        from c in _db.MCustomers
                         join b in _db.MBiodata on c.BiodataId equals b.Id
                         where
-                            cm.IsDelete == false
-                            && c.IsDelete == false
+                            c.IsDelete == false
                             && b.IsDelete == false
                             && c.Id == appointmentDone.CustomerId
                         select b.Fullname
                     ).FirstOrDefault();
 
                     appointmentDone.CustomerGender = (
-                        from cm in _db.MCustomerMembers
-                        join c in _db.MCustomers on cm.CustomerId equals c.Id
+                        from c in _db.MCustomers
                         where
-                            cm.IsDelete == false
-                            && c.IsDelete == false
+                            c.IsDelete == false
                             && c.Id == appointmentDone.CustomerId
                         select c.Gender
                     ).FirstOrDefault();
 
                     appointmentDone.CustomerAge = (
-                        from cm in _db.MCustomerMembers
-                        join c in _db.MCustomers on cm.CustomerId equals c.Id
+                        from c in _db.MCustomers
                         where
-                            cm.IsDelete == false
-                            && c.IsDelete == false
+                            c.IsDelete == false
                             && c.Id == appointmentDone.CustomerId
                         select (int)((DateTime.Now - c.Dob!.Value).TotalDays / 365.242199)
                     ).FirstOrDefault();
@@ -213,8 +221,7 @@ namespace HealthCare340B.DataAccess
 
         public VMResponse<VMTAppointmentDone> GetByAppointmentId(long appointmentId)
         {
-            VMResponse<VMTAppointmentDone> response =
-                new VMResponse<VMTAppointmentDone>();
+            VMResponse<VMTAppointmentDone> response = new VMResponse<VMTAppointmentDone>();
 
             try
             {
@@ -244,33 +251,27 @@ namespace HealthCare340B.DataAccess
                 ).FirstOrDefault();
 
                 appointmentDone.CustomerFullname = (
-                        from cm in _db.MCustomerMembers
-                        join c in _db.MCustomers on cm.CustomerId equals c.Id
+                        from c in _db.MCustomers
                         join b in _db.MBiodata on c.BiodataId equals b.Id
                         where
-                            cm.IsDelete == false
-                            && c.IsDelete == false
+                            c.IsDelete == false
                             && b.IsDelete == false
                             && c.Id == appointmentDone.CustomerId
                         select b.Fullname
                     ).FirstOrDefault();
 
                 appointmentDone.CustomerGender = (
-                        from cm in _db.MCustomerMembers
-                        join c in _db.MCustomers on cm.CustomerId equals c.Id
+                        from c in _db.MCustomers
                         where
-                            cm.IsDelete == false
-                            && c.IsDelete == false
+                            c.IsDelete == false
                             && c.Id == appointmentDone.CustomerId
                         select c.Gender
                     ).FirstOrDefault();
 
                 appointmentDone.CustomerAge = (
-                    from cm in _db.MCustomerMembers
-                    join c in _db.MCustomers on cm.CustomerId equals c.Id
+                    from c in _db.MCustomers
                     where
-                        cm.IsDelete == false
-                        && c.IsDelete == false
+                        c.IsDelete == false
                         && c.Id == appointmentDone.CustomerId
                     select (int)((DateTime.Now - c.Dob!.Value).TotalDays / 365.242199)
                 ).FirstOrDefault();
