@@ -1,9 +1,11 @@
-﻿using HealthCare340B.ViewModel;
+﻿using System.Drawing;
+using System.Net;
+using HealthCare340B.DataModel;
+using HealthCare340B.ViewModel;
 using HealthCare340B.Web.AddOns;
 using HealthCare340B.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using SelectPdf;
-using System.Drawing;
 
 namespace HealthCare340B.Web.Controllers
 {
@@ -62,7 +64,7 @@ namespace HealthCare340B.Web.Controllers
 
             try
             {
-                data = await _appointmentHistoryModel.GetByFilter(
+                data = await _appointmentHistoryModel.GetAppointmentDoneByFilter(
                     string.IsNullOrEmpty(filter) ? "" : filter,
                     (long)HttpContext.Session.GetInt32("userBiodataId")!
                 );
@@ -153,81 +155,138 @@ namespace HealthCare340B.Web.Controllers
 
         public async Task<IActionResult> PrescriptionPdf(long appointmentId)
         {
-            if (!isInSession())
-            {
-                HttpContext.Session.SetString("errMsg", "Please login first!");
-                return RedirectToAction("Index", "Auth");
-            }
-            if (!isInRole())
-            {
-                HttpContext.Session.SetString("errMsg", "You are not authorized!");
-                return RedirectToAction("Index", "Home");
-            }
-
             VMTAppointmentDone? data = new VMTAppointmentDone();
 
             try
             {
-                data = await _appointmentHistoryModel.GetByAppointmentId(appointmentId);
+                data = await _appointmentHistoryModel.GetAppointmentDoneByAppointmentId(
+                    appointmentId
+                );
+
+                // Set up the PDF converter with Blink rendering engine
+                HtmlToPdf converter = new HtmlToPdf
+                {
+                    Options =
+                    {
+                        RenderingEngine = RenderingEngine.Blink,
+                        PdfPageSize = PdfPageSize.Custom,
+                        PdfPageOrientation = PdfPageOrientation.Portrait,
+                        WebPageWidth = 302, // Match 80mm width for the web page
+                        WebPageHeight = 0, // Let SelectPdf calculate height dynamically
+                        WebPageFixedSize = false, // Dynamically adjust the content size
+                        AutoFitWidth = HtmlToPdfPageFitMode.ShrinkOnly,
+                        AutoFitHeight = HtmlToPdfPageFitMode.NoAdjustment,
+                    },
+                };
+
+                // Set the custom page size dynamically based on prescription count
+                float pageWidth = 80 * 2.83465f; // 80mm converted to points
+                float baseHeight = 77 * 2.83465f; // Base height for 1 prescription (77mm)
+                float additionalHeight = (96 - 77) * 2.83465f; // Additional height per prescription
+
+                int numPrescriptions = data.Prescriptions?.Count ?? 0;
+                float pageHeight =
+                    baseHeight + (additionalHeight * Math.Max(0, numPrescriptions - 1));
+
+                converter.Options.PdfPageCustomSize = new SizeF(pageWidth, pageHeight);
+
+                // Render the HTML content
+                string htmlContent = await Render.ViewToStringAsync(
+                    this,
+                    "PrescriptionPdf",
+                    data,
+                    true
+                );
+
+                // Convert the HTML content to PDF
+                PdfDocument doc = converter.ConvertHtmlString(htmlContent);
+
+                // Save the PDF to a byte array
+                byte[] pdf = doc.Save();
+
+                // Close the PDF document
+                doc.Close();
+
+                // Return the PDF file as a download
+                return File(pdf, "application/pdf", "ResepDigital.pdf");
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    "An error occurred while generating the PDF."
+                );
+            }
+        }
+
+        [HttpPost]
+        public async Task<VMResponse<List<VMTPrescription>>?> UpdatePrintAttemptAsync(long appointmentId)
+        {
+            VMResponse<List<VMTPrescription>>? response = null;
+
+            try
+            {
+                // Fetch Prescription
+                List<VMTPrescription> data = await _appointmentHistoryModel.GetPrescriptionByAppointmentId(appointmentId);
+
+                // Update print attempt for each prescription
+                if (data != null)
+                {
+                    long userId = long.Parse(HttpContext.Session.GetString("userId")!);
+                    foreach (VMTPrescription prescription in data)
+                    {
+                        if (DateTime.Now.Date < prescription.CreatedOn.Date.AddDays(2))
+                        {
+                            if (prescription.PrintAttempt == null || prescription.PrintAttempt < 2)
+                            {
+                                prescription.ModifiedBy = userId;
+                            }
+                            else
+                            {
+                                response = new VMResponse<List<VMTPrescription>>
+                                {
+                                    StatusCode = HttpStatusCode.BadRequest,
+                                    Message = "Prescription print attempt has reached the limit.",
+                                };
+
+                                throw new Exception(response.Message);
+                            }
+                        }
+                        else
+                        {
+                            response = new VMResponse<List<VMTPrescription>>
+                            {
+                                StatusCode = HttpStatusCode.BadRequest,
+                                Message = "Prescription is no longer valid after 2 days from creation.",
+                            };
+
+                            throw new Exception(response.Message);
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception("No prescription data found");
+                }
+
+                response = await _appointmentHistoryModel.UpdatePrintAttemptAsync(data);
+
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    HttpContext.Session.SetString("successMsg", response.Message);
+                }
+                else
+                {
+                    HttpContext.Session.SetString("errMsg", response.Message);
+                }
             }
             catch (Exception ex)
             {
                 HttpContext.Session.SetString("errMsg", ex.Message);
             }
 
-            //return View(data);
-
-            // Set up the PDF converter with Blink rendering engine
-            HtmlToPdf converter = new HtmlToPdf();
-            converter.Options.RenderingEngine = RenderingEngine.Blink;
-
-            // Set converter options
-            converter.Options.PdfPageSize = PdfPageSize.Custom;
-
-            // Set lebar tetap (80mm), dan hitung tinggi berdasarkan jumlah obat
-            float pageWidth = 80 * 2.83465f;
-            float baseHeight = 77 * 2.83465f; // Tinggi awal untuk 1 obat
-            float additionalHeight = (96 - 77) * 2.83465f; // Tambahan tinggi per obat
-
-            // Jumlah obat
-            int numObat = data.Prescriptions!.Count;
-
-            // Hitung tinggi halaman dinamis
-            float pageHeight = baseHeight + (additionalHeight * (numObat - 1));
-
-            // Set ukuran halaman dinamis
-            converter.Options.PdfPageCustomSize = new SizeF(pageWidth, pageHeight);
-
-            // Tetap menggunakan orientasi portrait
-            converter.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
-
-            // Sesuaikan lebar halaman web agar sesuai dengan lebar 80mm (302px)
-            converter.Options.WebPageWidth = 302;
-
-            // Tinggi halaman web biarkan otomatis untuk menyesuaikan konten
-            converter.Options.WebPageHeight = 0; // Biarkan SelectPdf menghitung tinggi konten
-            converter.Options.WebPageFixedSize = false;
-
-            // Atur supaya konten pas secara horizontal (mengecilkan jika perlu)
-            converter.Options.AutoFitWidth = HtmlToPdfPageFitMode.ShrinkOnly;
-
-            // Tidak menyesuaikan tinggi konten secara vertikal
-            converter.Options.AutoFitHeight = HtmlToPdfPageFitMode.NoAdjustment;
-
-            // Render the view as HTML string
-            string htmlContent = await Render.ViewToStringAsync(this, "PrescriptionPdf", data, true);
-
-            // Convert HTML string to PDF
-            PdfDocument doc = converter.ConvertHtmlString(htmlContent);
-
-            // Save PDF to a byte array
-            byte[] pdf = doc.Save();
-
-            // Close the PDF document
-            doc.Close();
-
-            // Return the PDF file to the browser
-            return File(pdf, "application/pdf", "ResepDigital.pdf");
+            return response;
         }
     }
 }

@@ -41,5 +41,31 @@ namespace HealthCare340B.API.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpPut("[action]")]
+        public async Task<ActionResult> UpdatePrintAttempt(List<VMTPrescription> model)
+        {
+            try
+            {
+                VMResponse<List<VMTPrescription>> response = await Task.Run(() => _prescription.UpdatePrintAttempt(model));
+
+                if (response.Data != null)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    Console.WriteLine("PrescriptionController.UpdatePrintAttempt: " + response.Message);
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception e)
+            {
+                // Console Logging
+                Console.WriteLine("PrescriptionController.UpdatePrintAttempt: " + e.Message);
+
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

@@ -23,9 +23,8 @@
         $("#staticModalLabel").text("@ViewBag.Title");
 
         $("#btnPrint").click(function (e) {
-            window.open("/AppointmentHistory/PrescriptionPdf?appointmentId=" + @Model, '_blank');
-            @*$.ajax({
-                url: "/AppointmentHistory/UpdateAttemp",
+            $.ajax({
+                url: "/AppointmentHistory/UpdatePrintAttempt",
                 type: "POST",
                 data: {
                     appointmentId: @Model
@@ -34,11 +33,37 @@
                 beforeSend: () => {
 
                 },
-                success: location.reload(),
+                success: function (response) {
+                    if (response.statusCode == 200 || response.statusCode == 201) {
+                        let pdfUrl = "/AppointmentHistory/PrescriptionPdf?appointmentId=" + @Model;
+                        fetch(pdfUrl)
+                            .then(response => response.blob()) // Get the PDF as a Blob
+                            .then(blob => {
+                                // Create a link element, trigger download, and refresh page
+                                let link = document.createElement('a');
+                                let url = window.URL.createObjectURL(blob);
+                                link.href = url;
+                                link.download = "Resep-Digital.pdf";
+                                document.body.appendChild(link);
+                                link.click(); // Trigger the download
+                                link.remove(); // Remove the link after triggering download
+
+                                // Refresh the current page after download
+                                window.location.reload();
+                            })
+                            .catch(error => {
+                                console.error("PDF download error:", error);
+                                alert("Error downloading PDF.");
+                            });
+                    }
+                    else {
+                        location.reload();
+                    }
+                },
                 error: function (errResponse) {
                     console.error(errResponse);
                 }
-            });*@
+            });
         });
     });
 </script>

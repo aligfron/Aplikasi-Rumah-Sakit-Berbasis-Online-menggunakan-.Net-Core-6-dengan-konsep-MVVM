@@ -98,7 +98,14 @@ For more information on enabling MVC for empty projects, visit https://go.micros
                                 <div class="col-5">
                                     <!-- Kolom kedua: Resep Digital -->
                                     <h6>Resep Digital</h6>
-                                    <small class="fst-italic text-danger">Resep digital sudah tidak berlaku sejak tanggal 20 Juni 2020</small>
+                                    @if (DateTime.Now.Date >= item.AppointmentDate?.AddDays(2))
+                                    {
+                                        <small class="fst-italic text-danger">Resep digital sudah tidak berlaku sejak tanggal @item.AppointmentDate?.AddDays(2).ToString("dd MMMM yyyy")</small>
+                                    }
+                                    else if (item.Prescriptions.Any(p => p.PrintAttempt >= 2))
+                                    {
+                                        <small class="fst-italic text-danger">Resep digital sudah dicetak 2 kali, tidak bisa mencetak ulang.</small>
+                                    }
                                     <ul class="list-group mb-1">
                                         @foreach (var prescription in item.Prescriptions)
                                         {
@@ -110,7 +117,14 @@ For more information on enabling MVC for empty projects, visit https://go.micros
                                             </li>
                                         }
                                     </ul>
-                                    <a data-id="@item.Id" class="btn btn-primary btnCetak w-100" data-bs-toggle="modal" data-bs-target="#staticModal">Cetak <i>(.pdf)</i></a>
+                                    @if (item.Prescriptions.Any(p => p.PrintAttempt >= 2) || DateTime.Now.Date >= item.AppointmentDate?.AddDays(2))
+                                    {
+                                        <a class="btn btn-secondary w-100" disabled>Cetak <i>(.pdf)</i></a>
+                                    }
+                                    else
+                                    {
+                                        <a data-id="@item.Id" class="btn btn-primary btnCetak w-100" data-bs-toggle="modal" data-bs-target="#staticModal">Cetak <i>(.pdf)</i></a>
+                                    }
                                 </div>
                             }
                         </div>

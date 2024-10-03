@@ -76,5 +76,69 @@ namespace HealthCare340B.DataAccess
 
             return response;
         }
+
+        public VMResponse<List<VMTPrescription>> UpdatePrintAttempt(List<VMTPrescription> model)
+        {
+            VMResponse<List<VMTPrescription>> response = new VMResponse<List<VMTPrescription>>();
+
+            using (IDbContextTransaction dbTran = _db.Database.BeginTransaction())
+            {
+                try
+                {
+                    if (model != null)
+                    {
+                        foreach (VMTPrescription prescription in model)
+                        {
+                            TPrescription tprescription = _db.TPrescriptions.Find(prescription.Id);
+
+                            if (DateTime.Now.Date < prescription.CreatedOn.Date.AddDays(2))
+                            {
+                                if (prescription.PrintAttempt == null || prescription.PrintAttempt < 2)
+                                {
+                                    if (tprescription.PrintAttempt == null)
+                                    {
+                                        tprescription.PrintAttempt = 1;
+                                    }
+                                    else
+                                    {
+                                        tprescription.PrintAttempt = tprescription.PrintAttempt + 1;
+                                    }
+
+                                    tprescription.PrintedOn = DateTime.Now;
+                                    tprescription.ModifiedBy = prescription.ModifiedBy;
+                                    tprescription.ModifiedOn = DateTime.Now;
+
+                                    _db.Update(tprescription);
+                                    _db.SaveChanges();
+                                }
+                                else
+                                {
+                                    throw new Exception("Prescription print attempt has reached the limit");
+                                }
+                            }
+                            else
+                            {
+                                throw new Exception("Prescription is no longer valid after 2 days from creation");
+                            }
+                            
+                        }
+
+                        dbTran.Commit();
+
+                        //Yang melakukan printattemp dipastikan memiliki setidaknya 1 obat
+                        response.Data = GetByAppointmentId(model[0].AppointmentId ?? 0).Data;
+                        response.Message = $"{HttpStatusCode.OK} - Prescription print attempt successfully updated";
+                        response.StatusCode = HttpStatusCode.OK;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    dbTran.Rollback();
+                    response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+                }
+
+                return response;
+            }
+        }
     }
 }
