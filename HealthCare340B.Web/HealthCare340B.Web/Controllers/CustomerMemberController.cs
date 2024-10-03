@@ -48,8 +48,8 @@ namespace HealthCare340B.Web.Controllers
             string? filter,
             int? pageNumber,
             int? currPageSize,
-            string? orderBy,
-            string? orderDirection
+            string? orderBy = "name",
+            string? orderDirection = "asc"
         )
         {
             if (!isInSession())
@@ -92,14 +92,26 @@ namespace HealthCare340B.Web.Controllers
                         ? data?.OrderBy(d => d.Age).ToList()
                         : data?.OrderByDescending(d => d.Age).ToList();
                 }
+                else if (orderBy == "totalChat")
+                {
+                    data = orderDirection == "asc"
+                        ? data?.OrderBy(d => d.TotalChat).ToList()
+                        : data?.OrderByDescending(d => d.TotalChat).ToList();
+                }
+                else if (orderBy == "totalAppointment")
+                {
+                    data = orderDirection == "asc"
+                        ? data?.OrderBy(d => d.TotalAppointment).ToList()
+                        : data?.OrderByDescending(d => d.TotalAppointment).ToList();
+                }
             }
 
             ViewBag.Title = "Daftar Pasien";
             ViewBag.imgFolder = _imageFolder;
             ViewBag.Filter = filter;
             ViewBag.PageSize = currPageSize ?? _pageSize;
-            ViewBag.OrderBy = orderBy ?? "name";
-            ViewBag.OrderDirection = orderDirection ?? "asc";
+            ViewBag.OrderBy = orderBy;
+            ViewBag.OrderDirection = orderDirection;
 
             ViewBag.Breadcrumb = new List<BreadcrumbItem>
             {

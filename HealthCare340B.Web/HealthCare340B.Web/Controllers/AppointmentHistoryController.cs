@@ -45,8 +45,8 @@ namespace HealthCare340B.Web.Controllers
             string? filter,
             int? pageNumber,
             int? currPageSize,
-            string? orderBy,
-            string? orderDirection
+            string? orderBy = "appointment_date",
+            string? orderDirection = "asc"
         )
         {
             if (!isInSession())
@@ -104,8 +104,8 @@ namespace HealthCare340B.Web.Controllers
             ViewBag.imgFolder = _imageFolder;
             ViewBag.Filter = filter;
             ViewBag.PageSize = currPageSize ?? _pageSize;
-            ViewBag.OrderBy = orderBy ?? "appointment_date";
-            ViewBag.OrderDirection = orderDirection ?? "asc";
+            ViewBag.OrderBy = orderBy;
+            ViewBag.OrderDirection = orderDirection;
 
             ViewBag.Breadcrumb = new List<BreadcrumbItem>
             {
