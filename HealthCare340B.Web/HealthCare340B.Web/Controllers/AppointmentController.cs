@@ -535,7 +535,6 @@ namespace HealthCare340B.Web.Controllers
                 return response;
             }
         }
-
         public IActionResult DeleteOne(long appId, string custName, string appDate, string medFacName, string docName, string treatment)
         {
             ViewBag.AppointmentId = appId;
@@ -545,6 +544,16 @@ namespace HealthCare340B.Web.Controllers
             ViewBag.DoctorName = docName;
             ViewBag.Treatment = treatment;
             return View();
+        }
+
+        [HttpPost]
+        public async Task<VMResponse<VMTAppointment>> DeleteOneAsync(long id)
+        {
+            VMResponse<VMTAppointment> data = new VMResponse<VMTAppointment>();
+
+            data = await appointment.DeleteOne(id, long.Parse(HttpContext.Session.GetString("userId")!));
+            HttpContext.Session.SetString("successMsg", "Janji berhasil dibatalkan!");
+            return data;
         }
     }
 }

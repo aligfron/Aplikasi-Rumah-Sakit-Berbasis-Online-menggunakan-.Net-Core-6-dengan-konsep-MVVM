@@ -310,6 +310,7 @@ else
     });
 
     $(".btn-outline-danger").click(function (e) {
+        $("#staticModalLgBody").html(spinner);
         var id = $(this).attr("data-id");
         var customerName = $(this).attr("data-customerName");
         customerName = encodeURIComponent(customerName.trim());
@@ -320,6 +321,6 @@ else
         doctorName = encodeURIComponent(doctorName.trim());
         var treatment = $(this).attr("data-treatment");
         treatment = encodeURIComponent(treatment.trim());
-        $("#staticModalLgBody").load(`/Appointment/DeleteOne?id=${id}&custName=${customerName}&appDate=${appDate}&medFacName=${medFacName}&docName=${doctorName}&treatment=${treatment}`)
+        $("#staticModalLgBody").load(`/Appointment/DeleteOne?appId=${id}&custName=${customerName}&appDate=${appDate}&medFacName=${medFacName}&docName=${doctorName}&treatment=${treatment}`)
     });
 </script>

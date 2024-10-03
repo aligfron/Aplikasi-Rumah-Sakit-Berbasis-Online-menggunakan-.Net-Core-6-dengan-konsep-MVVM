@@ -25,7 +25,37 @@
         <div class="w-10"></div>
         <div class="w-30"><button id="btnCancel" class="btn btn-outline-info">Cancel</button></div>
         <div class="w-10"></div>
-        <div class="w-30"><button id="btnSave" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#staticModalLg">Batalkan Janji</button></div>
+        <div class="w-30"><button id="btnDelete" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#staticModalLg">Batalkan Janji</button></div>
         <div class="w-10"></div>
     </div>
 </div>
+
+<script>
+    $(document).ready(() => {
+        $("#btnDelete").click(function (e) {
+            $.ajax({
+                url: "/Appointment/DeleteOne",
+                type: "post",
+                data: {
+                    id: @ViewBag.AppointmentId
+                },
+                dataType: "json",
+                success: function(response) {
+                    debugger;
+                    if (response.statusCode == 200) {
+                        $("#staticModalLg").modal("hide");
+                        location.href = "/Appointment/RencanaKedatangan";
+                    }
+                    else {
+                        toastAlert(response.message, "error");
+                    }
+                },
+                error: function(errResponse) {
+                    console.log(errResponse);
+                    debugger;
+                }
+            });
+        });
+       
+    })
+</script>

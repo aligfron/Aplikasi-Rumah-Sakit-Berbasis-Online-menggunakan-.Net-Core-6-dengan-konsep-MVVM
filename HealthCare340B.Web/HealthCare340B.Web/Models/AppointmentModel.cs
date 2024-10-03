@@ -556,5 +556,39 @@ namespace HealthCare340B.Web.Models
             }
             return response;
         }
+
+        public async Task<VMResponse<VMTAppointment>?> DeleteOne(long id, long userId)
+        {
+            VMResponse<VMTAppointment>? response = new VMResponse<VMTAppointment>();
+            try
+            {
+                response =
+                   JsonConvert.DeserializeObject<VMResponse<VMTAppointment>?>(     // Convert the Json string to a class
+                       await httpClient.DeleteAsync($"{apiUrl}Appointment/DeleteOne/{id}/{userId}")    // Call the API
+                       .Result                                                     // Read the Result
+                       .Content                                                    // Get the Content Result
+                       .ReadAsStringAsync()                                        // Convert the content as string
+                   );
+
+                if (response != null)
+                {
+                    if (response.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new Exception(response.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Appointment API could not be reached");
+                }
+            }
+            catch (Exception e)
+            {
+                //Logging
+                Console.WriteLine("AppointmentModel.Delete: " + e.Message);
+                throw new Exception("AppointmentModel.Delete: " + e.Message);
+            }
+            return response;
+        }
     }
 }

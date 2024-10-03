@@ -42,7 +42,7 @@ namespace HealthCare340B.API.Controllers
             }
         }
 
-        [HttpDelete("[action]")]
+        [HttpDelete("[action]/{id}/{userId}")]
         public async Task<ActionResult> DeleteOne(long id, long userId)
         {
             VMResponse<VMTAppointment?> response = new VMResponse<VMTAppointment?>();
