@@ -515,5 +515,46 @@ namespace HealthCare340B.Web.Models
                 throw new Exception(e.Message);
             }
         }
+
+        public async Task<VMResponse<VMTAppointment>?> Update(VMTAppointment data)
+        {
+            VMResponse<VMTAppointment>? response = new VMResponse<VMTAppointment>();
+            try
+            {
+                jsonData = JsonConvert.SerializeObject(data);
+                content = new StringContent(    // Create a blank HttpRequest Document
+                    jsonData,               // Put the Request Body (data)
+                    Encoding.UTF8,          // Assign the Request body's character set
+                    "application/json"      // Assain the Request body's format / Content-Type
+                    );
+
+                response =
+                   JsonConvert.DeserializeObject<VMResponse<VMTAppointment>?>(     // Convert the Json string to a class
+                       await httpClient.PutAsync($"{apiUrl}Appointment", content)    // Call the API
+                       .Result                                                     // Read the Result
+                       .Content                                                    // Get the Content Result
+                       .ReadAsStringAsync()                                        // Convert the content as string
+                   );
+
+                if (response != null)
+                {
+                    if (response.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new Exception(response.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Appointment API could not be reached");
+                }
+            }
+            catch (Exception e)
+            {
+                //Logging
+                Console.WriteLine("AppointmentModel.Update: " + e.Message);
+                throw new Exception("AppointmentModel.Update: " + e.Message);
+            }
+            return response;
+        }
     }
 }

@@ -95,8 +95,17 @@
             </div>
             <div class="col-4 d-flex justify-content-center" style="text-align: center; vertical-align: middle;">
                 <div class="btn-group" style="text-align: center;">
-                   <button data-id="@app.Id" data-customerId="@app.CustomerId" data-customerName="@app.CustomerName" data-doctorId="@app.DoctorId" data-medFacId="@app.MedicalFacilityId" data-medFacName="@app.MedicalFacilityName" data-bs-toggle="modal" data-bs-target="#staticModal" class="btn btn-outline-info" style="height: 25%; margin-top: 50px;">Ubah</button>
-                    <button data-id="@app.CustomerId" data-doctorId="@app.DoctorId" data-medFacId="@app.MedicalFacilityId" class="btn btn-outline-danger" style="height: 25%; margin-top: 50px;">Batal</button>
+                   <button data-id="@app.Id" data-customerId="@app.CustomerId" data-customerName="@app.CustomerName" 
+                   data-doctorId="@app.DoctorId" data-medFacId="@app.MedicalFacilityId" data-medFacName="@app.MedicalFacilityName" 
+                   data-appDate="@(app.AppointmentDate?.ToString("yyyy-MM-dd"))" data-timeStart="@app.TimeStart"
+                   data-timeEnd="@app.TimeEnd" data-treatmentId="@app.TreatmentId"
+                   data-bs-toggle="modal" data-bs-target="#staticModal" 
+                   class="btn btn-outline-info" style="height: 25%; margin-top: 50px;">Ubah</button>
+                    <button data-id="@app.Id" data-customerName="@app.CustomerName" 
+                    data-appDate="@(app.AppointmentDate?.ToString("yyyy-MM-dd"))" data-doctorName="@app.DoctorName"
+                    data-medFacName="@app.MedicalFacilityName" data-treatment="@app.Treatment" 
+                    data-bs-toggle="modal" data-bs-target="#staticModalLg"
+                    class="btn btn-outline-danger" style="height: 25%; margin-top: 50px;">Batal</button>
                </div>
            </div>
         </div>
@@ -285,14 +294,32 @@ else
     $(".btn-outline-info").click(function (e) {
         $("#staticModalBody").html(spinner);
         var id = $(this).data("id");
-        var customerId = $(this).data("customerId");
+        var customerId = $(this).attr("data-customerId");
         var customerName = $(this).attr("data-customerName");
         customerName = encodeURIComponent(customerName.trim());
         var doctorId = $(this).attr("data-doctorId");
         var medFacId = $(this).attr("data-medFacId");
         var medFacName = $(this).attr("data-medFacName");
         medFacName = encodeURIComponent(medFacName.trim());
-        debugger;
-        $("#staticModalBody").load(`/Appointment/Update?id=${id}&custId=${customerId}&doctorId=${doctorId}&medFacId=${medFacId}&medFacName=${medFacName}`);
-    })
+        var appDate = $(this).attr("data-appDate");
+        var timeStart = $(this).attr("data-timeStart");
+        var timeEnd = $(this).attr("data-timeEnd");
+        var treatmentId = $(this).attr("data-treatmentId");
+        //debugger;
+        $("#staticModalBody").load(`/Appointment/Update?id=${id}&custId=${customerId}&custName=${customerName}&doctorId=${doctorId}&medFacId=${medFacId}&medFacName=${medFacName}&appDate=${appDate}&timeStart=${timeStart}&timeEnd=${timeEnd}&treatmentId=${treatmentId}`);
+    });
+
+    $(".btn-outline-danger").click(function (e) {
+        var id = $(this).attr("data-id");
+        var customerName = $(this).attr("data-customerName");
+        customerName = encodeURIComponent(customerName.trim());
+        var appDate = $(this).attr("data-appDate");
+        var medFacName = $(this).attr("data-medFacName");
+        medFacName = encodeURIComponent(medFacName.trim());
+        var doctorName = $(this).attr("data-doctorName");
+        doctorName = encodeURIComponent(doctorName.trim());
+        var treatment = $(this).attr("data-treatment");
+        treatment = encodeURIComponent(treatment.trim());
+        $("#staticModalLgBody").load(`/Appointment/DeleteOne?id=${id}&custName=${customerName}&appDate=${appDate}&medFacName=${medFacName}&docName=${doctorName}&treatment=${treatment}`)
+    });
 </script>

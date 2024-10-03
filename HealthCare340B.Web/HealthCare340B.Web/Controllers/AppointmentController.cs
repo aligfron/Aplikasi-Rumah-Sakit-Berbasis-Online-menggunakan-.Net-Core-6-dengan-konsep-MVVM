@@ -489,17 +489,62 @@ namespace HealthCare340B.Web.Controllers
             return View(Pagination<VMTAppointment>.Create(dataAppointment ?? new List<VMTAppointment>(), pageNumber ?? 1, ViewBag.PageSize));
         }
 
-        public async Task<IActionResult> Update(long id, long doctorId, long custId, long medFacId, string medFacName)
+        public async Task<IActionResult> Update(long id, long doctorId, long custId, string custName, long medFacId, string medFacName, string appDate, string timeStart, string timeEnd, long treatmentId)
         {
             VMMDoctor? dataDoctor = await appointment.GetDoctor(id);
             ViewBag.AppointmentId = id;
             ViewBag.DoctorId = doctorId;
             ViewBag.CustomerId = custId;
             ViewBag.ImgFolder = imageFolder;
-            //ViewBag.CustomerName = custName;
+            ViewBag.CustomerName = custName;
             ViewBag.MedicalFacilityId = medFacId;
             ViewBag.MedicalFacilityName = medFacName;
+            ViewBag.AppointmentDate = DateTime.Parse(appDate).ToString("yyyy-MM-dd");
+            ViewBag.TimeStart = timeStart;
+            ViewBag.TimeEnd = timeEnd;
+            ViewBag.TreatmentId = treatmentId;
             return View(dataDoctor);
+        }
+
+        [HttpPost]
+        public async Task<VMResponse<VMTAppointment>> Update(long id, long custId, long dofId, long dosId, long dotId, string appDate)
+        {
+            try
+            {
+                VMTAppointment data = new VMTAppointment
+                {
+                    Id = id,
+                    CustomerId = custId,
+                    DoctorOfficeId = dofId,
+                    DoctorOfficeScheduleId = dosId,
+                    DoctorOfficeTreatmentId = dotId,
+                    AppointmentDate = DateTime.Parse(appDate),
+                    ModifiedBy = long.Parse(HttpContext.Session.GetString("userId")!)
+                };
+
+                VMResponse<VMTAppointment>? response = await appointment.Update(data);
+                HttpContext.Session.SetString("successMsg", "Janji berhasil diubah!");
+                return response!;
+            }
+            catch (Exception e)
+            {
+                VMResponse<VMTAppointment> response = new VMResponse<VMTAppointment>
+                {
+                    Message = e.Message
+                };
+                return response;
+            }
+        }
+
+        public IActionResult DeleteOne(long appId, string custName, string appDate, string medFacName, string docName, string treatment)
+        {
+            ViewBag.AppointmentId = appId;
+            ViewBag.CustomerName = custName;
+            ViewBag.AppointmentDate = DateTime.Parse(appDate).ToString("dd MMMM yyyy");
+            ViewBag.MedicalFacilityName = medFacName;
+            ViewBag.DoctorName = docName;
+            ViewBag.Treatment = treatment;
+            return View();
         }
     }
 }

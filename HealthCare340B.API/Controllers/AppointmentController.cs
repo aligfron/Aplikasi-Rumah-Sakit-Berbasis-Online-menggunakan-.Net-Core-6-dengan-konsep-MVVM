@@ -18,6 +18,54 @@ namespace HealthCare340B.API.Controllers
             appointment = new DAAppointment(_db);
         }
 
+        [HttpPut]
+        public async Task<ActionResult> Update(VMTAppointment data)
+        {
+            VMResponse<VMTAppointment?> response = new VMResponse<VMTAppointment?>();
+            try
+            {
+                response = await Task.Run(() => appointment.Update(data));
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    throw new Exception(response.Message);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("AppointmentController.Update: " + e.Message);
+
+                throw new Exception(response.Message);
+            }
+        }
+
+        [HttpDelete("[action]")]
+        public async Task<ActionResult> DeleteOne(long id, long userId)
+        {
+            VMResponse<VMTAppointment?> response = new VMResponse<VMTAppointment?>();
+            try
+            {
+                response = await Task.Run(() => appointment.DeleteOne(id, userId));
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    throw new Exception(response.Message);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("AppointmentController.Delete: " + e.Message);
+
+                throw new Exception(response.Message);
+            }
+        }
+
         [HttpPost("[action]")]
         public async Task<ActionResult> GetByCustomerId(List<long>? custId)
         {
