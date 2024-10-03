@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using HealthCare340B.DataAccess;
 using HealthCare340B.DataModel;
 using HealthCare340B.ViewModel;
+using System.Net;
 
 namespace HealthCare340B.API.Controllers
 {
@@ -100,6 +101,19 @@ namespace HealthCare340B.API.Controllers
         {
             try
             {
+                // Trim the input fields to avoid whitespaces
+                model.Name = model.Name?.Trim();
+
+                // Check if the trimmed input is empty or null
+                if (string.IsNullOrWhiteSpace(model.Name))
+                {
+                    return BadRequest(new VMResponse<VMMCustomerRelation>
+                    {
+                        Message = "Name cannot be empty or just spaces.",
+                        StatusCode = HttpStatusCode.BadRequest
+                    });
+                }
+
                 VMResponse<VMMCustomerRelation> response = await Task.Run(() => _customerRelation.Create(model));
 
                 if (response.Data != null)
@@ -126,6 +140,19 @@ namespace HealthCare340B.API.Controllers
         {
             try
             {
+                // Trim the input fields to avoid whitespaces
+                model.Name = model.Name?.Trim();
+
+                // Check if the trimmed input is empty or null
+                if (string.IsNullOrWhiteSpace(model.Name))
+                {
+                    return BadRequest(new VMResponse<VMMCustomerRelation>
+                    {
+                        Message = "Name cannot be empty or just spaces.",
+                        StatusCode = HttpStatusCode.BadRequest
+                    });
+                }
+
                 VMResponse<VMMCustomerRelation> response = await Task.Run(() => _customerRelation.Update(model));
 
                 if (response.Data != null)

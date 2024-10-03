@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using HealthCare340B.DataAccess;
 using HealthCare340B.DataModel;
 using HealthCare340B.ViewModel;
+using System.Net;
 
 namespace HealthCare340B.API.Controllers
 {
@@ -126,6 +127,29 @@ namespace HealthCare340B.API.Controllers
         {
             try
             {
+                // Trim the input fields to avoid whitespaces
+                model.Fullname = model.Fullname?.Trim();
+
+                // Check if the trimmed input is empty or null
+                if (string.IsNullOrWhiteSpace(model.Fullname))
+                {
+                    return BadRequest(new VMResponse<VMMCustomerRelation>
+                    {
+                        Message = "Fullname cannot be empty or just spaces.",
+                        StatusCode = HttpStatusCode.BadRequest
+                    });
+                }
+
+                // Check if the date of birth is not greater than today
+                if (model.Dob.HasValue && model.Dob.Value.Date > DateTime.Today)
+                {
+                    return BadRequest(new VMResponse<VMMCustomerRelation>
+                    {
+                        Message = "Date of birth cannot be greater than today.",
+                        StatusCode = HttpStatusCode.BadRequest
+                    });
+                }
+
                 VMResponse<VMMCustomerMember> response = await Task.Run(() => _customerMember.Create(model));
 
                 if (response.Data != null)

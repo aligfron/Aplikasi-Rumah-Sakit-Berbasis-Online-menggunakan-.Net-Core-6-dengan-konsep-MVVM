@@ -115,42 +115,52 @@ namespace HealthCare340B.DataAccess
             {
                 try
                 {
-                    if (model != null)
+                    // Validate for null input in case it was missed by the controller
+                    if (model == null || string.IsNullOrWhiteSpace(model.Name))
                     {
-                        MCustomerRelation cr = new MCustomerRelation
-                        {
-                            Name = model.Name,
-                            IsDelete = false,
-                            CreatedBy = model.CreatedBy,
-                            CreatedOn = DateTime.Now,
-                        };
-
-                        _db.Add(cr);
-                        _db.SaveChanges();
-                        dbTran.Commit();
-
-                        response.Data = new VMMCustomerRelation
-                        {
-                            Id = cr.Id,
-                            Name = cr.Name,
-                            CreatedBy = cr.CreatedBy,
-                            CreatedOn = cr.CreatedOn,
-                            ModifiedBy = cr.ModifiedBy,
-                            ModifiedOn = cr.ModifiedOn,
-                            DeletedBy = cr.DeletedBy,
-                            DeletedOn = cr.DeletedOn,
-                            IsDelete = cr.IsDelete,
-                        };
-                        response.Message =
-                            $"{HttpStatusCode.Created} - Customer relation data successfully inserted";
-                        response.StatusCode = HttpStatusCode.Created;
-                    }
-                    else
-                    {
-                        response.Message =
-                            $"{HttpStatusCode.BadRequest} - Invalid customer relation data";
+                        response.Message = $"{HttpStatusCode.BadRequest} - Invalid customer relation data";
                         response.StatusCode = HttpStatusCode.BadRequest;
+                        return response;
                     }
+
+                    // Check if a duplicate record exists (ignoring case)
+                    var existingRecord = _db.MCustomerRelations
+                                            .Where(c => c.Name.ToLower() == model.Name.ToLower() && !c.IsDelete)
+                                            .FirstOrDefault();
+                    if (existingRecord != null)
+                    {
+                        response.Message = $"{HttpStatusCode.Conflict} - Duplicate customer relation name exists.";
+                        response.StatusCode = HttpStatusCode.Conflict;
+                        return response;
+                    }
+
+                    // Create a new record if validation passes
+                    MCustomerRelation cr = new MCustomerRelation
+                    {
+                        Name = model.Name,
+                        IsDelete = false,
+                        CreatedBy = model.CreatedBy,
+                        CreatedOn = DateTime.Now,
+                    };
+
+                    _db.Add(cr);
+                    _db.SaveChanges();
+                    dbTran.Commit();
+
+                    response.Data = new VMMCustomerRelation
+                    {
+                        Id = cr.Id,
+                        Name = cr.Name,
+                        CreatedBy = cr.CreatedBy,
+                        CreatedOn = cr.CreatedOn,
+                        ModifiedBy = cr.ModifiedBy,
+                        ModifiedOn = cr.ModifiedOn,
+                        DeletedBy = cr.DeletedBy,
+                        DeletedOn = cr.DeletedOn,
+                        IsDelete = cr.IsDelete,
+                    };
+                    response.Message = $"{HttpStatusCode.Created} - Customer relation data successfully inserted";
+                    response.StatusCode = HttpStatusCode.Created;
                 }
                 catch (Exception ex)
                 {
@@ -170,48 +180,58 @@ namespace HealthCare340B.DataAccess
             {
                 try
                 {
-                    if (model != null)
+                    // Validate for null input in case it was missed by the controller
+                    if (model == null || string.IsNullOrWhiteSpace(model.Name))
                     {
-                        MCustomerRelation? cr = _db.MCustomerRelations.Find(model.Id);
+                        response.Message = $"{HttpStatusCode.BadRequest} - Invalid customer relation data";
+                        response.StatusCode = HttpStatusCode.BadRequest;
+                        return response;
+                    }
 
-                        if (cr != null)
+                    // Check if a duplicate record exists (ignoring case)
+                    var existingRecord = _db.MCustomerRelations
+                                            .Where(c => c.Name.ToLower() == model.Name.ToLower() && !c.IsDelete)
+                                            .FirstOrDefault();
+                    if (existingRecord != null)
+                    {
+                        response.Message = $"{HttpStatusCode.Conflict} - Duplicate customer relation name exists.";
+                        response.StatusCode = HttpStatusCode.Conflict;
+                        return response;
+                    }
+
+                    MCustomerRelation? cr = _db.MCustomerRelations.Find(model.Id);
+
+                    if (cr != null)
+                    {
+                        cr.Name = model.Name;
+                        cr.ModifiedBy = model.ModifiedBy;
+                        cr.ModifiedOn = DateTime.Now;
+
+                        _db.Update(cr);
+                        _db.SaveChanges();
+                        dbTran.Commit();
+
+                        response.Data = new VMMCustomerRelation
                         {
-                            cr.Name = model.Name;
-                            cr.ModifiedBy = model.ModifiedBy;
-                            cr.ModifiedOn = DateTime.Now;
-
-                            _db.Update(cr);
-                            _db.SaveChanges();
-                            dbTran.Commit();
-
-                            response.Data = new VMMCustomerRelation
-                            {
-                                Id = cr.Id,
-                                Name = cr.Name,
-                                CreatedBy = cr.CreatedBy,
-                                CreatedOn = cr.CreatedOn,
-                                ModifiedBy = cr.ModifiedBy,
-                                ModifiedOn = cr.ModifiedOn,
-                                DeletedBy = cr.DeletedBy,
-                                DeletedOn = cr.DeletedOn,
-                                IsDelete = cr.IsDelete,
-                            };
-                            response.Message =
-                                $"{HttpStatusCode.OK} - Customer relation data successfully updated";
-                            response.StatusCode = HttpStatusCode.OK;
-                        }
-                        else
-                        {
-                            response.Message =
-                                $"{HttpStatusCode.NotFound} - Customer relation not found";
-                            response.StatusCode = HttpStatusCode.NotFound;
-                        }
+                            Id = cr.Id,
+                            Name = cr.Name,
+                            CreatedBy = cr.CreatedBy,
+                            CreatedOn = cr.CreatedOn,
+                            ModifiedBy = cr.ModifiedBy,
+                            ModifiedOn = cr.ModifiedOn,
+                            DeletedBy = cr.DeletedBy,
+                            DeletedOn = cr.DeletedOn,
+                            IsDelete = cr.IsDelete,
+                        };
+                        response.Message =
+                            $"{HttpStatusCode.OK} - Customer relation data successfully updated";
+                        response.StatusCode = HttpStatusCode.OK;
                     }
                     else
                     {
                         response.Message =
-                            $"{HttpStatusCode.BadRequest} - Invalid customer relation data";
-                        response.StatusCode = HttpStatusCode.BadRequest;
+                            $"{HttpStatusCode.NotFound} - Customer relation not found";
+                        response.StatusCode = HttpStatusCode.NotFound;
                     }
                 }
                 catch (Exception ex)

@@ -1,7 +1,7 @@
-﻿using HealthCare340B.ViewModel;
-using Newtonsoft.Json;
-using System.Net;
+﻿using System.Net;
 using System.Text;
+using HealthCare340B.ViewModel;
+using Newtonsoft.Json;
 
 namespace HealthCare340B.Web.Models
 {
@@ -21,30 +21,35 @@ namespace HealthCare340B.Web.Models
             webHostEnv = _webHostEnv;
             imageFolder = _config["ImageFolder"];
         }
+
         private string UploadFile(IFormFile? imageFile)
         {
             string uniqueFileName = string.Empty;
             if (imageFile != null)
             {
                 uniqueFileName = $"{Guid.NewGuid()}-{imageFile.FileName}";
-                using (FileStream fileStream = new FileStream(
-                    $"{webHostEnv.WebRootPath}\\{imageFolder}\\{uniqueFileName}", FileMode.CreateNew
-                    ))
+                using (
+                    FileStream fileStream = new FileStream(
+                        $"{webHostEnv.WebRootPath}\\{imageFolder}\\{uniqueFileName}",
+                        FileMode.CreateNew
+                    )
+                )
                 {
                     imageFile.CopyTo(fileStream);
                 }
             }
             return uniqueFileName;
         }
+
         //aaa
         public async Task<VMMDoctor?> GetByIdProfilDokter(long? id)
         {
             VMMDoctor? data = null;
             try
             {
-                VMResponse<VMMDoctor>? apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMDoctor>>(
-
-                    await httpClient.GetStringAsync(apiUrl + "DokterProfil/" + id));
+                VMResponse<VMMDoctor>? apiResponse = JsonConvert.DeserializeObject<
+                    VMResponse<VMMDoctor>
+                >(await httpClient.GetStringAsync(apiUrl + "DokterProfil/" + id));
 
                 if (apiResponse != null)
                 {
@@ -58,21 +63,25 @@ namespace HealthCare340B.Web.Models
                     }
                 }
             }
-            catch
-                (Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine($"DokterProfilModel.GetAll : {ex.Message}");
             }
             return data;
         }
+
         public async Task<VMMDoctor?> GetDoctorByBiodataId(int idBiodata)
         {
             VMMDoctor? data = null;
             try
             {
-                VMResponse<VMMDoctor>? apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMDoctor>>(
-
-                    await httpClient.GetStringAsync(apiUrl + "DokterProfil/GetDoctorByBiodataId/" + idBiodata));
+                VMResponse<VMMDoctor>? apiResponse = JsonConvert.DeserializeObject<
+                    VMResponse<VMMDoctor>
+                >(
+                    await httpClient.GetStringAsync(
+                        apiUrl + "DokterProfil/GetDoctorByBiodataId/" + idBiodata
+                    )
+                );
 
                 if (apiResponse != null)
                 {
@@ -86,13 +95,13 @@ namespace HealthCare340B.Web.Models
                     }
                 }
             }
-            catch
-                (Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine($"DokterProfilModel.GetAll : {ex.Message}");
             }
             return data;
         }
+
         private bool DeleteOldImage(string oldImageFileName)
         {
             try
@@ -112,8 +121,8 @@ namespace HealthCare340B.Web.Models
             {
                 return false;
             }
-
         }
+
         internal async Task<VMResponse<VMMBiodatum>> UpdateAsync(VMMBiodatum data)
         {
             VMResponse<VMMBiodatum>? apiResponse = new VMResponse<VMMBiodatum>();
@@ -127,29 +136,22 @@ namespace HealthCare340B.Web.Models
                     }
                     data.ImagePath = UploadFile(data.ImageFile);
                     data.ImageFile = null;
+                }
 
-                    //manggil api update proses
-                    jsonData = JsonConvert.SerializeObject(data);
-                    content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-                    apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMBiodatum>?>(
-                        await httpClient.PutAsync($"{apiUrl}DokterProfil", content).Result.Content.ReadAsStringAsync()
-                        );
-                }
-                else
-                {
-                    jsonData = JsonConvert.SerializeObject(data);
-                    content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-                    apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMBiodatum>?>(
-                        await httpClient.PutAsync($"{apiUrl}DokterProfil", content).Result.Content.ReadAsStringAsync()
-                        );
-                }
+                jsonData = JsonConvert.SerializeObject(data);
+                content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+                apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMBiodatum>?>(
+                    await httpClient
+                        .PutAsync($"{apiUrl}Biodata/UpdateImagePath", content)
+                        .Result.Content.ReadAsStringAsync()
+                );
+
                 if (apiResponse != null)
                 {
                     if (apiResponse.StatusCode != HttpStatusCode.OK)
                     {
                         throw new Exception(apiResponse.Message);
                     }
-
                 }
                 else
                 {
@@ -169,9 +171,10 @@ namespace HealthCare340B.Web.Models
             VMTCurrentDoctorSpecialization? data = null;
             try
             {
-                VMResponse<VMTCurrentDoctorSpecialization>? apiResponse = JsonConvert.DeserializeObject<VMResponse<VMTCurrentDoctorSpecialization>>(
-
-                    await httpClient.GetStringAsync(apiUrl + "SpecializationDoctor/" + id));
+                VMResponse<VMTCurrentDoctorSpecialization>? apiResponse =
+                    JsonConvert.DeserializeObject<VMResponse<VMTCurrentDoctorSpecialization>>(
+                        await httpClient.GetStringAsync(apiUrl + "SpecializationDoctor/" + id)
+                    );
 
                 if (apiResponse != null)
                 {
@@ -185,23 +188,29 @@ namespace HealthCare340B.Web.Models
                     }
                 }
             }
-            catch
-                (Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine($"SpecializationDoctorModel.GetAll : {ex.Message}");
             }
             return data;
         }
-        public async Task<VMResponse<VMTCurrentDoctorSpecialization>?> CreateSpecializationDoctorAsync(VMTCurrentDoctorSpecialization data)
+
+        public async Task<VMResponse<VMTCurrentDoctorSpecialization>?> CreateSpecializationDoctorAsync(
+            VMTCurrentDoctorSpecialization data
+        )
         {
-            VMResponse<VMTCurrentDoctorSpecialization>? apiResponse = new VMResponse<VMTCurrentDoctorSpecialization>();
+            VMResponse<VMTCurrentDoctorSpecialization>? apiResponse =
+                new VMResponse<VMTCurrentDoctorSpecialization>();
             try
             {
                 jsonData = JsonConvert.SerializeObject(data);
                 content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
-                apiResponse = JsonConvert.DeserializeObject<VMResponse<VMTCurrentDoctorSpecialization>?>(
-                    await httpClient.PostAsync($"{apiUrl}SpecializationDoctor", content).Result.Content.ReadAsStringAsync()
+                apiResponse =
+                    JsonConvert.DeserializeObject<VMResponse<VMTCurrentDoctorSpecialization>?>(
+                        await httpClient
+                            .PostAsync($"{apiUrl}SpecializationDoctor", content)
+                            .Result.Content.ReadAsStringAsync()
                     );
 
                 if (apiResponse != null)
@@ -210,7 +219,6 @@ namespace HealthCare340B.Web.Models
                     {
                         throw new Exception(apiResponse.Message);
                     }
-
                 }
                 else
                 {
@@ -223,22 +231,29 @@ namespace HealthCare340B.Web.Models
             }
             return apiResponse;
         }
-        public async Task<VMResponse<VMTCurrentDoctorSpecialization>?> EditSpecializationDoctorAsync(VMTCurrentDoctorSpecialization data)
+
+        public async Task<VMResponse<VMTCurrentDoctorSpecialization>?> EditSpecializationDoctorAsync(
+            VMTCurrentDoctorSpecialization data
+        )
         {
-            VMResponse<VMTCurrentDoctorSpecialization>? apiResponse = new VMResponse<VMTCurrentDoctorSpecialization>();
+            VMResponse<VMTCurrentDoctorSpecialization>? apiResponse =
+                new VMResponse<VMTCurrentDoctorSpecialization>();
             try
             {
                 //manggil api update proses
                 jsonData = JsonConvert.SerializeObject(data);
                 content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-                apiResponse = JsonConvert.DeserializeObject<VMResponse<VMTCurrentDoctorSpecialization>?>
-                    (await httpClient.PutAsync($"{apiUrl}SpecializationDoctor", content).Result.Content.ReadAsStringAsync());
+                apiResponse =
+                    JsonConvert.DeserializeObject<VMResponse<VMTCurrentDoctorSpecialization>?>(
+                        await httpClient
+                            .PutAsync($"{apiUrl}SpecializationDoctor", content)
+                            .Result.Content.ReadAsStringAsync()
+                    );
 
                 if (apiResponse != null)
                 {
                     if (apiResponse.StatusCode != HttpStatusCode.OK)
                     {
-
                         throw new Exception(apiResponse.Message);
                     }
                 }
@@ -246,18 +261,13 @@ namespace HealthCare340B.Web.Models
                 {
                     throw new Exception("Specialization api could not be reached");
                 }
-
             }
             catch (Exception e)
             {
                 Console.WriteLine($"SpecializationModel.GetbyId: {e.Message}");
-
             }
             return apiResponse;
         }
-
-
-
 
         // punya faraday
 
@@ -266,18 +276,24 @@ namespace HealthCare340B.Web.Models
             VMResponse<List<VMMBiodataAddress>>? apiResponse = null;
             try
             {
-                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync($"{apiUrl}TabAlamat/GetAll");
+                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync(
+                    $"{apiUrl}TabAlamat/GetAll"
+                );
 
                 if (apiResponseMsg != null)
                 {
                     if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
                     {
-                        apiResponse = JsonConvert.DeserializeObject<VMResponse<List<VMMBiodataAddress>>?>(await apiResponseMsg.Content.ReadAsStringAsync());
+                        apiResponse = JsonConvert.DeserializeObject<VMResponse<
+                            List<VMMBiodataAddress>
+                        >?>(await apiResponseMsg.Content.ReadAsStringAsync());
                         return apiResponse?.Data;
                     }
                     else
                     {
-                        throw new Exception($"Error: {apiResponseMsg.StatusCode}, {await apiResponseMsg.Content.ReadAsStringAsync()}");
+                        throw new Exception(
+                            $"Error: {apiResponseMsg.StatusCode}, {await apiResponseMsg.Content.ReadAsStringAsync()}"
+                        );
                     }
                 }
                 else
@@ -296,13 +312,17 @@ namespace HealthCare340B.Web.Models
             VMResponse<List<VMMLocation>>? apiResponse = null;
             try
             {
-                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync($"{apiUrl}TabAlamat/GetAllLocation");
+                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync(
+                    $"{apiUrl}TabAlamat/GetAllLocation"
+                );
 
                 if (apiResponseMsg != null)
                 {
                     if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
                     {
-                        apiResponse = JsonConvert.DeserializeObject<VMResponse<List<VMMLocation>>?>(await apiResponseMsg.Content.ReadAsStringAsync());
+                        apiResponse = JsonConvert.DeserializeObject<VMResponse<List<VMMLocation>>?>(
+                            await apiResponseMsg.Content.ReadAsStringAsync()
+                        );
                     }
                     else
                     {
@@ -321,7 +341,6 @@ namespace HealthCare340B.Web.Models
             }
 
             return apiResponse!.Data;
-
         }
 
         public async Task<List<VMMBiodataAddress>?> GetByFilter(string filter)
@@ -330,15 +349,18 @@ namespace HealthCare340B.Web.Models
             try
             {
                 HttpResponseMessage apiResponseMsg = await httpClient.GetAsync(
-                            (string.IsNullOrEmpty(filter))
-                            ? $"{apiUrl}TabAlamat/GetAll"
-                            : $"{apiUrl}TabAlamat/GetByFilter/{filter}");
+                    (string.IsNullOrEmpty(filter))
+                        ? $"{apiUrl}TabAlamat/GetAll"
+                        : $"{apiUrl}TabAlamat/GetByFilter/{filter}"
+                );
 
                 if (apiResponseMsg != null)
                 {
                     if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
                     {
-                        apiResponse = JsonConvert.DeserializeObject<VMResponse<List<VMMBiodataAddress>>?>(await apiResponseMsg.Content.ReadAsStringAsync());
+                        apiResponse = JsonConvert.DeserializeObject<VMResponse<
+                            List<VMMBiodataAddress>
+                        >?>(await apiResponseMsg.Content.ReadAsStringAsync());
                     }
                     else
                     {
@@ -357,7 +379,6 @@ namespace HealthCare340B.Web.Models
             }
 
             return apiResponse!.Data;
-
         }
 
         public async Task<VMResponse<VMMBiodataAddress>?> CreateAsync(VMMBiodataAddress data)
@@ -367,19 +388,13 @@ namespace HealthCare340B.Web.Models
             try
             {
                 jsonData = JsonConvert.SerializeObject(data);
-                content = new StringContent(
-                    jsonData,
-                    Encoding.UTF8,
-                    "application/json"
-                );
+                content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
-                apiResponse =
-                    JsonConvert.DeserializeObject<VMResponse<VMMBiodataAddress>?>(
-                        await httpClient.PostAsync($"{apiUrl}TabAlamat", content)
-                            .Result
-                            .Content
-                            .ReadAsStringAsync()
-                    );
+                apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMBiodataAddress>?>(
+                    await httpClient
+                        .PostAsync($"{apiUrl}TabAlamat", content)
+                        .Result.Content.ReadAsStringAsync()
+                );
 
                 if (apiResponse != null)
                 {
@@ -423,7 +438,6 @@ namespace HealthCare340B.Web.Models
                 {
                     throw new Exception("TabAlamat API cannot be reached!");
                 }
-
             }
             catch (Exception e)
             {
@@ -456,7 +470,6 @@ namespace HealthCare340B.Web.Models
                 {
                     throw new Exception("TabProfile API cannot be reached!");
                 }
-
             }
             catch (Exception e)
             {
@@ -467,7 +480,6 @@ namespace HealthCare340B.Web.Models
             return data;
         }
 
-
         public async Task<VMMCustomer?> GetCustomerByBioId(int bioId)
         {
             VMMCustomer? data = null;
@@ -476,7 +488,9 @@ namespace HealthCare340B.Web.Models
             {
                 VMResponse<VMMCustomer>? apiResponse =
                     JsonConvert.DeserializeObject<VMResponse<VMMCustomer>?>(
-                        await httpClient.GetStringAsync($"{apiUrl}TabProfile/GetCustomerByBioId/{bioId}")
+                        await httpClient.GetStringAsync(
+                            $"{apiUrl}TabProfile/GetCustomerByBioId/{bioId}"
+                        )
                     );
 
                 if (apiResponse != null)
@@ -490,7 +504,6 @@ namespace HealthCare340B.Web.Models
                 {
                     throw new Exception("TabProfile API cannot be reached!");
                 }
-
             }
             catch (Exception e)
             {
@@ -507,17 +520,12 @@ namespace HealthCare340B.Web.Models
             try
             {
                 jsonData = JsonConvert.SerializeObject(data);
-                content = new StringContent(
-                    jsonData,
-                    Encoding.UTF8,
-                    "application/json");
+                content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
                 apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMCustomer>?>(
-                    await httpClient.PutAsync($"{apiUrl}TabProfile/Update", content)
-                    .Result
-                        .Content
-                        .ReadAsStringAsync()
-
+                    await httpClient
+                        .PutAsync($"{apiUrl}TabProfile/Update", content)
+                        .Result.Content.ReadAsStringAsync()
                 );
 
                 if (apiResponse != null)
@@ -535,12 +543,9 @@ namespace HealthCare340B.Web.Models
             catch (Exception e)
             {
                 throw new Exception($"ProfileModel.UpdateProfileAsync: {e.Message}");
-
             }
             return apiResponse;
         }
-
-
 
         public async Task<VMResponse<VMMBiodataAddress>?> UpdateAsync(VMMBiodataAddress data)
         {
@@ -548,17 +553,12 @@ namespace HealthCare340B.Web.Models
             try
             {
                 jsonData = JsonConvert.SerializeObject(data);
-                content = new StringContent(
-                    jsonData,
-                    Encoding.UTF8,
-                    "application/json");
+                content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
                 apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMBiodataAddress>?>(
-                    await httpClient.PutAsync($"{apiUrl}TabAlamat/Update", content)
-                    .Result
-                        .Content
-                        .ReadAsStringAsync()
-
+                    await httpClient
+                        .PutAsync($"{apiUrl}TabAlamat/Update", content)
+                        .Result.Content.ReadAsStringAsync()
                 );
 
                 if (apiResponse != null)
@@ -576,7 +576,6 @@ namespace HealthCare340B.Web.Models
             catch (Exception e)
             {
                 throw new Exception($"ProfileModel.UpdateAsync: {e.Message}");
-
             }
             return apiResponse;
         }
@@ -587,11 +586,10 @@ namespace HealthCare340B.Web.Models
             try
             {
                 apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMBiodataAddress>?>(
-                    await httpClient.DeleteAsync($"{apiUrl}TabAlamat/{id}/{userId}")
-                    .Result
-                    .Content
-                    .ReadAsStringAsync()
-                    );
+                    await httpClient
+                        .DeleteAsync($"{apiUrl}TabAlamat/{id}/{userId}")
+                        .Result.Content.ReadAsStringAsync()
+                );
 
                 if (apiResponse != null)
                 {
@@ -619,23 +617,21 @@ namespace HealthCare340B.Web.Models
             public long UserId { get; set; }
         }
 
-        public async Task<VMResponse<List<VMMBiodataAddress>>?> MultipleDeleteAsync(VMMBiodataAddress.MultipleDeleteRequest requestData)
+        public async Task<VMResponse<List<VMMBiodataAddress>>?> MultipleDeleteAsync(
+            VMMBiodataAddress.MultipleDeleteRequest requestData
+        )
         {
-            VMResponse<List<VMMBiodataAddress>>? apiResponse = new VMResponse<List<VMMBiodataAddress>>();
+            VMResponse<List<VMMBiodataAddress>>? apiResponse =
+                new VMResponse<List<VMMBiodataAddress>>();
             try
             {
                 jsonData = JsonConvert.SerializeObject(requestData);
-                content = new StringContent(
-                    jsonData,
-                    Encoding.UTF8,
-                    "application/json");
+                content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
                 apiResponse = JsonConvert.DeserializeObject<VMResponse<List<VMMBiodataAddress>>?>(
-                    await httpClient.PutAsync($"{apiUrl}TabAlamat/MultipleDelete", content)
-                    .Result
-                        .Content
-                        .ReadAsStringAsync()
-
+                    await httpClient
+                        .PutAsync($"{apiUrl}TabAlamat/MultipleDelete", content)
+                        .Result.Content.ReadAsStringAsync()
                 );
 
                 if (apiResponse != null)
@@ -653,7 +649,6 @@ namespace HealthCare340B.Web.Models
             catch (Exception e)
             {
                 throw new Exception($"ProfileModel.MultipleDeleteAsync: {e.Message}");
-
             }
 
             return apiResponse;
