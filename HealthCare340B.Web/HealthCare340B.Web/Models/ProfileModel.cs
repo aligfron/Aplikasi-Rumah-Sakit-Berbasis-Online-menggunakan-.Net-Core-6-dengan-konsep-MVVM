@@ -101,7 +101,34 @@ namespace HealthCare340B.Web.Models
             }
             return data;
         }
+        public async Task<VMMDoctor?> GetByDetailDokter(long? id)
+        {
+            VMMDoctor? data = null;
+            try
+            {
+                VMResponse<VMMDoctor>? apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMDoctor>>(
 
+                    await httpClient.GetStringAsync(apiUrl + "DokterProfil/GetByDetailDokter/" + id));
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode == HttpStatusCode.OK)
+                    {
+                        data = apiResponse.Data;
+                    }
+                    else
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+            }
+            catch
+                (Exception ex)
+            {
+                Console.WriteLine($"DokterProfilModel.GetAll : {ex.Message}");
+            }
+            return data;
+        }
         private bool DeleteOldImage(string oldImageFileName)
         {
             try

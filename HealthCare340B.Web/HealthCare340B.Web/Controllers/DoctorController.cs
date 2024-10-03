@@ -156,11 +156,11 @@ namespace HealthCare340B.Web.Controllers
                     return NotFound("Doctor not found for the given Biodata ID.");
                 }
 
-                data = await profile.GetByIdProfilDokter(GetDoctorByBiodataId.Id);
+                data = await profile.GetByDetailDokter(GetDoctorByBiodataId.Id);
             }
             else
             {
-                data = await profile.GetByIdProfilDokter(id.Value);
+                data = await profile.GetByDetailDokter(id.Value);
                 if (data == null)
                 {
                     return NotFound("Doctor not found for the given ID.");

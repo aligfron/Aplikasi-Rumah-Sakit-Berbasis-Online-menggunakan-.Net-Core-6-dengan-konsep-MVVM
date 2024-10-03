@@ -14,7 +14,7 @@
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
                         <li class="breadcrumb-item"><a href="#" id="breadcrumbProfile">Profile</a></li>
-                        <li class="breadcrumb-item active" aria-current="page" id="breadcrumbCurrent">Profile</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page" id="breadcrumbCurrent">Profile</li>
                     </ol>
                 </nav>
             </div>
@@ -29,7 +29,8 @@
                         <div class="d-flex justify-content-center align-items-center flex-column">
                             <form id="frmFoto" enctype="multipart/form-data">
                                 <div class="avatar avatar-2xl position-relative">
-                                    <img id="profileImage" src="~/@ViewBag.imgFolder/@(Model.ImagePath ?? "blank-profile-picture.png")" alt="Avatar" class="rounded-circle">
+                                    <img id="profileImage" src="~/@ViewBag.imgFolder/@(Model.ImagePath ?? "blank-profile-picture.png")" alt="Avatar" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+
 
                                     <label for="imageUpload" class="position-absolute" style="top: 0px; right: -20px; cursor: pointer;">
                                         <i class="bi bi-pencil-fill" style="font-size: 1rem;"></i>
@@ -215,13 +216,13 @@
 
         if (file) {
             const fileType = file.type;
-            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']; // Tambahkan jenis gambar yang diizinkan di sini
+            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
             if (!validImageTypes.includes(fileType)) {
-                document.getElementById('cancelImageBtn').classList.remove('d-none'); // Tampilkan tombol cancel
+                document.getElementById('cancelImageBtn').classList.remove('d-none'); 
                 $("#fotoError").text("File yang anda pilih bukan gambar, silahkan pilih ulang").show();
-                event.target.value = ''; // Kosongkan input file
-                document.getElementById('saveImageBtn').classList.add('d-none'); // Sembunyikan tombol simpan
+                event.target.value = ''; 
+                document.getElementById('saveImageBtn').classList.add('d-none'); 
                 return; 
             }
 
@@ -230,9 +231,9 @@
                 output.src = reader.result;
             };
 
-            reader.readAsDataURL(file); // Mulai membaca file gambar
+            reader.readAsDataURL(file); 
 
-            // Tampilkan tombol "Simpan Gambar" setelah gambar berhasil diunggah
+           
             document.getElementById('fotoError').classList.add('d-none');
             document.getElementById('saveImageBtn').classList.remove('d-none');
             document.getElementById('cancelImageBtn').classList.remove('d-none');
@@ -245,11 +246,9 @@
     }
 
     $(document).ready(function () {
-        // Event ketika tab Obrolan di klik
         $('#Obrolan-tab').on('click', function () {
-            $('#breadcrumbCurrent').text('Obrolan'); // Update breadcrumb menjadi Obrolan
+            $('#breadcrumbCurrent').text('Obrolan');
             $('#breadcrumbProfile').attr('href', '#').on('click', function () {
-                // Kembali ke profil ketika breadcrumb Profile diklik
                 $('#breadcrumbProfile').attr('href', '@Url.Action("Index", "Profile")')
             });
             if ($(this).hasClass('active')) {
@@ -262,9 +261,8 @@
             }
         });
 
-        // Event ketika tab Janji di klik
         $('#Janji-tab').on('click', function () {
-            $('#breadcrumbCurrent').text('Janji'); // Update breadcrumb menjadi Janji
+            $('#breadcrumbCurrent').text('Janji');
             $('#breadcrumbProfile').attr('href', '@Url.Action("Index", "Profile")');
 
             if ($(this).hasClass('active')) {
@@ -277,7 +275,6 @@
             }
         });
 
-        // Default profile breadcrumb behavior
         $('#breadcrumbProfile').on('click', function () {
             $('#breadcrumbProfile').attr('href', '@Url.Action("Index", "Profile")')
         });

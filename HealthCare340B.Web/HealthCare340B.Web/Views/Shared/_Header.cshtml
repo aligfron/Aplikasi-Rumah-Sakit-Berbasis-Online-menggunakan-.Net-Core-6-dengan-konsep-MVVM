@@ -24,7 +24,9 @@
                                 </div>
                                 <div class="user-img d-flex align-items-center">
                                     <div class="avatar avatar-md">
-                                        <img src="~/Images/@(string.IsNullOrEmpty(Context.Session.GetString("userImagePath")) ? "blank-profile-picture.png" : Context.Session.GetString("userImagePath"))">
+                                        <img src="~/Images/@(string.IsNullOrEmpty(Context.Session.GetString("userImagePath")) ? "blank-profile-picture.png" : Context.Session.GetString("userImagePath"))"
+                                             style="object-fit: cover; border-radius: 50%;" alt="User Profile">
+
                                     </div>
                                 </div>
                             </div>

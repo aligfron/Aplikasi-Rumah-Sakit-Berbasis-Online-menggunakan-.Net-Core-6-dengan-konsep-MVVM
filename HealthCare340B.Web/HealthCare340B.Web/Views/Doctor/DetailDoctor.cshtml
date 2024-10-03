@@ -15,7 +15,7 @@
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
                         <li class="breadcrumb-item"><a href="#" id="breadcrumbProfile">Cari Dokter</a></li>
-                        <li class="breadcrumb-item active" aria-current="page" id="breadcrumbCurrent">@Model.Fullname</li>
+                        <li class="breadcrumb-item text-muted" aria-current="page" id="breadcrumbCurrent">@Model.Fullname</li>
                     </ol>
                 </nav>
             </div>
@@ -29,7 +29,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-10">
                         <div class="col-4 text-center">
                             <div class="avatar avatar-3xl position-relative">
-                                <img id="profileImage" src="~/@ViewBag.imgFolder/@(Model.ImagePath ?? "blank-profile-picture.png")" alt="Avatar" class="rounded-circle">
+                                <img id="profileImage" src="~/@ViewBag.imgFolder/@(Model.ImagePath ?? "blank-profile-picture.png")" alt="Avatar" class="rounded-circle" style="width: 200px; height: 200px; object-fit: cover;">
                             </div>
                         </div>
                         <div class="col-4 text-center">
@@ -46,7 +46,7 @@
                             }
                             else
                             {
-                                <p>Anda Belum Menambahkan Spesialisasi</p>
+                                <p>Data Spesialisasi Belum ditambahkan</p>
                             }
                             @if (Model.MaxEndDate.Count > 0)
                             {
@@ -81,7 +81,7 @@
                             }
                             else
                             {
-                                <p>Data Tahun tidak tersedia</p> 
+                                <p>Data Tahun pengalaman belum ditambahkan</p> 
                             }
                             
                         </div>
@@ -125,7 +125,7 @@
                             else
                             {
                                 <div style="border: 1px solid #d3d3d3; border-radius: 5px; padding: 10px; text-align: center; margin-top: 10px;">
-                                    <p>Anda Belum Menambahkan Tindakan Medis</p>
+                                    <p>Data Tindakan Medis belum ditambahkan</p>
                                 </div>
                             }
 
@@ -157,7 +157,7 @@
                             else
                             {
                                 <div style="border: 1px solid #d3d3d3; border-radius: 5px; padding: 10px; text-align: center; margin-top: 10px;">
-                                    <p>Anda Belum Menambahkan Riwayat Praktek</p>
+                                    <p>Data Riwayat Praktek belum di tambahkan</p>
                                 </div>
                             }
                             <br />
@@ -184,7 +184,7 @@
                             else
                             {
                                 <div style="border: 1px solid #d3d3d3; border-radius: 5px; padding: 10px; text-align: center; margin-top: 10px;">
-                                    <p>Anda Belum Menambahkan Pendidikan</p>
+                                    <p>Data Pendidikan belum ditambahkan</p>
                                 </div>
                             }
                         </div>
@@ -200,10 +200,11 @@
                                     <div style="border: 2px solid var(--bs-primary); border-radius: 5px; padding: 10px;  margin-top: 10px;">
                                         <div class="row">
                                             <div class="col-6">
-                                                <p class="mb-0">@riwayarpraktek.LocationName</p>
+                                                    <p class="mb-0 text-primary"><strong>@riwayarpraktek.LocationName</strong></p>
 
-                                                    <p class="ps-3 text-muted small mb-0">@riwayarpraktek.MedicalFacilityName</p>
-                                                    <p class="fs-6 ps-3 text-muted small mb-0"><i class="bi bi-geo-alt-fill"></i> @riwayarpraktek.FullAddress</p>
+
+                                                    <p class="fs-6 ps-3 small mb-0">@riwayarpraktek.MedicalFacilityName</p>
+                                                    <p class="ps-3 small mb-0"><i class="bi bi-geo-alt-fill"></i> @riwayarpraktek.FullAddress</p>
                                                 
                                             </div>
                                                 <div class="col-2">
@@ -214,10 +215,15 @@
                                                     Konsultasi Mulai dari<br />
                                                     @if (riwayarpraktek.HargaKonsulMulai.Count > 0)
                                                     {
+                                                        List<int> tampungNilai = new List<int>();
                                                         @foreach (VMTDoctorOfficeTreatmentPrice hargakonsulmulai in riwayarpraktek.HargaKonsulMulai)
                                                         {
-                                                            <p>Rp. @String.Format("{0:N0}", hargakonsulmulai.PriceStartFrom)</p>
+                                                            int item = (int)hargakonsulmulai.PriceStartFrom!;
+
+                                                            tampungNilai.Add(item);
                                                         }
+                                                        int minharga = tampungNilai.Min();
+                                                        <p>Rp. @String.Format("{0:N0}", minharga)</p>
                                                     }
                                                     else
                                                     {
@@ -225,9 +231,10 @@
                                                     }
                                             </div>
                                         </div>
-                                        <a href="javascript:void(0);" onclick="toggleSchedule('scheduleDetails-@riwayarpraktek.Id')" style="text-decoration: none;">
-                                            <i class="bi bi-caret-down-fill"></i> Lihat Jadwal Praktek
-                                        </a>
+                                        <br />
+                                            <a href="javascript:void(0);" id="toggleLink-@riwayarpraktek.Id" onclick="toggleSchedule('scheduleDetails-@riwayarpraktek.Id', this)" style="text-decoration: none;">
+                                                <i class="bi bi-caret-down-fill"></i> <span>Lihat Jadwal Praktek</span>
+                                            </a>
                                             <div id="scheduleDetails-@riwayarpraktek.Id" style="display: none;">
                                                 <br />
                                                 @if (riwayarpraktek.JadwalPraktek.Count > 0)
@@ -291,16 +298,31 @@
 </div>
 
 <script>
-    function toggleSchedule(scheduleId) {
+    function toggleSchedule(scheduleId, linkElement) {
         var scheduleElement = document.getElementById(scheduleId);
+        var linkText = linkElement.querySelector('span');
+
         if (scheduleElement.style.display === "none") {
             scheduleElement.style.display = "block";
+            linkText.textContent = "Sembunyikan Jadwal Praktek";
         } else {
             scheduleElement.style.display = "none";
+            linkText.textContent = "Lihat Jadwal Praktek";
         }
-        
     }
+
+
     $(document).ready(function () {
+        var firstScheduleElement = document.querySelector('[id^="scheduleDetails-"]');
+        var firstLinkElement = document.querySelector('[id^="toggleLink-"] span');
+
+        if (firstScheduleElement) {
+            firstScheduleElement.style.display = "block";  // Tampilkan data pertama
+            firstLinkElement.textContent = "Sembunyikan Jadwal Praktek";  // Ubah teks toggle pertama
+        }
+
+
+        //
         $('#toggleSchedule').on('click', function (e) {
             e.preventDefault();
 

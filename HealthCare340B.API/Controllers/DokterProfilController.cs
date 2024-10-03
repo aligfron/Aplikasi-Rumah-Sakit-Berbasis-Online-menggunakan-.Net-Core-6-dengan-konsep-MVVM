@@ -85,5 +85,30 @@ namespace HealthCare340B.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("[action]/{id}")]
+        public async Task<ActionResult> GetByDetailDokter(long id)
+        {
+            try
+                {
+                    VMResponse<VMMDoctor?> response = await Task.Run(() => dokterProfil.GetByDetailDokter(id));
+                    if (response.Data != null)
+                    {
+                        return Ok(response);
+                    }
+                    else
+                    {
+                        Console.WriteLine(response.Message);
+                        return NoContent();
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("DokterProfilController.GetByID " + ex.Message);
+                    return BadRequest(ex.Message);
+                }
+            
+        }
     }
 }
