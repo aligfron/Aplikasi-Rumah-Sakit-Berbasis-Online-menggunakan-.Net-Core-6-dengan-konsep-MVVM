@@ -653,5 +653,85 @@ namespace HealthCare340B.Web.Models
 
             return apiResponse;
         }
+
+        public async Task<VMResponse<VMMUser>?> UpdateEmailAsync(VMMUser data)
+        {
+            VMResponse<VMMUser>? apiResponse = new VMResponse<VMMUser>();
+            try
+            {
+                jsonData = JsonConvert.SerializeObject(data);
+                content = new StringContent(
+                    jsonData,
+                    Encoding.UTF8,
+                    "application/json");
+
+                apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMUser>?>(
+                    await httpClient.PutAsync($"{apiUrl}TabProfile/UpdateEmail", content)
+                    .Result
+                        .Content
+                        .ReadAsStringAsync()
+
+                );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("TabAlamat API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"ProfileModel.UpdateAsync: {e.Message}");
+
+            }
+            return apiResponse;
+        }
+
+        public async Task<VMResponse<VMTToken>?> GenerateOTPAsync(string email)
+        {
+            VMResponse<VMTToken>? apiResponse = new VMResponse<VMTToken>();
+
+            try
+            {
+                jsonData = JsonConvert.SerializeObject(email);
+                content = new StringContent(
+                    jsonData,
+                    Encoding.UTF8,
+                    "application/json"
+                );
+
+                apiResponse =
+                    JsonConvert.DeserializeObject<VMResponse<VMTToken>?>(
+                        await httpClient.PostAsync($"{apiUrl}TabProfile/GenerateOTP/{email}", content)
+                            .Result
+                            .Content
+                            .ReadAsStringAsync()
+                    );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode != HttpStatusCode.Created)
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("TabProfile API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"ProfileModel.GenerateOTPAsync: {e.Message}");
+            }
+
+            return apiResponse;
+        }
     }
 }

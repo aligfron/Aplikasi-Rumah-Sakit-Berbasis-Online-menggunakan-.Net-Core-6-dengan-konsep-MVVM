@@ -89,8 +89,7 @@ namespace HealthCare340B.Web.Models
             VMResponse<List<VMMMedicalItem>>? apiResponse = new VMResponse<List<VMMMedicalItem>>();
             try
             {
-                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync($"{apiUrl}MedicalItem/GetByFilter?categoryId={categoryId}&isSegmentation={isSegmentation}&priceMax={priceMax}&priceMin={priceMin}&name={name}&indication={indication}"
-);
+                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync($"{apiUrl}MedicalItem/GetByFilter?categoryId={categoryId}&isSegmentation={isSegmentation}&priceMax={priceMax}&priceMin={priceMin}&name={name}&indication={indication}");
 
                 if (apiResponseMsg != null)
                 {
@@ -134,8 +133,8 @@ namespace HealthCare340B.Web.Models
                 {
                     if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
                     {
-                        apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMMedicalItemCategory>?>
-                            (apiResponseMsg.Content.ReadAsStringAsync().Result);
+                        string responseContent = await apiResponseMsg.Content.ReadAsStringAsync();
+                        apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMMedicalItemCategory>?>(responseContent);
 
                         data = apiResponse!.Data;
                     }
@@ -151,13 +150,12 @@ namespace HealthCare340B.Web.Models
             }
             catch (Exception e)
             {
-                //Logging
+                // Logging
                 Console.WriteLine("MedicalItemModel.GetById: " + e.Message);
                 throw new Exception("MedicalItemModel.GetById: " + e.Message);
             }
 
             return data;
-
         }
 
     }

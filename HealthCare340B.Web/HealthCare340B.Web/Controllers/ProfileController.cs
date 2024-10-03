@@ -15,7 +15,7 @@ namespace HealthCare340B.Web.Controllers
         private ProfileModel profile;
         private SpecializationModel specialization;
         private string? _userId;
-        private string? _roleCode; 
+        private string? _roleCode;
         private readonly int pageSize;
 
         public ProfileController(IConfiguration _config, IWebHostEnvironment _webHostEnv)
@@ -56,7 +56,7 @@ namespace HealthCare340B.Web.Controllers
             ViewBag.imgFolder = imageFolder;
 
             string role = HttpContext.Session.GetString("userRoleCode")!;
-            
+
             ViewBag.Breadcrumb = new List<BreadcrumbItem>
             {
                 new BreadcrumbItem { Name = "Beranda", Controller = "Home", Action = "Index" },
@@ -474,5 +474,25 @@ namespace HealthCare340B.Web.Controllers
             }
             return (response);
         }
+
+        [HttpPost]
+        public async Task<VMResponse<VMTToken>?> GenerateOTP([FromBody] VMEmail data)
+        {
+            Console.WriteLine("Received email: " + data.Email);
+            var dataToken = new VMTToken { Email = data.Email };
+            return await profile.GenerateOTPAsync(data.Email);
+        }
+
+        [HttpPost]
+        public async Task<VMResponse<VMMUser>?> UpdateEmail([FromBody] VMMUser data)
+        {
+            Console.WriteLine("Received email: " + data.Email);
+            return await profile.UpdateEmailAsync(data);
+        }
+    }
+
+    public class VMEmail
+    {
+        public string Email { get; set; }
     }
 }

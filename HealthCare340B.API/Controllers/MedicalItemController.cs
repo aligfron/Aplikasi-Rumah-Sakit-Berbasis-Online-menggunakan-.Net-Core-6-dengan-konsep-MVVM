@@ -68,11 +68,11 @@ namespace HealthCare340B.API.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<ActionResult> GetByFilter(long? categoryId, bool? segmentation, int? priceMax, int? priceMin, string? filter)
+        public async Task<ActionResult> GetByFilter(long? categoryId, bool? isSegmentation, int? priceMax, int? priceMin, string? name, string? indication)
         {
             try
             {
-                VMResponse<List<VMMMedicalItem>?> response = await Task.Run(() => medItem.GetByFilter(categoryId, segmentation, priceMax, priceMin, filter));
+                VMResponse<List<VMMMedicalItem>?> response = await Task.Run(() => medItem.GetByFilter(categoryId, isSegmentation, priceMax, priceMin, name, indication));
                 if (response.Data != null && response.Data.Count > 0)
                 {
                     return Ok(response);
@@ -99,7 +99,7 @@ namespace HealthCare340B.API.Controllers
             {
                 if (id == null)
                     throw new ArgumentNullException();
-                VMResponse<List<VMMMedicalItemCategory>?> response = await Task.Run(() => medItem.GetById((long)id));
+                VMResponse<VMMMedicalItemCategory?> response = await Task.Run(() => medItem.GetById((long)id));
                 if (response.Data != null)
                 {
                     return Ok(response);

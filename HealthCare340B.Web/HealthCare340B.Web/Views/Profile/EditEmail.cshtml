@@ -28,18 +28,44 @@
     $("#staticModalLabel").text("@ViewBag.Title");
 
     $(document).on("click", "#btnUpdateEmail", function (e) {
+        e.preventDefault();
         var newEmail = $("#email").val();
+        console.log("ini loh emailnya : " + newEmail);
         var existingEmail = "@Model.Email";
 
         if (newEmail === existingEmail) {
             $("#emailAlert").show();
         } else {
             $("#emailAlert").hide();
-            console.log("Email updated to: " + newEmail);
+            $.ajax({
+                url: '/Profile/GenerateOTP',
+                type: 'POST',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify({ email: newEmail }),
+                success: function (otpResponse) {
+                    if (otpResponse.statusCode === 201 || otpResponse.statusCode === 200) {
+                        $.ajax({
+                            url: '/Profile/UpdateEmail',
+                            type: 'POST',
+                            data: { email: newEmail },
+                            success: function (response) {
+                                console.log("Email updated to: " + newEmail);
+                                $("#staticModalBody").html("");
+                                $("#staticModalBody").load("/Profile/OTPEmail/");
+                            },
+                            error: function (error) {
+                                console.error("Error updating email: ", error);
+                            }
+                        });
+                    } else {
+                        console.error("Error generating OTP: ", otpResponse.message);
+                    }
+                },
+                error: function (error) {
+                    console.error("Error generating OTP: ", error);
+                }
+            });
         }
-
-        $("#staticModalBody").html("");
-        $("#staticModalBody").load("/Profile/OTPEmail/");
     });
-
 </script>

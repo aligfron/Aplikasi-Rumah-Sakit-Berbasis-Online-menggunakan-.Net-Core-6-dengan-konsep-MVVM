@@ -248,8 +248,6 @@ namespace HealthCare340B.DataAccess
         }
 
 
-
-
         public VMResponse<VMTToken> GenerateOTP(string email)
         {
             VMResponse<VMTToken> response = new VMResponse<VMTToken>();

@@ -1,12 +1,9 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@model List<VMMMedicalItem>
+﻿@model Pagination<VMMMedicalItem>
 @{
     Layout = "_HasilDokterView";
 }
 
-<div class="container mt-3">
+<div class="container mt-3" id="medicalItemsContainer">
     <!-- Breadcrumb -->
     <div class="p-2 rounded" style="background-color: #F5F8FF;">
         <nav aria-label="breadcrumb">
@@ -31,8 +28,7 @@
                 <p class="text-muted" style="font-size: 20px;">
                     @if (!string.IsNullOrEmpty(ViewBag.CategoryName))
                     {
-                        <span>Category: @ViewBag.CategoryName</span>
-
+                        <span>Kategori: @ViewBag.CategoryName</span>
                         <br />
                     }
                     @if (ViewBag.Segmentation != null)
@@ -40,26 +36,27 @@
                         if (ViewBag.Segmentation == true)
                         {
                             <span>Hanya cari obat bebas (tanpa resep)</span>
-
                             <br />
                         }
                         else
                         {
                             <span>Cari Semua Obat (termasuk obat keras)</span>
-
                             <br />
                         }
                     }
                     @if (ViewBag.PriceMax != null)
                     {
-                        <span>Price Max: @ViewBag.PriceMax</span>
-
+                        <span>Harga Maksimal: @ViewBag.PriceMax</span>
                         <br />
                     }
                     @if (ViewBag.PriceMin != null)
                     {
-                        <span>Price Min: @ViewBag.PriceMin</span>
-
+                        <span>Harga Minial: @ViewBag.PriceMin</span>
+                        <br />
+                    }
+                    @if ((ViewBag.Name == ViewBag.Indication) != null)
+                    {
+                        <span>Nama atau Indikasi : @ViewBag.Name</span>
                         <br />
                     }
                 </p>
@@ -70,20 +67,41 @@
         </div>
     </div>
 
-    <!-- Daftar Medical Item -->
+    <!-- Medical Items List -->
     @if (Model != null && Model.Any())
     {
         <p>Jumlah Medical Item ditemukan: @Model.Count</p>
-        <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        <div class="row">
             @foreach (var item in Model)
             {
-                <div style="border: 1px solid #ccc; padding: 20px; width: 45%;">
-                    <h3>@item.Name</h3>
-                    <p>@item.Packaging</p>
-                    <p>Rp @item.PriceMin - Rp @item.PriceMax</p>
-                    <p>@item.Indication</p>
-                    <button class="btn btn-primary">Tambah ke Keranjang</button>
-                    <button class="btn btn-secondary">Detail</button>
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="row g-0">
+                            <!-- Left: Description -->
+                            <div class="col-md-8 p-3">
+                                <h3 class="h5">@item.Name</h3>
+                                <p>@item.Packaging</p>
+                                <p class="text-muted">Rp @item.PriceMin - Rp @item.PriceMax</p>
+                                <p class="small">@item.Indication</p>
+
+                                <!-- Add to Cart and Detail Button -->
+                                <div class="d-flex align-items-center">
+                                    <button class="btn btn-primary add-to-cart-btn">Tambah ke Keranjang</button>
+                                    <div class="quantity-selector ms-3" style="display:none;">
+                                        <button class="btn btn-outline-primary btn-decrease">-</button>
+                                        <span class="quantity mx-2">1</span>
+                                        <button class="btn btn-outline-primary btn-increase">+</button>
+                                    </div>
+                                    <button class="btn btn-secondary btn-sm ms-3 style=" position: absolute; bottom: 0; right: 0;"">Detail</button>
+                                </div>
+                            </div>
+
+                            <!-- Right: Image Placeholder -->
+                            <div class="col-md-4">
+                                <img id="profileImage" src="~/images/paracetamol.jpeg" alt="Avatar" class="rounded-circle" style="width: 180px; height: 180px;">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             }
         </div>
@@ -94,22 +112,156 @@
     }
 
     <!-- Pagination -->
-    <div style="margin-top: 20px;">
-        <span>Menampilkan 1 - 4 dari @Model.Count</span>
-        <button class="btn btn-outline-primary">Sebelumnya</button>
-        <button class="btn btn-outline-primary">Selanjutnya</button>
+    <div class="mt-4 d-flex justify-content-between">
+        <span>Page @Model.PageIndex of @Model.TotalPages (Total Data: @Model.TotalData)</span>
+        <div role="group" class="btn-group">
+            <a id="btnPrev" class="btn btn-secondary @(Model.HasPreviousPage ? "" : "disabled")" href="javascript:void(0)" data-pagenumber="@(Model.PageIndex - 1)" data-currentpagesize="@ViewBag.PageSize">
+                <i class="fas fa-backward"></i>
+            </a>
+            <a id="btnNext" class="btn btn-secondary @(Model.HasNextPage ? "" : "disabled")" href="javascript:void(0)" data-pagenumber="@(Model.PageIndex + 1)" data-currentpagesize="@ViewBag.PageSize">
+                <i class="fas fa-forward"></i>
+            </a>
+        </div>
     </div>
 
     <!-- Keranjang -->
-    <div style="margin-top: 20px;">
+    <div class="mt-4" id="cartFooter" style="display:none;">
         <span>1 Produk | Estimasi Harga: Rp 48.000</span>
         <button class="btn btn-success">Keranjang Saya</button>
     </div>
 </div>
 
+
 <script>
-    $("#researchBtn").click(function (e) {
-        $("#staticModalBody").html("")
-        $("#staticModalBody").load("/MedicalItem/SearchMedicalItem")
-    })
+    $(document).ready(function () {
+        let cartItems = {}; // Menyimpan item dalam keranjang berdasarkan nama produk
+        let totalPrice = 0;
+
+        // Fungsi untuk memperbarui ringkasan keranjang
+        function updateCartSummary() {
+            let totalProductTypes = 0;
+            totalPrice = 0;
+
+            // Hitung jumlah jenis produk (bukan quantity per produk) dan total estimasi harga
+            $.each(cartItems, function (key, item) {
+                totalProductTypes += 1; // Menambah jenis produk
+                totalPrice += item.maxPrice * item.quantity; // Menggunakan harga tertinggi (PriceMax) dikali quantity
+            });
+
+            if (totalProductTypes > 0) {
+                $("#cartFooter").show();
+                $("#cartFooter").html(`${totalProductTypes} Produk | Estimasi Harga: Rp ${totalPrice.toLocaleString()}`);
+            } else {
+                $("#cartFooter").hide();
+            }
+        }
+
+        // Fungsi untuk menangani pagination
+        function handlePagination(button) {
+            let pageNumber = button.data("pagenumber");
+            let currentPageSize = button.data("currentpagesize");
+
+            if (button.hasClass("disabled")) {
+                return;
+            }
+
+            $.ajax({
+                url: "/MedicalItem/ResultSearchMedicalItem",
+                type: "get",
+                data: {
+                    "pageNumber": pageNumber,
+                    "currentPageSize": currentPageSize,
+                },
+                success: function (response) {
+                    $("#medicalItemsContainer").html(response);
+                },
+                error: function (errResponse) {
+                    console.error(errResponse);
+                }
+            });
+        }
+
+        // Event handler untuk tombol Previous
+        $("#btnPrev").click(function (e) {
+            e.preventDefault();
+            handlePagination($(this));
+        });
+
+        // Event handler untuk tombol Next
+        $("#btnNext").click(function (e) {
+            e.preventDefault();
+            handlePagination($(this));
+        });
+
+        // Event handler untuk tombol "Tambah ke Keranjang"
+        $(".add-to-cart-btn").click(function () {
+            const productName = $(this).closest(".card").find("h3").text(); // Mengambil nama produk
+            const productMaxPrice = parseInt($(this).closest(".card").find(".text-muted").text().split('-')[1].replace(/[^0-9]/g, '')); // Mengambil harga tertinggi produk (PriceMax)
+
+            if (!cartItems[productName]) {
+                cartItems[productName] = {
+                    maxPrice: productMaxPrice,
+                    quantity: 1 // Mulai dengan quantity 1
+                };
+            }
+
+            $(this).next(".quantity-selector").show(); // Menampilkan selector jumlah
+            $(this).hide(); // Menyembunyikan tombol "Tambah ke Keranjang"
+
+            updateCartSummary(); // Memperbarui ringkasan keranjang
+        });
+
+        // Event handler untuk tombol "Tambah" pada selector jumlah
+        $(document).on('click', '.btn-increase', function () {
+            const productName = $(this).closest(".card").find("h3").text();
+            const quantityElement = $(this).siblings(".quantity");
+            let currentQuantity = parseInt(quantityElement.text());
+
+            currentQuantity += 1; // Menambah jumlah
+            quantityElement.text(currentQuantity);
+
+            // Update quantity di cartItems
+            if (cartItems[productName]) {
+                cartItems[productName].quantity = currentQuantity;
+            }
+
+            updateCartSummary(); // Memperbarui ringkasan keranjang
+        });
+
+        // Event handler untuk tombol "Kurang" pada selector jumlah
+        $(document).on('click', '.btn-decrease', function () {
+            const productName = $(this).closest(".card").find("h3").text();
+            const quantityElement = $(this).siblings(".quantity");
+            let currentQuantity = parseInt(quantityElement.text());
+
+            if (currentQuantity > 1) {
+                currentQuantity -= 1; // Mengurangi jumlah
+                quantityElement.text(currentQuantity);
+
+                // Update quantity di cartItems
+                if (cartItems[productName]) {
+                    cartItems[productName].quantity = currentQuantity;
+                }
+
+            } else {
+                // Jika quantity 1 dan tombol "Kurang" ditekan, sembunyikan selector dan tampilkan kembali tombol "Tambah ke Keranjang"
+                $(this).closest(".quantity-selector").hide();
+                $(this).closest(".quantity-selector").prev(".add-to-cart-btn").show();
+
+                // Menghapus item dari keranjang
+                delete cartItems[productName];
+            }
+
+            updateCartSummary(); // Memperbarui ringkasan keranjang
+        });
+
+        // Tombol ulang pencarian
+        $("#researchBtn").click(function (e) {
+            $("#staticModalBody").html("");
+            $("#staticModalBody").load("/MedicalItem/SearchMedicalItem");
+        });
+    });
+
 </script>
+
+

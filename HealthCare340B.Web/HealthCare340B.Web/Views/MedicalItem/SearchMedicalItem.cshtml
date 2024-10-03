@@ -31,15 +31,19 @@
                 <input type="text" name="filter" class="form-control" id="filter" placeholder="nama obat atau indikasi">
             </div>
 
+            <input type="hidden" name="Name" id="hiddenName" value="" />
+            <input type="hidden" name="Indication" id="hiddenIndication" value="" />
+
+
             <div class="form-group">
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="segmentation" value="true">
+                    <input class="form-check-input" type="radio" name="isSegmentation" value="true" checked>
                     <label class="form-check-label" for="obatBebas">
                         Hanya cari obat bebas (tanpa resep)
                     </label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="segmentation" value="false">
+                    <input class="form-check-input" type="radio" name="isSegmentation" value="false">
                     <label class="form-check-label" for="semuaObat">
                         Cari Semua Obat (termasuk obat keras)
                     </label>
@@ -69,5 +73,13 @@
     $("#btnSearch").click(function (e) {
         e.preventDefault();
         $("#resultSearchDrug").submit();
+    });
+
+    $(document).ready(function () {
+        $('#filter').on('input', function () {
+            var filterValue = $(this).val();
+            $('#hiddenName').val(filterValue);
+            $('#hiddenIndication').val(filterValue);
+        });
     });
 </script>

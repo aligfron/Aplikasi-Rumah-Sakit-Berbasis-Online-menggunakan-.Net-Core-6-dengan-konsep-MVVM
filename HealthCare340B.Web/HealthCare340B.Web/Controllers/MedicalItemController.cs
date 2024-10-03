@@ -1,4 +1,5 @@
 ﻿using HealthCare340B.ViewModel;
+using HealthCare340B.Web.AddOns;
 using HealthCare340B.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +9,13 @@ namespace HealthCare340B.Web.Controllers
     {
         private readonly MedicalItemModel medItem;
         private readonly string imageFolder;
+        private readonly int pageSize;
 
         public MedicalItemController(IConfiguration _config, IWebHostEnvironment _webHostEnv)
         {
             medItem = new MedicalItemModel(_config, _webHostEnv);
             imageFolder = _config["ImageFolder"];
+            pageSize = int.Parse(_config["PageSize"]);
         }
 
 
@@ -30,7 +33,7 @@ namespace HealthCare340B.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ResultSearchMedicalItem(VMMMedicalItem dataFilter)
+        public async Task<IActionResult> ResultSearchMedicalItem(VMMMedicalItem dataFilter, int? pageNumber, int? currentPageSize)
         {
             List<VMMMedicalItem>? data = await medItem.GetByFilter(
                 dataFilter.MedicalItemCategoryId,
@@ -51,14 +54,18 @@ namespace HealthCare340B.Web.Controllers
             }
 
             ViewBag.MedicalItemCategoryId = dataFilter.MedicalItemCategoryId;
-            VMMMedicalItemCategory category = await medItem.GetById(ViewBag.MedicalItemCategoryId);
-            ViewBag.CategoryName = category.Name;
-            ViewBag.Segementation = dataFilter.SegmentationName;
+            if(ViewBag.MedicalItemCategoryId != null)
+            {
+                VMMMedicalItemCategory category = await medItem.GetById(ViewBag.MedicalItemCategoryId);
+                ViewBag.CategoryName = category.Name;
+            }
+            ViewBag.Segmentation = dataFilter.isSegmentation;
             ViewBag.PriceMax = dataFilter.PriceMax;
             ViewBag.PriceMin = dataFilter.PriceMin;
             ViewBag.Name = dataFilter.Name;
             ViewBag.Indication = dataFilter.Indication;
             ViewBag.ImgFolder = imageFolder;
+            ViewBag.PageSize = currentPageSize ?? 2;
 
             if (data == null || !data.Any())
             {
@@ -66,7 +73,7 @@ namespace HealthCare340B.Web.Controllers
                 data = new List<VMMMedicalItem>();
             }
 
-            return View("ResultSearchMedicalItem", data);
+            return View(Pagination<VMMMedicalItem>.Create(data ?? new List<VMMMedicalItem>(), pageNumber ?? 1, ViewBag.PageSize));
         }
         
 

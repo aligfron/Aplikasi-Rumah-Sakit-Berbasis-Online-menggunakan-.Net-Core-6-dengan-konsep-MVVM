@@ -94,8 +94,14 @@ namespace HealthCare340B.DataAccess
             return response;
         }
 
-        public VMResponse<List<VMMMedicalItem>?> GetByFilter(long? categoryId, bool? segmentation, int? priceMax, int? priceMin, string? filter)
+        public VMResponse<List<VMMMedicalItem>?> GetByFilter(long? categoryId, bool? segmentation, int? priceMax, int? priceMin, string? name, string? indication)
         {
+            string filter = null;
+            if(name == indication)
+            {
+                filter = name;
+            }
+
             VMResponse<List<VMMMedicalItem>?> response = new VMResponse<List<VMMMedicalItem>?>();
             try
             {
@@ -103,10 +109,11 @@ namespace HealthCare340B.DataAccess
                             join i in db.MMedicalItemCategories on m.MedicalItemCategoryId equals i.Id
                             join s in db.MMedicalItemSegmentations on m.MedicalItemSegmentationId equals s.Id
                             where m.IsDelete == false
-                            && (!categoryId.HasValue || i.Id == categoryId
-                            && (!segmentation.HasValue || (segmentation.Value ? s.Name != "obat merah" : true))
-                            && (!priceMax.HasValue || !priceMin.HasValue || m.PriceMax <= priceMax && m.PriceMin >= priceMin)
-                            && (string.IsNullOrEmpty(filter) || m.Name.Contains(filter) || m.Indication.Contains(filter)))
+                            && (!categoryId.HasValue || i.Id == categoryId)
+                            && (!segmentation.HasValue || (segmentation.Value ? s.Id != 5 : true))
+                            && (!priceMax.HasValue || m.PriceMax <= priceMax)
+                            && (!priceMin.HasValue || m.PriceMin >= priceMin)
+                            && (string.IsNullOrEmpty(filter) || m.Name.ToLower().Contains(filter) || m.Indication.Contains(filter))
                             select new VMMMedicalItem
                             {
                                 Id = m.Id,
@@ -155,13 +162,13 @@ namespace HealthCare340B.DataAccess
             return response;
         }
 
-        public VMResponse<List<VMMMedicalItemCategory>?> GetById(long Id)
+        public VMResponse<VMMMedicalItemCategory?> GetById(long Id)
         {
-            VMResponse<List<VMMMedicalItemCategory>?> response = new VMResponse<List<VMMMedicalItemCategory>?>();
+            VMResponse<VMMMedicalItemCategory?> response = new VMResponse<VMMMedicalItemCategory?>();
 
             try
             {
-                response.Data = (
+                var data = (
                     from mc in db.MMedicalItemCategories
                     where mc.IsDelete == false && mc.Id == Id
                     select new VMMMedicalItemCategory
@@ -176,13 +183,15 @@ namespace HealthCare340B.DataAccess
                         DeletedOn = mc.DeletedOn,
                         IsDelete = mc.IsDelete
                     }
-                    ).ToList();
+                ).FirstOrDefault(); // Use FirstOrDefault to get a single item or null
 
-                response.Message = (response.Data.Count > 0)
-                   ? $"{HttpStatusCode.OK} - {response.Data.Count} medical category(s) successfully fetched"
+                response.Data = data;
+
+                response.Message = (response.Data != null)
+                   ? $"{HttpStatusCode.OK} - Medical category successfully fetched"
                    : $"{HttpStatusCode.NoContent} - No medical category is found";
 
-                response.StatusCode = (response.Data.Count > 0)
+                response.StatusCode = (response.Data != null)
                     ? HttpStatusCode.OK
                     : HttpStatusCode.NoContent;
             }
