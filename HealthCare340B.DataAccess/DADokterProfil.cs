@@ -23,51 +23,50 @@ namespace HealthCare340B.DataAccess
             VMResponse<VMMDoctor?> response = new VMResponse<VMMDoctor?>();
             try
             {
-                if (id > 0)
-                {
-                    response.Data = (
+                VMMDoctor? DetailDokter = (
+                    from doktor in db.MDoctors
+                    join biodata in db.MBiodata on doktor.BiodataId equals biodata.Id
+                    where doktor.IsDelete == false
+                    && (doktor.Id == id)
+                    select new VMMDoctor
+                    {
+                        Id = doktor.Id,
+                        ImagePath = biodata.ImagePath,
+                        BiodataId = biodata.Id,
+                        Fullname = biodata.Fullname
+                    }
+                ).FirstOrDefault();
 
-                        from doktor in db.MDoctors join biodata in db.MBiodata on doktor.BiodataId equals biodata.Id
-                        where doktor.IsDelete == false
-                        && (doktor.Id == id)
-                        select new VMMDoctor
-                        {
-                            Id = doktor.Id,
-                            ImagePath = biodata.ImagePath,
-                            BiodataId = biodata.Id,
-                            Fullname = biodata.Fullname,
-
-                            SpecializationName = (
+                DetailDokter!.SpecializationName = (
                                 from Cspesialisation in db.TCurrentDoctorSpecializations
                                 join s in db.MSpecializations on Cspesialisation.SpecializationId equals s.Id // untuk ngambil nama spesialisasi
-                                where doktor.Id == Cspesialisation.DoctorId &&
-                                doktor.IsDelete == false && Cspesialisation.IsDelete == false
-                                select new VMTCurrentDoctorSpecialization
-                                {
-                                    Id = Cspesialisation.Id,
-                                    Specialization = s.Name,
-                                    SpecializationId = Cspesialisation.SpecializationId
-                                }
-                            ).ToList(),
-
-                            // untuk ngambil nama tindakan medis
-                            TreatmentName = (
+                                where Cspesialisation.DoctorId == DetailDokter.Id &&
+                                Cspesialisation.IsDelete == false
+                                select s.Name
+               ).FirstOrDefault();
+                DetailDokter.SpecializationId = (
+                                from Cspesialisation in db.TCurrentDoctorSpecializations
+                                join s in db.MSpecializations on Cspesialisation.SpecializationId equals s.Id // untuk ngambil nama spesialisasi
+                                where Cspesialisation.DoctorId == DetailDokter.Id &&
+                                Cspesialisation.IsDelete == false
+                                select s.Id
+               ).FirstOrDefault();
+                DetailDokter.TreatmentName = (
                                 from tindakanmedis in db.TDoctorTreatments
-                                where doktor.Id == tindakanmedis.DoctorId &&
-                                doktor.IsDelete == false && tindakanmedis.IsDelete == false
+                                where tindakanmedis.DoctorId == DetailDokter.Id &&
+                                tindakanmedis.IsDelete == false
                                 select new VMTDoctorTreatment
                                 {
                                     Id = tindakanmedis.Id,
                                     Name = tindakanmedis.Name
                                 }
-                            ).ToList(),
-
-                            DoctorOffice = (
+                 ).ToList();
+                DetailDokter.DoctorOffice = (
                                     from riwayarpraktek in db.TDoctorOffices
                                     join d in db.MMedicalFacilities on riwayarpraktek.MedicalFacilityId equals d.Id
                                     join e in db.MLocations on d.LocationId equals e.Id // untuk ngambil nama lokasi rumah sakit dan spesialisasi
-                                    where doktor.Id == riwayarpraktek.DoctorId &&
-                                doktor.IsDelete == false && riwayarpraktek.IsDelete == false
+                                    where riwayarpraktek.DoctorId == DetailDokter.Id &&
+                                    riwayarpraktek.IsDelete == false
                                     orderby riwayarpraktek.EndDate descending
                                     select new VMTDoctorOffice
                                     {
@@ -77,14 +76,14 @@ namespace HealthCare340B.DataAccess
                                         StartDate = riwayarpraktek.StartDate,
                                         EndDate = riwayarpraktek.EndDate,
                                         FullAddress = d.FullAddress,
-                                        MedicalFacilityName = d.Name
+                                        MedicalFacilityName = d.Name                                        
                                     }
-                            ).ToList(),
-
-                            InstitutionName = (
+                            ).ToList();
+                DetailDokter.InstitutionName = (
                                 from pendidikan in db.MDoctorEducations
-                                where pendidikan.DoctorId == doktor.Id &&
-                                doktor.IsDelete == false && pendidikan.IsDelete == false
+                                where pendidikan.DoctorId == DetailDokter.Id &&
+                                pendidikan.IsDelete == false
+                                orderby pendidikan.EndYear descending
                                 select new VMMDoctorEducation
                                 {
                                     Id = pendidikan.Id,
@@ -92,48 +91,33 @@ namespace HealthCare340B.DataAccess
                                     Major = pendidikan.Major,
                                     EndYear = pendidikan.EndYear
                                 }
-                            ).ToList(),
-                            Appointment = (
-                                from janji in db.TAppointments
-                                join doff in db.TDoctorOffices on janji.DoctorOfficeId equals doff.Id
-                                where janji.IsDelete == false && doktor.Id == doff.DoctorId && janji.IsDelete == false
-                                select new VMTAppointment
-                                {
-                                    Id = janji.Id
-                                }
-                            ).ToList(),
-                            //obrolan
-                            Obrolan = (
+                            ).ToList();
+                DetailDokter.Appointment = (
+                    from janji in db.TAppointments
+                    join doff in db.TDoctorOffices on janji.DoctorOfficeId equals doff.Id
+                    where janji.IsDelete == false && DetailDokter.Id == doff.DoctorId && janji.IsDelete == false
+                    select janji.Id
+                ).Count();
+                //obrolan
+                DetailDokter.Obrolan = (
                                 from obrolan in db.TCustomerChats
-                                where doktor.Id == obrolan.DoctorId &&
-                                obrolan.IsDelete == false &&
-                                doktor.IsDelete == false
-                                select new VMTCustomerChat
-                                {
-                                    Id = obrolan.Id
-                                }                            
-                            ).ToList(),
+                                where obrolan.DoctorId == DetailDokter.Id &&
+                                obrolan.IsDelete == false
+                                select obrolan.Id
+                                
+                ).Count();
 
-                        }
+                response.Data = DetailDokter;
 
-                    ).FirstOrDefault();
+                response.Message =
+                    (response.Data != null)
+                        ? $"{HttpStatusCode.OK} - DetailDokter data successfully fetched"
+                        : $"{HttpStatusCode.NoContent} - No DetailDokter found";
 
-                    if (response.Data != null)
-                    {
-                        response.StatusCode = HttpStatusCode.OK;
-                        response.Message = $"{HttpStatusCode.OK} - Dokter Profil Sukses Full";
-                    }
-                    else
-                    {
-                        response.StatusCode = HttpStatusCode.NoContent;
-                        response.Message = $"{HttpStatusCode.NoContent} - Dokter Profil does not exis";
-                    }
-                }
-                else
-                {
-                    response.StatusCode = HttpStatusCode.BadRequest;
-                    response.Message = $"{HttpStatusCode.BadRequest} - please input Dokter Profil";
-                }
+                response.StatusCode =
+                    (response.Data != null) ? HttpStatusCode.OK : HttpStatusCode.NoContent;
+
+
             }
             catch (Exception e)
             {
@@ -233,6 +217,147 @@ namespace HealthCare340B.DataAccess
             VMResponse<VMMDoctor?> response = new VMResponse<VMMDoctor?>();
             try
             {
+                VMMDoctor? DetailDokter = (
+                    from doktor in db.MDoctors
+                    join biodata in db.MBiodata on doktor.BiodataId equals biodata.Id
+                    where doktor.IsDelete == false
+                    && (doktor.Id == id)
+                    select new VMMDoctor
+                    {
+                        Id = doktor.Id,
+                        ImagePath = biodata.ImagePath,
+                        BiodataId = biodata.Id,
+                        Fullname = biodata.Fullname
+                    }
+                ).FirstOrDefault();
+
+                DetailDokter!.SpecializationName = (
+                                from Cspesialisation in db.TCurrentDoctorSpecializations
+                                join s in db.MSpecializations on Cspesialisation.SpecializationId equals s.Id // untuk ngambil nama spesialisasi
+                                where Cspesialisation.DoctorId == DetailDokter.Id &&
+                                Cspesialisation.IsDelete == false
+                                select s.Name                                    
+               ).FirstOrDefault();
+                DetailDokter.TreatmentName = (
+                                from tindakanmedis in db.TDoctorTreatments
+                                where tindakanmedis.DoctorId == DetailDokter.Id &&
+                                tindakanmedis.IsDelete == false
+                                select new VMTDoctorTreatment
+                                {
+                                    Id = tindakanmedis.Id,
+                                    Name = tindakanmedis.Name
+                                }
+                 ).ToList();
+                DetailDokter.DoctorOffice = (
+                                    from riwayarpraktek in db.TDoctorOffices
+                                    join d in db.MMedicalFacilities on riwayarpraktek.MedicalFacilityId equals d.Id
+                                    join e in db.MLocations on d.LocationId equals e.Id // untuk ngambil nama lokasi rumah sakit dan spesialisasi
+                                    where riwayarpraktek.DoctorId == DetailDokter.Id &&
+                                    riwayarpraktek.IsDelete == false
+                                    orderby riwayarpraktek.EndDate descending
+                                    select new VMTDoctorOffice
+                                    {
+                                        Id = riwayarpraktek.Id,
+                                        LocationName = e.Name,
+                                        Specialization = riwayarpraktek.Specialization,
+                                        StartDate = riwayarpraktek.StartDate,
+                                        EndDate = riwayarpraktek.EndDate,
+                                        FullAddress = d.FullAddress,
+                                        MedicalFacilityName = d.Name,
+                                        JadwalPraktek = (
+                                                from mfs in db.MMedicalFacilitySchedules
+                                                join mf in db.MMedicalFacilities on mfs.MedicalFacilityId equals mf.Id
+                                                join mfc in db.MMedicalFacilityCategories on mf.MedicalFacilityCategoryId equals mfc.Id
+                                                join dof in db.TDoctorOffices on mf.Id equals dof.MedicalFacilityId
+                                                where dof.DoctorId == DetailDokter.Id && mfs.IsDelete == false && mfs.MedicalFacilityId == riwayarpraktek.MedicalFacilityId
+                                                select new VMMMedicalFacilitySchedule
+                                                {
+                                                    Day = mfs.Day,
+                                                    TimeScheduleStart = mfs.TimeScheduleStart,
+                                                    TimeScheduleEnd = mfs.TimeScheduleEnd
+
+                                                }
+                                            ).ToList(),
+                                        HargaKonsulMulai = (
+                                                from dotp in db.TDoctorOfficeTreatmentPrices
+                                                join dot in db.TDoctorOfficeTreatments on dotp.DoctorOfficeTreatmentId equals dot.Id
+                                                join dof in db.TDoctorOffices on dot.DoctorOfficeId equals dof.Id
+                                                where dof.DoctorId == DetailDokter.Id
+                                                      && dotp.IsDelete == false
+                                                      && dof.MedicalFacilityId == riwayarpraktek.MedicalFacilityId
+                                                select dotp.PriceStartFrom
+                                        ).Min()
+                                    }
+                            ).ToList();
+                DetailDokter.TotalYearsExperience = (
+                        from riwayarpraktek in db.TDoctorOffices
+                        where riwayarpraktek.DoctorId == DetailDokter.Id && riwayarpraktek.IsDelete == false
+                        select riwayarpraktek.EndDate.HasValue
+                            ? riwayarpraktek.EndDate.Value.Year - riwayarpraktek.StartDate.Year
+                            : 1
+                    ).Sum();
+                DetailDokter.InstitutionName = (
+                                from pendidikan in db.MDoctorEducations
+                                where pendidikan.DoctorId == DetailDokter.Id&&
+                                pendidikan.IsDelete == false
+                                orderby pendidikan.EndYear descending
+                                select new VMMDoctorEducation
+                                {
+                                    Id = pendidikan.Id,
+                                    InstitutionName = pendidikan.InstitutionName,
+                                    Major = pendidikan.Major,
+                                    EndYear = pendidikan.EndYear
+                                }
+                            ).ToList();
+
+                //detail dokter tambahan
+                DetailDokter.JadwalPraktek = (
+                                 from mfs in db.MMedicalFacilitySchedules
+                                 join mf in db.MMedicalFacilities on mfs.MedicalFacilityId equals mf.Id
+                                 join mfc in db.MMedicalFacilityCategories on mf.MedicalFacilityCategoryId equals mfc.Id
+                                 join dof in db.TDoctorOffices on mf.Id equals dof.MedicalFacilityId
+                                 where dof.DoctorId == DetailDokter.Id && mfs.IsDelete == false
+                                 select new VMMMedicalFacilitySchedule
+                                 {
+                                     Day = mfs.Day,
+                                     TimeScheduleStart = mfs.TimeScheduleStart,
+                                     TimeScheduleEnd = mfs.TimeScheduleEnd
+
+                                 }
+                             ).ToList();
+                DetailDokter.HargaKonsulMulai = (
+                                from dotp in db.TDoctorOfficeTreatmentPrices
+                                join dot in db.TDoctorOfficeTreatments on dotp.DoctorOfficeTreatmentId equals dot.Id
+                                join dof in db.TDoctorOffices on dot.DoctorOfficeId equals dof.Id
+                                where dof.DoctorId == DetailDokter.Id && dotp.IsDelete == false
+                                select dotp.Price
+                                
+                            ).FirstOrDefault();
+
+                response.Data = DetailDokter;
+
+                response.Message =
+                    (response.Data != null)
+                        ? $"{HttpStatusCode.OK} - DetailDokter data successfully fetched"
+                        : $"{HttpStatusCode.NoContent} - No DetailDokter found";
+
+                response.StatusCode =
+                    (response.Data != null) ? HttpStatusCode.OK : HttpStatusCode.NoContent;
+
+            }
+            catch (Exception e)
+            {
+
+                response.Message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
+            }
+            return response;
+
+        }
+        public VMResponse<VMMDoctor?> GetByDetailDokter2(long id)
+        {
+            VMResponse<VMMDoctor?> response = new VMResponse<VMMDoctor?>();
+            try
+            {
                 if (id > 0)
                 {
                     response.Data = (
@@ -248,18 +373,18 @@ namespace HealthCare340B.DataAccess
                             BiodataId = biodata.Id,
                             Fullname = biodata.Fullname,
 
-                            SpecializationName = (
-                                from Cspesialisation in db.TCurrentDoctorSpecializations
-                                join s in db.MSpecializations on Cspesialisation.SpecializationId equals s.Id // untuk ngambil nama spesialisasi
-                                where doktor.Id == Cspesialisation.DoctorId &&
-                                Cspesialisation.IsDelete == false
-                                select new VMTCurrentDoctorSpecialization
-                                {
-                                    Id = Cspesialisation.Id,
-                                    Specialization = s.Name,
-                                    SpecializationId = Cspesialisation.SpecializationId
-                                }
-                            ).ToList(),
+                            //SpecializationName = (
+                            //    from Cspesialisation in db.TCurrentDoctorSpecializations
+                            //    join s in db.MSpecializations on Cspesialisation.SpecializationId equals s.Id // untuk ngambil nama spesialisasi
+                            //    where doktor.Id == Cspesialisation.DoctorId &&
+                            //    Cspesialisation.IsDelete == false
+                            //    select new VMTCurrentDoctorSpecialization
+                            //    {
+                            //        Id = Cspesialisation.Id,
+                            //        Specialization = s.Name,
+                            //        SpecializationId = Cspesialisation.SpecializationId
+                            //    }
+                            //).FirstOrDefault(),
 
                             // untuk ngambil nama tindakan medis
                             TreatmentName = (
@@ -303,18 +428,18 @@ namespace HealthCare340B.DataAccess
 
                                                 }
                                             ).ToList(),
-                                        HargaKonsulMulai = (
-                                                from dotp in db.TDoctorOfficeTreatmentPrices
-                                                join dot in db.TDoctorOfficeTreatments on dotp.DoctorOfficeTreatmentId equals dot.Id
-                                                join dof in db.TDoctorOffices on dot.DoctorOfficeId equals dof.Id
-                                                where doktor.Id ==  dof.DoctorId && dotp.IsDelete == false && dof.MedicalFacilityId == riwayarpraktek.MedicalFacilityId
-                                                select new VMTDoctorOfficeTreatmentPrice
-                                                {
-                                                    Price = dotp.Price,
-                                                    PriceStartFrom = dotp.PriceStartFrom,
-                                                    PriceUntilFrom = dotp.PriceUntilFrom
-                                                }
-                                            ).ToList()
+                                        //HargaKonsulMulai = (
+                                        //        from dotp in db.TDoctorOfficeTreatmentPrices
+                                        //        join dot in db.TDoctorOfficeTreatments on dotp.DoctorOfficeTreatmentId equals dot.Id
+                                        //        join dof in db.TDoctorOffices on dot.DoctorOfficeId equals dof.Id
+                                        //        where doktor.Id == dof.DoctorId && dotp.IsDelete == false && dof.MedicalFacilityId == riwayarpraktek.MedicalFacilityId
+                                        //        select new VMTDoctorOfficeTreatmentPrice
+                                        //        {
+                                        //            Price = dotp.Price,
+                                        //            PriceStartFrom = dotp.PriceStartFrom,
+                                        //            PriceUntilFrom = dotp.PriceUntilFrom
+                                        //        }
+                                        //    ).ToList()
                                     }
                             ).ToList(),
                             MaxEndDate = (
@@ -341,25 +466,6 @@ namespace HealthCare340B.DataAccess
                                     EndYear = pendidikan.EndYear
                                 }
                             ).ToList(),
-                            Appointment = (
-                                from janji in db.TAppointments
-                                join doff in db.TDoctorOffices on janji.DoctorOfficeId equals doff.Id
-                                where janji.IsDelete == false && doktor.Id == doff.DoctorId
-                                select new VMTAppointment
-                                {
-                                    Id = janji.Id
-                                }
-                            ).ToList(),
-                            //obrolan
-                            Obrolan = (
-                                from obrolan in db.TCustomerChats
-                                where doktor.Id == obrolan.DoctorId &&
-                                obrolan.IsDelete == false 
-                                select new VMTCustomerChat
-                                {
-                                    Id = obrolan.Id
-                                }
-                            ).ToList(),
 
                             //detail dokter tambahan
                             JadwalPraktek = (
@@ -376,7 +482,7 @@ namespace HealthCare340B.DataAccess
 
                                 }
                             ).ToList(),
-                            HargaKonsulMulai = (
+                            /*HargaKonsulMulai = (
                                 from dotp in db.TDoctorOfficeTreatmentPrices
                                 join dot in db.TDoctorOfficeTreatments on dotp.DoctorOfficeTreatmentId equals dot.Id
                                 join dof in db.TDoctorOffices on dot.DoctorOfficeId equals dof.Id
@@ -387,7 +493,7 @@ namespace HealthCare340B.DataAccess
                                     PriceStartFrom = dotp.PriceStartFrom,
                                     PriceUntilFrom = dotp.PriceUntilFrom
                                 }
-                            ).ToList()
+                            ).ToList()*/
 
                         }
 

@@ -129,16 +129,9 @@ namespace HealthCare340B.Web.Controllers
 
         public async Task<IActionResult> DetailDoctor(int? id)
         {
-            ViewBag.Title = "Profil";
+            ViewBag.Title = "Detail Dokter";
             ViewBag.imgFolder = imageFolder;
-            ViewBag.Specialization = await specialization.getByFilter("");
             ViewBag.Role = HttpContext.Session.GetString("userRoleCode")!;
-
-            ViewBag.Breadcrumb = new List<BreadcrumbItem>
-    {
-        new BreadcrumbItem { Name = "Beranda", Controller = "Home", Action = "Index" },
-        new BreadcrumbItem { Name = "Profil", IsActive = true }
-    };
 
             VMMDoctor? data = null;
 
@@ -155,7 +148,6 @@ namespace HealthCare340B.Web.Controllers
                 {
                     return NotFound("Doctor not found for the given Biodata ID.");
                 }
-
                 data = await profile.GetByDetailDokter(GetDoctorByBiodataId.Id);
             }
             else

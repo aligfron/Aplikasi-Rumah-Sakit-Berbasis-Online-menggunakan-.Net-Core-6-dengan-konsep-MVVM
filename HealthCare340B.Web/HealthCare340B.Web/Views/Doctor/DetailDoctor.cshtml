@@ -34,78 +34,30 @@
                         </div>
                         <div class="col-4 text-center">
                             <h3 class="mt-3 mb-0">@Model.Fullname</h3>
-                            @if (Model.SpecializationName.Count > 0)
+                            @if (Model.SpecializationName != null)
                             {
-                                @foreach (VMTCurrentDoctorSpecialization specialization in Model.SpecializationName)
-                                {
-                                    if (specialization.Specialization != null)
-                                    {
-                                        <p class="text-small mb-0">@specialization.Specialization</p>
-                                    }
-                                }
+                                <p class="text-small mb-0">@Model.SpecializationName</p>
                             }
                             else
                             {
-                                <p>Data Spesialisasi Belum ditambahkan</p>
+                                <p>Anda Belum Menambahkan Spesialisasi</p>
                             }
-                            @if (Model.MaxEndDate.Count > 0)
-                            {
-                                int maxYear = 0;
-                                List<int> tampungNilai = new List<int>();
 
-                                foreach (VMTDoctorOffice maxenddate in Model.MaxEndDate)
-                                {
-
-
-                                    if (maxenddate.EndDate.HasValue)  
-                                    {
-                                        int yearend = maxenddate.EndDate.Value.Year;
-                                        int yearstar = maxenddate.StartDate.Year;
-                                        if (yearend == yearstar)
-                                        {
-                                            int jumlah = 1;
-                                            tampungNilai.Add(jumlah);
-
-                                        }
-                                        else
-                                        {
-                                            int jumlah = yearend - yearstar;
-                                            tampungNilai.Add(jumlah);
-                                        }
-                                    }
-                                }
-                                int total = tampungNilai.Sum();
-
-                                <p>@(total) Tahun Pengalaman</p>
+                            <p>@Model.TotalYearsExperience Tahun Pengalaman</p>
                                
-                            }
-                            else
-                            {
-                                <p>Data Tahun pengalaman belum ditambahkan</p> 
-                            }
                             
                         </div>
                         <div class="col-4 text-center">
                             <button class="btn btn-primary">Chat Dokter</button>
 
-                            @if (Model.HargaKonsulMulai.Count > 0)
+                            @if (Model.HargaKonsulMulai != null)
                             {
-                                int i = 0;
-                                foreach (VMTDoctorOfficeTreatmentPrice chatdokter in Model.HargaKonsulMulai)
-                                {
-                                    if (i == 0)
-                                    {
-                                        <p class="mt-3">Rp. @String.Format("{0:N0}", chatdokter.Price)</p>
-                                    }
-                                    i++;
-                                }
+                                <p class="mt-3">Rp. @String.Format("{0:N0}", Model.HargaKonsulMulai)</p>                                    
                             }
-
                             else
                             {
                                 <p class="mt-3">Tidak Membuka layanan Online</p>
-                            }
-                            
+                            }                            
                         </div>
                     </div>
 
@@ -201,11 +153,8 @@
                                         <div class="row">
                                             <div class="col-6">
                                                     <p class="mb-0 text-primary"><strong>@riwayarpraktek.LocationName</strong></p>
-
-
                                                     <p class="fs-6 ps-3 small mb-0">@riwayarpraktek.MedicalFacilityName</p>
-                                                    <p class="ps-3 small mb-0"><i class="bi bi-geo-alt-fill"></i> @riwayarpraktek.FullAddress</p>
-                                                
+                                                    <p class="ps-3 small mb-0"><i class="bi bi-geo-alt-fill"></i> @riwayarpraktek.FullAddress</p>                                                
                                             </div>
                                                 <div class="col-2">
                                                     
@@ -213,17 +162,9 @@
                                             <div class="col-4 text-center"> 
                                                 <p class="small text-muted"></p>
                                                     Konsultasi Mulai dari<br />
-                                                    @if (riwayarpraktek.HargaKonsulMulai.Count > 0)
+                                                    @if (riwayarpraktek.HargaKonsulMulai != null)
                                                     {
-                                                        List<int> tampungNilai = new List<int>();
-                                                        @foreach (VMTDoctorOfficeTreatmentPrice hargakonsulmulai in riwayarpraktek.HargaKonsulMulai)
-                                                        {
-                                                            int item = (int)hargakonsulmulai.PriceStartFrom!;
-
-                                                            tampungNilai.Add(item);
-                                                        }
-                                                        int minharga = tampungNilai.Min();
-                                                        <p>Rp. @String.Format("{0:N0}", minharga)</p>
+                                                        <p>Rp. @String.Format("{0:N0}", riwayarpraktek.HargaKonsulMulai)</p>
                                                     }
                                                     else
                                                     {

@@ -1,25 +1,20 @@
-﻿
-    @if (Model.SpecializationName.Count > 0)
-    {
-        foreach (VMTCurrentDoctorSpecialization specialization in Model.SpecializationName)
-        {
-            <h5>Nama Spesialisasi: @specialization.Specialization</h5>
-            
-            <button class="btn btn-success position-absolute" data-id="@specialization.Id" style="bottom: 30px; right: 30px;" title="Edit" data-bs-toggle="modal" data-bs-target="#staticModal">
-                <i class="bi bi-pencil-fill"></i> Ubah Spesialisasi
-            </button>
-        }
-    }
-    else
-    {
-        <h5>Anda Belum Menambahkan Spesialisasi</h5>
-        <p style="font-size: smaller;">*Silahkan isi spesialisasi pada tombol tambah</p>
+﻿@if (Model.SpecializationName != null)
+{
+    <h5>Nama Spesialisasi: @Model.SpecializationName</h5>
 
-        <button class="btn btn-primary position-absolute" data-id="@Model.Id" style="bottom: 30px; right: 30px;" title="Edit" data-bs-toggle="modal" data-bs-target="#staticModal">
-            <i class="bi bi-plus-circle"></i> Tambah Spesialisasi
-        </button>
-    }
+    <button class="btn btn-success position-absolute" data-id="@Model.SpecializationId" style="bottom: 30px; right: 30px;" title="Edit" data-bs-toggle="modal" data-bs-target="#staticModal">
+        <i class="bi bi-pencil-fill"></i> Ubah Spesialisasi
+    </button>
+}
+else
+{
+    <h5>Anda Belum Menambahkan Spesialisasi</h5>
+    <p style="font-size: smaller;">*Silahkan isi spesialisasi pada tombol tambah</p>
 
+    <button class="btn btn-primary position-absolute" data-id="@Model.Id" style="bottom: 30px; right: 30px;" title="Edit" data-bs-toggle="modal" data-bs-target="#staticModal">
+        <i class="bi bi-plus-circle"></i> Tambah Spesialisasi
+    </button>
+}
 <script>
     $(".btn-primary").click(function (e) {
         $("#staticModalBody").html("");
