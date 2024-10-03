@@ -20,7 +20,7 @@ namespace HealthCare340B.Web.Models
         {
             apiUrl = _config["ApiUrl"];
         }
-        public async Task<VMResponse<VMTToken>> ConfirmAsync(string email) 
+        public async Task<VMResponse<VMTToken>> EmailConfirmAsync(string email) 
         {
             VMResponse<VMTToken> apiResponse = new VMResponse<VMTToken>();
             try 
@@ -36,8 +36,9 @@ namespace HealthCare340B.Web.Models
                 {
                     if (apiResponse.StatusCode == HttpStatusCode.Created)
                     {
-                        throw new Exception(apiResponse.Message);
+                        return apiResponse;
                     }
+                    
                 }
                 else 
                 {
@@ -61,7 +62,7 @@ namespace HealthCare340B.Web.Models
                 content = new StringContent(jsonData, Encoding.UTF8, "application/json");
                 apiResponse = JsonConvert.DeserializeObject<VMResponse<VMTToken>?>(
                               await httpClient
-                              .PutAsync($"{apiUrl}Register/VerifyOTP", content)
+                              .PostAsync($"{apiUrl}Register/VerifyOTP", content)
                               .Result.Content.ReadAsStringAsync()
                 );
                 if (apiResponse != null)

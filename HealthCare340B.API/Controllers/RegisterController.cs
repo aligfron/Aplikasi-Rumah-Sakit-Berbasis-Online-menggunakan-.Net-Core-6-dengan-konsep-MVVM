@@ -26,21 +26,27 @@ namespace HealthCare340B.API.Controllers
             {
                 VMResponse<VMTToken> response = await Task.Run(() => user.GenerateOTP(email));
 
+                if (response.Data != null)
+                {
+                    var mail = new MimeMessage();
+                    mail.From.Add(MailboxAddress.Parse("alvafikri14@gmail.com"));
+                    mail.To.Add(MailboxAddress.Parse(response.Data.Email));
 
-                var mail = new MimeMessage();
-                mail.From.Add(MailboxAddress.Parse("alvafikri14@gmail.com"));
-                mail.To.Add(MailboxAddress.Parse(response.Data.Email));
+                    mail.Subject = "OTP Verification";
+                    mail.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = $"your OTP is {response.Data.Token}" };
 
-                mail.Subject = "OTP Verification";
-                mail.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = $"your OTP is {response.Data.Token}" };
-
-                using var smtp = new MailKit.Net.Smtp.SmtpClient();
-                smtp.Connect("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
-                smtp.Authenticate("alvafikri14@gmail.com", "tirk fjil eirm ggja");
-                smtp.Send(mail);
-                smtp.Disconnect(true);
-                smtp.Dispose();
-                return Created("", new { Message = "OTP successfully created." });
+                    using var smtp = new MailKit.Net.Smtp.SmtpClient();
+                    smtp.Connect("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+                    smtp.Authenticate("alvafikri14@gmail.com", "tirk fjil eirm ggja");
+                    smtp.Send(mail);
+                    smtp.Disconnect(true);
+                    smtp.Dispose();
+                    return Created("api/Register", response);
+                }
+                else 
+                {
+                    return BadRequest(response.Message);
+                }
             }
             catch (Exception ex) 
             {
