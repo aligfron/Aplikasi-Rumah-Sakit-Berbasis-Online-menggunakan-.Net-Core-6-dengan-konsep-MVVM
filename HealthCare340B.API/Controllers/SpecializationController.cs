@@ -110,6 +110,10 @@ namespace HealthCare340B.API.Controllers
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(Data?.Name))
+                {
+                    return BadRequest("Input tidak boleh kosong atau hanya berisi spasi.");
+                }
                 return Created("api/spec", await Task.Run(() => spec.Create(Data)));
             }
             catch (Exception ex)
@@ -118,6 +122,7 @@ namespace HealthCare340B.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
 
         [HttpPut]
         public async Task<ActionResult> Update(VMMSpecialization Data)

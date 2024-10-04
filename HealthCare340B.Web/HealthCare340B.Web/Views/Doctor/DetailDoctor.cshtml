@@ -14,7 +14,7 @@
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="#" id="breadcrumbProfile">Cari Dokter</a></li>
+                        <li class="breadcrumb-item"><a href="#" id="kembali-btn">Cari Dokter</a></li>
                         <li class="breadcrumb-item text-muted" aria-current="page" id="breadcrumbCurrent">@Model.Fullname</li>
                     </ol>
                 </nav>
@@ -40,7 +40,7 @@
                             }
                             else
                             {
-                                <p>Anda Belum Menambahkan Spesialisasi</p>
+                                <p>Belum Ada Spesialisasi</p>
                             }
 
                             <p>@Model.TotalYearsExperience Tahun Pengalaman</p>
@@ -88,13 +88,14 @@
                                 <div style="border: 1px solid #d3d3d3; border-radius: 5px; padding: 10px;  margin-top: 10px;">
                                     @foreach (VMTDoctorOffice riwayarpraktek in Model.DoctorOffice)
                                     {
-                                        <div class="d-flex justify-content-between">
-                                            <div>
+                                        <div class="row">
+                                            <div class="col-8">
                                                 <p class="mb-0">@riwayarpraktek.LocationName</p>
                                                 <p class="text-muted small mb-0  ps-3">- @riwayarpraktek.Specialization</p>
                                             </div>
-                                            <div>
-                                                <p class="small text-muted">
+                                            <div class="col-1"></div>
+                                            <div class="col-3">
+                                                <p class="small">
                                                     @riwayarpraktek.StartDate.Year
                                                     -
                                                     @(riwayarpraktek.EndDate.HasValue && riwayarpraktek.EndDate.Value.Year == DateTime.Now.Year
@@ -214,7 +215,7 @@
                                 <table style="border: 2px solid #b0c4de; border-radius: 5px; padding: 10px; width: 100%; margin-top: 10px; border-collapse: separate; border-spacing: 0;">
                                     <tr style="border-bottom: 2px solid var(--bs-primary); text-align: center;  padding: 10px;">
                                         <td>
-                                            <p>Anda Belum Menambahkan Riwayat Praktek</p>
+                                            <p>Belum Ada Daftar Praktek</p>
                                         </td>
                                     </tr>
                                     <tr>
@@ -279,6 +280,14 @@
             } else {
                 toggleText.html('<i class="bi bi-caret-down"></i> Lihat Jadwal Praktek');
             }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#kembali-btn').click(function (e) {
+            e.preventDefault(); // Mencegah default action anchor
+            window.history.back(); // Kembali ke halaman sebelumnya
         });
     });
 </script>

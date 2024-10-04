@@ -47,7 +47,7 @@
 
                             @if (Model.SpecializationName != null)
                             {
-                                <p class="text-small mb-0">@Model.SpecializationName</p>
+                                <p class="text-small mb-0 text-center">@Model.SpecializationName</p>
                             }
                             else
                             {
@@ -103,13 +103,14 @@
 
                                 @foreach (VMTDoctorOffice riwayarpraktek in Model.DoctorOffice)
                                 {
-                                    <div class="d-flex justify-content-between">
-                                        <div>
+                                    <div class="row">
+                                        <div class="col-8">
                                             <p class="mb-0">@riwayarpraktek.LocationName</p>
-                                            <p class="text-muted small mb-0  ps-3">-@riwayarpraktek.Specialization</p>
+                                            <p class="text-muted small mb-0  ps-3">- @riwayarpraktek.Specialization</p>
                                         </div>
-                                        <div>
-                                            <p class="small text-muted">
+                                        <div class="col-1"></div>
+                                        <div class="col-3">
+                                            <p class="small">
                                                 @riwayarpraktek.StartDate.Year
                                                 -
                                                 @(riwayarpraktek.EndDate.HasValue && riwayarpraktek.EndDate.Value.Year == DateTime.Now.Year

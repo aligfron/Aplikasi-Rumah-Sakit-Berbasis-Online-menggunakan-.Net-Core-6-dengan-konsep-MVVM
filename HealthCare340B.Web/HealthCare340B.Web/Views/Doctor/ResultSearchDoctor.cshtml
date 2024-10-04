@@ -86,7 +86,7 @@
                                     <div class="col-md-4 text-center">
                                         @if (!string.IsNullOrEmpty(doctor.ImagePath))
                                         {
-                                            <img id="profileImage" src="~/@ViewBag.ImgFolder/@(doctor.ImagePath ?? "images/images_doctor.jpeg")" alt="Avatar" class="rounded-circle" style="width: 100px; height: 100px;">
+                                            <img id="profileImage" src="~/@ViewBag.ImgFolder/@(doctor.ImagePath ?? "images/blank-profile-picture.png")" alt="Avatar" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
                                         }
                                         else
                                         {
