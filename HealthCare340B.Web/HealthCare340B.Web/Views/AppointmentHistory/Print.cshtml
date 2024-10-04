@@ -31,7 +31,11 @@
                 },
                 dataType: "json",
                 beforeSend: () => {
-
+                    // Change the button to show a spinner
+                    $(this).html(`
+                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                        Sedang diproses...
+                    `).attr("disabled", true); // Disable button while processing
                 },
                 success: function (response) {
                     if (response.statusCode == 200 || response.statusCode == 201) {

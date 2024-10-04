@@ -25,14 +25,25 @@ namespace HealthCare340B.DataAccess
 
             try
             {
+                //List<long> customerIds = (
+                //    from cm in _db.MCustomerMembers
+                //    join c in _db.MCustomers on cm.CustomerId equals c.Id
+                //    join cr in _db.MCustomerRelations on cm.CustomerRelationId equals cr.Id
+                //    where
+                //        cm.IsDelete == false
+                //        && c.IsDelete == false
+                //        && cr.IsDelete == false
+                //        && cm.ParentBiodataId == parentBiodataId
+                //    select c.Id
+                //).ToList();
+
+                // Riwayat medis pasien akan tetap tersimpan jika customer dan relasi customer dihapus
                 List<long> customerIds = (
                     from cm in _db.MCustomerMembers
                     join c in _db.MCustomers on cm.CustomerId equals c.Id
                     join cr in _db.MCustomerRelations on cm.CustomerRelationId equals cr.Id
                     where
-                        cm.IsDelete == false
-                        && c.IsDelete == false
-                        && cr.IsDelete == false
+                        c.IsDelete == false
                         && cm.ParentBiodataId == parentBiodataId
                     select c.Id
                 ).ToList();
@@ -57,6 +68,7 @@ namespace HealthCare340B.DataAccess
                     where
                         ad.IsDelete == false
                         && a.IsDelete == false
+                        && a.AppointmentDate <= DateTime.Today
                         && customerIds.Contains(a.CustomerId!.Value)
                     select new VMTAppointmentDone
                     {
@@ -198,7 +210,6 @@ namespace HealthCare340B.DataAccess
                             a.CustomerFullname.ToLower().Contains(filter.ToLower())
                             || a.DoctorFullname.ToLower().Contains(filter.ToLower())
                         )
-                        && a.AppointmentDate < DateTime.Now
                     select a
                 ).ToList();
 
@@ -232,7 +243,7 @@ namespace HealthCare340B.DataAccess
                         ad.IsDelete == false
                         && a.IsDelete == false
                         && a.Id == appointmentId
-                        && a.AppointmentDate < DateTime.Now
+                        && a.AppointmentDate <= DateTime.Today
                     select new VMTAppointmentDone
                     {
                         Id = ad.Id,

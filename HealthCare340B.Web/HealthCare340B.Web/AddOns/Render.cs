@@ -18,15 +18,20 @@ namespace HealthCare340B.Web.AddOns
 
             using (var writer = new StringWriter())
             {
-                IViewEngine viewEngine = controller.HttpContext.RequestServices.GetService(typeof(ICompositeViewEngine)) as ICompositeViewEngine;
-                ViewEngineResult viewResult = viewEngine.FindView(controller.ControllerContext, viewName, !partial);
+                // Use GetRequiredService to avoid null reference issues
+                var viewEngine = controller.HttpContext.RequestServices
+                    .GetRequiredService<ICompositeViewEngine>();
 
-                if (viewResult.Success == false)
+                // Find the view, throw an exception if not found
+                var viewResult = viewEngine.FindView(controller.ControllerContext, viewName, !partial);
+                if (!viewResult.Success)
                 {
-                    return $"A view with the name {viewName} could not be found";
+                    // Log the error and throw an exception
+                    throw new InvalidOperationException($"View '{viewName}' not found.");
                 }
 
-                ViewContext viewContext = new ViewContext(
+                // Set up the ViewContext and render the view to the StringWriter
+                var viewContext = new ViewContext(
                     controller.ControllerContext,
                     viewResult.View,
                     controller.ViewData,

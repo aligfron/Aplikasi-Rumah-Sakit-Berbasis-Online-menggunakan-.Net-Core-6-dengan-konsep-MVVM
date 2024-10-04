@@ -171,11 +171,8 @@ namespace HealthCare340B.Web.Controllers
                         RenderingEngine = RenderingEngine.Blink,
                         PdfPageSize = PdfPageSize.Custom,
                         PdfPageOrientation = PdfPageOrientation.Portrait,
-                        WebPageWidth = 302, // Match 80mm width for the web page
-                        WebPageHeight = 0, // Let SelectPdf calculate height dynamically
-                        WebPageFixedSize = false, // Dynamically adjust the content size
+                        WebPageWidth = 302, // 80mm in pixels
                         AutoFitWidth = HtmlToPdfPageFitMode.ShrinkOnly,
-                        AutoFitHeight = HtmlToPdfPageFitMode.NoAdjustment,
                     },
                 };
 

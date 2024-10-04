@@ -47,7 +47,7 @@
                             <div class="avatar avatar-2xl position-relative">
                                 <img id="profileImage"
                                      src="~/@ViewBag.imgFolder/@(string.IsNullOrEmpty(Context.Session.GetString("userImagePath")) ? "blank-profile-picture.png" : Context.Session.GetString("userImagePath"))"
-                                     alt="Avatar">
+                                     alt="Avatar" style="object-fit: cover;">
                             </div>
                             <label for="imageUpload" class="position-absolute" style="cursor: pointer;">
                                 <i class="fas fa-pencil-alt"></i>
