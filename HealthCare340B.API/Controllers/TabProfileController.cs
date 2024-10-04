@@ -140,13 +140,36 @@ namespace HealthCare340B.API.Controllers
             }
         }
 
-        [HttpPost("[action]/{email?}")]
-        public async Task<ActionResult> GenerateOTP(string email)
+        [HttpPost("UpdatePassword")]
+        public ActionResult<VMResponse<VMMUser>> UpdatePassword([FromBody] VMMUser data)
         {
+            if (data == null || string.IsNullOrEmpty(data.Password))
+            {
+                return BadRequest(new VMResponse<VMMUser>
+                {
+                    Message = "Invalid data",
+                    StatusCode = HttpStatusCode.BadRequest
+                });
+            }
+
+            var response = tabProfile.UpdatePassword(data);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return StatusCode((int)response.StatusCode, response);
+            }
+        }
+
+        [HttpPost("[action]/{email?}")]
+        public async Task<ActionResult<VMResponse<VMTToken>>> GenerateOTP(string email)
+        {
+            var response = new VMResponse<VMTToken>();
             try
             {
-                VMResponse<VMTToken> response = await Task.Run(() => tabProfile.GenerateOTP(email));
-
+                response = await Task.Run(() => tabProfile.GenerateOTP(email));
 
                 var mail = new MimeMessage();
                 mail.From.Add(MailboxAddress.Parse("alvafikri14@gmail.com"));
@@ -161,12 +184,73 @@ namespace HealthCare340B.API.Controllers
                 smtp.Send(mail);
                 smtp.Disconnect(true);
                 smtp.Dispose();
-                return Created("", new { Message = "OTP successfully created." });
+
+                response.StatusCode = HttpStatusCode.Created;
+                response.Message = "OTP successfully created.";
+                return Created("", response);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                response.StatusCode = HttpStatusCode.BadRequest;
+                response.Message = ex.Message;
+                return BadRequest(response);
             }
+        }
+
+        [HttpPost("[action]/{email?}")]
+        public async Task<ActionResult<VMResponse<VMTToken>>> GenerateOTPPassword(string email)
+        {
+            var response = new VMResponse<VMTToken>();
+            try
+            {
+                response = await Task.Run(() => tabProfile.GenerateOTPPassword(email));
+
+                var mail = new MimeMessage();
+                mail.From.Add(MailboxAddress.Parse("alvafikri14@gmail.com"));
+                mail.To.Add(MailboxAddress.Parse(response.Data.Email));
+
+                mail.Subject = "OTP Verification";
+                mail.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = $"your OTP is {response.Data.Token}" };
+
+                using var smtp = new MailKit.Net.Smtp.SmtpClient();
+                smtp.Connect("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+                smtp.Authenticate("alvafikri14@gmail.com", "tirk fjil eirm ggja");
+                smtp.Send(mail);
+                smtp.Disconnect(true);
+                smtp.Dispose();
+
+                response.StatusCode = HttpStatusCode.Created;
+                response.Message = "OTP successfully created.";
+                return Created("", response);
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = HttpStatusCode.BadRequest;
+                response.Message = ex.Message;
+                return BadRequest(response);
+            }
+        }
+
+        [HttpPost("[action]/{OTP?}")]
+        public async Task<ActionResult> VerifyOTP(string OTP)
+        {
+            try
+            {
+                VMResponse<VMTToken> response = await Task.Run(() => tabProfile.VerifyOTP(OTP));
+                if (response.Data != null)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest("OTP is Wrong or Expired");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
 
     }

@@ -380,6 +380,30 @@ namespace HealthCare340B.Web.Controllers
         }
 
 
+        public async Task<IActionResult> CurrentPassword()
+        {
+            ViewBag.Title = "Edit Password";
+            VMMCustomer? data = new VMMCustomer();
+            try
+            {
+                int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
+                data = await profile.GetCustomerByBioId(bioId);
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+
+            if (data == null)
+            {
+                ViewBag.Message = "Tidak ada Profil Customer ditemukan berdasarkan pencarian Anda.";
+                data = new VMMCustomer();
+            }
+            ViewBag.Password = data.Password;
+            return View(data);
+        }
+
+
 
         public async Task<IActionResult> EditPassword()
         {
@@ -400,15 +424,24 @@ namespace HealthCare340B.Web.Controllers
                 ViewBag.Message = "Tidak ada Profil Customer ditemukan berdasarkan pencarian Anda.";
                 data = new VMMCustomer();
             }
+            ViewBag.Password = data.Password;
             return View(data);
         }
 
-        public async Task<IActionResult> OTPEmail()
+        public async Task<IActionResult> OTPEmail(string email)
         {
             ViewBag.Title = "Kirim OTP";
+            ViewBag.Email = email;
             return View();
         }
 
+        public async Task<IActionResult> OTPPassword(string email, string password)
+        {
+            ViewBag.Title = "Kirim OTP";
+            ViewBag.Email = email;
+            ViewBag.Password = password;
+            return View();
+        }
 
         //ali
         public async Task<IActionResult> CreateSpeDoctor(int id)
@@ -484,15 +517,80 @@ namespace HealthCare340B.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<VMResponse<VMMUser>?> UpdateEmail([FromBody] VMMUser data)
+        public async Task<VMResponse<VMTToken>?> GenerateOTPPassword([FromBody] VMEmail data)
         {
             Console.WriteLine("Received email: " + data.Email);
-            return await profile.UpdateEmailAsync(data);
+            var dataToken = new VMTToken { Email = data.Email };
+            return await profile.GenerateOTPPasswordAsync(data.Email, data.Password);
+        }
+
+
+        [HttpPost]
+        public async Task<VMResponse<VMMUser>?> UpdateEmail([FromBody] VMMUser data)
+        {
+
+            VMResponse<VMMUser>? response = null;
+            try
+            {
+                response = await profile.UpdateEmailAsync(data);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    HttpContext.Session.SetString("successMsg", response.Message);
+                }
+                else
+                {
+                    HttpContext.Session.SetString("errMsg", response.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+
+            return (response);
+        }
+
+        [HttpPost]
+        public async Task<VMResponse<VMMUser>?> UpdatePassword([FromBody] VMMUser data)
+        {
+
+            VMResponse<VMMUser>? response = null;
+            try
+            {
+                response = await profile.UpdatePasswordAsync(data);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    HttpContext.Session.SetString("successMsg", response.Message);
+                }
+                else
+                {
+                    HttpContext.Session.SetString("errMsg", response.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
+
+            return (response);
+        }
+
+
+        [HttpPost]
+        public async Task<VMResponse<VMTToken>> VerifyToken([FromBody] VMTToken data)
+        {
+            Console.WriteLine("Received token: " + data.Token);
+            return await profile.VerifyOTPAsync(data);
         }
     }
-
+    public class VMToken
+    {
+        public string Token { get; set; }
+    }
     public class VMEmail
     {
         public string Email { get; set; }
+        public string Password { get; set; }
     }
+
 }

@@ -222,43 +222,154 @@ namespace HealthCare340B.DataAccess
         public VMResponse<VMMUser> UpdateEmail(VMMUser data)
         {
             VMResponse<VMMUser> response = new VMResponse<VMMUser>();
-            try
+            using (IDbContextTransaction dbTran = db.Database.BeginTransaction())
             {
-                VMMUser? existingData = GetUserById(data.Id).Data;
-                if (existingData != null)
+                try
                 {
-                    VMResponse<VMTToken> OTPResponse = GenerateOTP(data.Email);
-                    if (OTPResponse.StatusCode == HttpStatusCode.Created)
+                    VMMUser? existingData = GetUserById(data.Id).Data;
+                    if (existingData != null)
                     {
-                        response.Message = $"{HttpStatusCode.OK} - OTP sent to the user's email address!";
+                        MUser updatedData = new MUser()
+                        {
+                            Id = existingData.Id,
+                            Email = data.Email,
+                            BiodataId = existingData.BiodataId,
+                            RoleId = existingData.RoleId,
+                            Password = existingData.Password,
+                            LoginAttempt = existingData.LoginAttempt,
+                            IsLocked = existingData.IsLocked,
+                            LastLogin = existingData.LastLogin,
+                            CreatedBy = existingData.CreatedBy,
+                            CreatedOn = existingData.CreatedOn,
+                            ModifiedBy = 1,
+                            ModifiedOn = DateTime.Now,
+                            DeletedBy = existingData?.DeletedBy,
+                            DeletedOn = existingData?.DeletedOn,
+                            IsDelete = existingData.IsDelete
+                        };
+
+                        db.Update(updatedData);
+                        db.SaveChanges();
+
+                        dbTran.Commit();
+
+                        response.Data = new VMMUser()
+                        {
+                            Id = updatedData.Id,
+                            Email = updatedData.Email,
+                            BiodataId = updatedData.BiodataId,
+                            RoleId = updatedData.RoleId,
+                            Password = updatedData.Password,
+                            LoginAttempt = updatedData.LoginAttempt,
+                            IsLocked = updatedData.IsLocked,
+                            LastLogin = updatedData.LastLogin,
+                            CreatedBy = updatedData.CreatedBy,
+                            CreatedOn = updatedData.CreatedOn,
+                            ModifiedBy = updatedData.ModifiedBy,
+                            ModifiedOn = updatedData.ModifiedOn,
+                            DeletedBy = updatedData?.DeletedBy,
+                            DeletedOn = updatedData?.DeletedOn,
+                            IsDelete = updatedData.IsDelete
+                        };
+
+                        response.Message = "Email updated successfully. Please verify OTP.";
                         response.StatusCode = HttpStatusCode.OK;
                     }
                     else
                     {
-                        response.Message = OTPResponse.Message;
-                        response.StatusCode = OTPResponse.StatusCode;
-                        return response;
+                        response.Message = "User not found.";
+                        response.StatusCode = HttpStatusCode.NotFound;
                     }
-
                 }
-                else
+                catch (Exception ex)
                 {
-                    response.Message = $"{HttpStatusCode.NotFound} - User not found.";
-                    response.StatusCode = HttpStatusCode.NotFound;
+                    response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+                    if (ex.InnerException != null)
+                    {
+                        response.Message += $" Inner Exception: {ex.InnerException.Message}";
+                    }
+                    response.StatusCode = HttpStatusCode.InternalServerError;
                 }
             }
-            catch (Exception ex)
-            {
-                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
-                if (ex.InnerException != null)
-                {
-                    response.Message += $" Inner Exception: {ex.InnerException.Message}";
-                }
-            }
+                
             return response;
         }
 
+        public VMResponse<VMMUser> UpdatePassword(VMMUser data)
+        {
+            VMResponse<VMMUser> response = new VMResponse<VMMUser>();
+            using (IDbContextTransaction dbTran = db.Database.BeginTransaction())
+            {
+                try
+                {
+                    VMMUser? existingData = GetUserById(data.Id).Data;
+                    if (existingData != null)
+                    {
+                        MUser updatedData = new MUser()
+                        {
+                            Id = existingData.Id,
+                            Email = existingData.Email,
+                            BiodataId = existingData.BiodataId,
+                            RoleId = existingData.RoleId,
+                            Password = data.Password,
+                            LoginAttempt = existingData.LoginAttempt,
+                            IsLocked = existingData.IsLocked,
+                            LastLogin = existingData.LastLogin,
+                            CreatedBy = existingData.CreatedBy,
+                            CreatedOn = existingData.CreatedOn,
+                            ModifiedBy = 1,
+                            ModifiedOn = DateTime.Now,
+                            DeletedBy = existingData?.DeletedBy,
+                            DeletedOn = existingData?.DeletedOn,
+                            IsDelete = existingData.IsDelete
+                        };
 
+                        db.Update(updatedData);
+                        db.SaveChanges();
+
+                        dbTran.Commit();
+
+                        response.Data = new VMMUser()
+                        {
+                            Id = updatedData.Id,
+                            Email = updatedData.Email,
+                            BiodataId = updatedData.BiodataId,
+                            RoleId = updatedData.RoleId,
+                            Password = updatedData.Password,
+                            LoginAttempt = updatedData.LoginAttempt,
+                            IsLocked = updatedData.IsLocked,
+                            LastLogin = updatedData.LastLogin,
+                            CreatedBy = updatedData.CreatedBy,
+                            CreatedOn = updatedData.CreatedOn,
+                            ModifiedBy = updatedData.ModifiedBy,
+                            ModifiedOn = updatedData.ModifiedOn,
+                            DeletedBy = updatedData?.DeletedBy,
+                            DeletedOn = updatedData?.DeletedOn,
+                            IsDelete = updatedData.IsDelete
+                        };
+
+                        response.Message = "Email updated successfully. Please verify OTP.";
+                        response.StatusCode = HttpStatusCode.OK;
+                    }
+                    else
+                    {
+                        response.Message = "User not found.";
+                        response.StatusCode = HttpStatusCode.NotFound;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+                    if (ex.InnerException != null)
+                    {
+                        response.Message += $" Inner Exception: {ex.InnerException.Message}";
+                    }
+                    response.StatusCode = HttpStatusCode.InternalServerError;
+                }
+            }
+
+            return response;
+        }
 
         public VMResponse<VMTToken> GetByOTP(string token)
         {
@@ -351,6 +462,8 @@ namespace HealthCare340B.DataAccess
             return response!;
         }
 
+
+
         public VMResponse<VMTToken> GenerateOTP(string email)
         {
             VMResponse<VMTToken> response = new VMResponse<VMTToken>();
@@ -380,9 +493,48 @@ namespace HealthCare340B.DataAccess
                     };
                     db.Add(OTPToken);
                     db.SaveChanges(); // Simpan perubahan
+                    dbTran.Commit();
+                }
+                catch (Exception ex)
+                {
+                    dbTran.Rollback();
+                }
+            }
+            response.Data = GetByOTP(OTP).Data;
+            response.StatusCode = HttpStatusCode.Created;
+            response.Message = $"{HttpStatusCode.Created} - OTP created";
+            return response;
+        }
 
-
-
+        public VMResponse<VMTToken> GenerateOTPPassword(string email)
+        {
+            VMResponse<VMTToken> response = new VMResponse<VMTToken>();
+            var userExist = GetByEmail(email).Data;
+            if (userExist == null)
+            {
+                response.StatusCode = HttpStatusCode.NotFound;
+                response.Message = $"{HttpStatusCode.NotFound} - Email not found";
+                return response;
+            }
+            var OTP = new Random().Next(1000000, 9999999).ToString();
+            var Expire = DateTime.Now.AddMinutes(10);
+            bool isExpire = false;
+            using (IDbContextTransaction dbTran = db.Database.BeginTransaction())
+            {
+                try
+                {
+                    TToken OTPToken = new TToken()
+                    {
+                        Email = email,
+                        Token = OTP,
+                        UsedFor = "Create Account",
+                        ExpiredOn = Expire,
+                        IsExpired = isExpire,
+                        CreatedBy = 1,
+                        CreatedOn = DateTime.Now
+                    };
+                    db.Add(OTPToken);
+                    db.SaveChanges(); // Simpan perubahan
                     dbTran.Commit();
                 }
                 catch (Exception ex)

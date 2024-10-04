@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Text;
 using HealthCare340B.ViewModel;
+using HealthCare340B.Web.Controllers;
 using Newtonsoft.Json;
 
 namespace HealthCare340B.Web.Models
@@ -693,7 +694,7 @@ namespace HealthCare340B.Web.Models
                     "application/json");
 
                 apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMUser>?>(
-                    await httpClient.PutAsync($"{apiUrl}TabProfile/UpdateEmail", content)
+                    await httpClient.PostAsync($"{apiUrl}TabProfile/UpdateEmail", content)
                     .Result
                         .Content
                         .ReadAsStringAsync()
@@ -715,6 +716,45 @@ namespace HealthCare340B.Web.Models
             catch (Exception e)
             {
                 throw new Exception($"ProfileModel.UpdateAsync: {e.Message}");
+
+            }
+            return apiResponse;
+        }
+
+        public async Task<VMResponse<VMMUser>?> UpdatePasswordAsync(VMMUser data)
+        {
+            VMResponse<VMMUser>? apiResponse = new VMResponse<VMMUser>();
+            try
+            {
+                jsonData = JsonConvert.SerializeObject(data);
+                content = new StringContent(
+                    jsonData,
+                    Encoding.UTF8,
+                    "application/json");
+
+                apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMUser>?>(
+                    await httpClient.PostAsync($"{apiUrl}TabProfile/UpdatePassword", content)
+                    .Result
+                        .Content
+                        .ReadAsStringAsync()
+
+                );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("TabAlamat API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"ProfileModel.UpdatePasswordAsync: {e.Message}");
 
             }
             return apiResponse;
@@ -760,5 +800,128 @@ namespace HealthCare340B.Web.Models
 
             return apiResponse;
         }
+
+
+        public async Task<VMResponse<VMTToken>?> GenerateOTPPasswordAsync(string email, string password)
+        {
+            VMResponse<VMTToken>? apiResponse = new VMResponse<VMTToken>();
+
+            try
+            {
+                jsonData = JsonConvert.SerializeObject(email);
+                content = new StringContent(
+                    jsonData,
+                    Encoding.UTF8,
+                    "application/json"
+                );
+
+                apiResponse =
+                    JsonConvert.DeserializeObject<VMResponse<VMTToken>?>(
+                        await httpClient.PostAsync($"{apiUrl}TabProfile/GenerateOTPPassword/{email}", content)
+                            .Result
+                            .Content
+                            .ReadAsStringAsync()
+                    );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode != HttpStatusCode.Created)
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("TabProfile API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"ProfileModel.GenerateOTPAsync: {e.Message}");
+            }
+
+            return apiResponse;
+        }
+
+        public async Task<VMResponse<VMTToken>?> VerifyOTPAsync(VMTToken data)
+        {
+            VMResponse<VMTToken>? apiResponse = new VMResponse<VMTToken>();
+            try
+            {
+                jsonData = JsonConvert.SerializeObject(data);
+                content = new StringContent(
+                    jsonData,
+                    Encoding.UTF8,
+                    "application/json"
+                );
+
+                apiResponse =
+                    JsonConvert.DeserializeObject<VMResponse<VMTToken>?>(
+                        await httpClient.PostAsync($"{apiUrl}TabProfile/VerifyOTP/{data.Token}", content)
+                            .Result
+                            .Content
+                            .ReadAsStringAsync()
+                    );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("TabProfile API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"ProfileModel.VerifyOTPAsync: {e.Message}");
+            }
+
+            return apiResponse;
+        }
+
+        public async Task<VMResponse<VMTToken>?> VerifyOTPPasswordAsync(VMTToken data)
+        {
+            VMResponse<VMTToken>? apiResponse = new VMResponse<VMTToken>();
+            try
+            {
+                jsonData = JsonConvert.SerializeObject(data);
+                content = new StringContent(
+                    jsonData,
+                    Encoding.UTF8,
+                    "application/json"
+                );
+
+                apiResponse =
+                    JsonConvert.DeserializeObject<VMResponse<VMTToken>?>(
+                        await httpClient.PostAsync($"{apiUrl}TabProfile/VerifyOTPPassword/{data.Token}", content)
+                            .Result
+                            .Content
+                            .ReadAsStringAsync()
+                    );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("TabProfile API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"ProfileModel.VerifyOTPAsync: {e.Message}");
+            }
+
+            return apiResponse;
+        }
+
     }
 }
