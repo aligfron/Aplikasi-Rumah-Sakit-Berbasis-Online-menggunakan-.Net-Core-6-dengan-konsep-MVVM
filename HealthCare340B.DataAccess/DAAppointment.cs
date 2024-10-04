@@ -757,7 +757,7 @@ namespace HealthCare340B.DataAccess
 
                     dbTran.Commit();
                     response.StatusCode = HttpStatusCode.OK;
-                    response.Message = $"{HttpStatusCode.OK} - Appointment successfully updated!";
+                    response.Message = $"{HttpStatusCode.OK} - Appointment successfully deleted!";
                 }
                 catch (Exception e)
                 {
@@ -766,6 +766,89 @@ namespace HealthCare340B.DataAccess
                 }
                 return response;
             }           
+        }
+
+        public VMResponse<List<VMTAppointment>?> DeleteMultiple(List<long> appId, long userId)
+        {
+            VMResponse<List<VMTAppointment>?> response = new VMResponse<List<VMTAppointment>?>();
+            using (IDbContextTransaction dbTran = db.Database.BeginTransaction())
+            {
+                try
+                {
+                    List<VMTAppointment> existedDatas = new List<VMTAppointment>();
+                    foreach (long id in appId)
+                    {
+                        VMTAppointment? existedData = (
+                        from a in db.TAppointments
+                        where a.IsDelete == false && a.Id == id
+                        select new VMTAppointment
+                        {
+                            Id = a.Id,
+                            CustomerId = a.CustomerId,
+                            DoctorOfficeId = a.DoctorOfficeId,
+                            DoctorOfficeScheduleId = a.DoctorOfficeScheduleId,
+                            DoctorOfficeTreatmentId = a.DoctorOfficeTreatmentId,
+                            AppointmentDate = a.AppointmentDate,
+                            CreatedBy = a.CreatedBy,
+                            CreatedOn = a.CreatedOn,
+                            ModifiedBy = a.ModifiedBy,
+                            ModifiedOn = a.ModifiedOn,
+                            DeletedBy = a.DeletedBy,
+                            DeletedOn = a.DeletedOn,
+                            IsDelete = a.IsDelete,
+                        }
+                        ).FirstOrDefault();
+
+                        if (existedData == null)
+                        {
+                            response.StatusCode = HttpStatusCode.BadRequest;
+                            response.Message = $"{HttpStatusCode.BadRequest} - Appointment with Id: {id} does not exist!";
+                            return response;
+                        }
+                        existedDatas.Add(existedData);
+
+                        TAppointment updatedData = new TAppointment();
+                        updatedData.Id = existedData.Id;
+                        updatedData.CustomerId = existedData.CustomerId;
+                        updatedData.DoctorOfficeId = existedData.DoctorOfficeId;
+                        updatedData.DoctorOfficeScheduleId = existedData.DoctorOfficeScheduleId;
+                        updatedData.DoctorOfficeTreatmentId = existedData.DoctorOfficeTreatmentId;
+                        updatedData.AppointmentDate = existedData.AppointmentDate;
+                        updatedData.CreatedBy = existedData.CreatedBy;
+                        updatedData.CreatedOn = existedData.CreatedOn;
+                        updatedData.ModifiedBy = existedData.ModifiedBy;
+                        updatedData.ModifiedOn = existedData.ModifiedOn;
+                        updatedData.DeletedBy = userId;
+                        updatedData.DeletedOn = DateTime.Now;
+                        updatedData.IsDelete = true;
+
+                        db.Update(updatedData);
+                        db.SaveChanges();
+
+                        TAppointmentCancellation cancelledData = new TAppointmentCancellation();
+                        cancelledData.AppointmentId = id;
+                        cancelledData.CreatedBy = userId;
+                        cancelledData.CreatedOn = DateTime.Now;
+
+                        db.Add(cancelledData);
+                        db.SaveChanges();
+                    }
+
+                    response.Data = existedDatas;
+                    dbTran.Commit();
+
+                    response.StatusCode = HttpStatusCode.OK;
+                    response.Message = $"{HttpStatusCode.OK} - Appointment successfully deleted!";
+
+                }
+                catch (Exception e)
+                {
+                    dbTran.Rollback();
+                    response.Message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
+                }
+                return response;
+            }
+                
         }
     }
 }

@@ -2,6 +2,7 @@
 using HealthCare340B.Web.AddOns;
 using HealthCare340B.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Net;
 
 namespace HealthCare340B.Web.Controllers
@@ -11,6 +12,9 @@ namespace HealthCare340B.Web.Controllers
         private AppointmentModel appointment;
         private CustomerMemberModel customerMember;
         private readonly string imageFolder;
+
+        private string? userId;
+        private string? roleName;
 
         public AppointmentController(IConfiguration _config, IWebHostEnvironment _webHostEnv)
         {
@@ -42,6 +46,30 @@ namespace HealthCare340B.Web.Controllers
             }
         }
 
+        private bool isInSession()
+        {
+            userId = HttpContext.Session.GetString("userId");
+
+            if (userId == null)
+            {
+                HttpContext.Session.SetString("warnMsg", "Please Login First!");
+                return false;
+            }
+            return true;
+        }
+
+        private bool isPasien()
+        {
+            roleName = HttpContext.Session.GetString("userRoleCode");
+
+            if (roleName != "ROLE_PASIEN")
+            {
+                HttpContext.Session.SetString("errMsg", "You Are Not Authorized!");
+                return false;
+            }
+            return true;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -49,6 +77,16 @@ namespace HealthCare340B.Web.Controllers
 
         public async Task<IActionResult> Create(long id)
         {
+            if (!isInSession())
+            {
+                return RedirectToAction("Index", "Auth");
+            }
+
+            if (!isPasien())
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             VMMDoctor? dataDoctor = await appointment.GetDoctor(id);
             ViewBag.Title = "Buat Janji";
             ViewBag.imgFolder = imageFolder;
@@ -58,7 +96,14 @@ namespace HealthCare340B.Web.Controllers
 
         public async Task<VMResponse<List<VMMCustomerMember>?>> GetMemberById(long biodataId)
         {
-            VMResponse<List<VMMCustomerMember>?> response = new VMResponse<List<VMMCustomerMember>?>();            
+            VMResponse<List<VMMCustomerMember>?> response = new VMResponse<List<VMMCustomerMember>?>();
+            
+            if (!isInSession() || !isPasien())
+            {
+                response.StatusCode = HttpStatusCode.Forbidden;
+                response.Message = $"{HttpStatusCode.Forbidden} - You Are Not Authorized!";
+            }
+
             try
             {
                 response.Data = await customerMember.GetAll(biodataId);
@@ -67,8 +112,8 @@ namespace HealthCare340B.Web.Controllers
             }
             catch (Exception e)
             {
-                response.StatusCode = HttpStatusCode.BadRequest;
-                response.Message = $"{HttpStatusCode.BadRequest} - Customer Member Not Found!";
+                //response.StatusCode = HttpStatusCode.BadRequest;
+                response.Message = e.Message;
             }
             return response;
         }
@@ -76,6 +121,13 @@ namespace HealthCare340B.Web.Controllers
         public async Task<VMResponse<List<VMMMedicalFacility>?>> GetMedFacByDoctorId(long doctorId)
         {
             VMResponse<List<VMMMedicalFacility>?> response = new VMResponse<List<VMMMedicalFacility>?>();
+
+            if (!isInSession() || !isPasien())
+            {
+                response.StatusCode = HttpStatusCode.Forbidden;
+                response.Message = $"{HttpStatusCode.Forbidden} - You Are Not Authorized!";
+            }
+
             try
             {
                 response.Data = await appointment.GetMedicalFacility(doctorId);
@@ -84,15 +136,31 @@ namespace HealthCare340B.Web.Controllers
             }
             catch (Exception e)
             {
-                response.StatusCode = HttpStatusCode.BadRequest;
-                response.Message = $"{HttpStatusCode.BadRequest} - Medical Facility Not Found!";
+                //response.StatusCode = HttpStatusCode.BadRequest;
+                response.Message = e.Message;
             }
             return response;
         }
 
         public async Task<DateTime?> GetStartDate(long doctorId, long medFacId)
         {
-            DateTime? startDate = await appointment.GetStartDate(doctorId, medFacId);
+            if (!isInSession() || !isPasien())
+            {
+                return new DateTime();
+            }
+
+            DateTime? startDate = new DateTime();
+            try
+            {
+                startDate = await appointment.GetStartDate(doctorId, medFacId);
+            }
+            catch (Exception e)
+            {
+                HttpContext.Session.SetString("errMsg", e.Message);
+                throw new Exception(e.Message);
+            }
+            
+
             if (startDate > DateTime.Now)
             {
                 return startDate;
@@ -104,6 +172,11 @@ namespace HealthCare340B.Web.Controllers
         }
         public async Task<DateTime?> GetEndDate(long doctorId, long medFacId)
         {
+            if (!isInSession() || !isPasien())
+            {
+                return new DateTime();
+            }
+
             DateTime? endDate = await appointment.GetEndDate(doctorId, medFacId);
             return endDate;           
         }
@@ -112,6 +185,11 @@ namespace HealthCare340B.Web.Controllers
         {
             try
             {
+                if (!isInSession() || !isPasien())
+                {
+                    throw new Exception("Unauthorized");
+                }
+
                 List<VMMMedicalFacilitySchedule>? response = await appointment.GetMedicalFacilitySchedule(medFacId, doctorId);
 
                 List<int> listDayOfWeek = new List<int>();
@@ -134,6 +212,11 @@ namespace HealthCare340B.Web.Controllers
         {
             try
             {
+                if (!isInSession() || !isPasien())
+                {
+                    throw new Exception("Unauthorized");
+                }
+
                 List<VMMMedicalFacilitySchedule>? response = await appointment.GetMedicalFacilitySchedule(medFacId, doctorId);
 
                 //List<int> listDayOfWeek = new List<int>();
@@ -193,6 +276,11 @@ namespace HealthCare340B.Web.Controllers
 
         public async Task<List<VMAppointmentSchedule>> GetTimeSlot(long medFacId, long doctorId, string date)
         {
+            if (!isInSession() || !isPasien())
+            {
+                throw new Exception("Unauthorized");
+            }
+
             List<VMMMedicalFacilitySchedule>? response = await appointment.GetMedicalFacilitySchedule(medFacId, doctorId);
 
             List<DateTime>? emptySlotDateTime = new List<DateTime>();
@@ -257,6 +345,13 @@ namespace HealthCare340B.Web.Controllers
         public async Task<VMResponse<List<VMTDoctorTreatment>?>> GetTreatment(long medFacId, long doctorId)
         {
             VMResponse<List<VMTDoctorTreatment>?> response = new VMResponse<List<VMTDoctorTreatment>?>();
+
+            if (!isInSession() || !isPasien())
+            {
+                response.StatusCode = HttpStatusCode.Forbidden;
+                response.Message = $"{HttpStatusCode.Forbidden} - You Are Not Authorized!";
+            }
+
             try
             {
                 response.Data = await appointment.GetTreatment(medFacId, doctorId);
@@ -275,6 +370,10 @@ namespace HealthCare340B.Web.Controllers
         {
             try
             {
+                if (!isInSession() || !isPasien())
+                {
+                    throw new Exception("Unauthorized");
+                }
                 return await appointment.GetDoctorOfficeId(doctorId, medFacId);
                 
             }
@@ -288,6 +387,10 @@ namespace HealthCare340B.Web.Controllers
         {
             try
             {
+                if (!isInSession() || !isPasien())
+                {
+                    throw new Exception("Unauthorized");
+                }
                 string dayString = ((DayOfWeek)day).ToString();
                 return await appointment.GetDoctorOfficeScheduleId(doctorId, medFacId, dayString, timeStart);
 
@@ -299,12 +402,32 @@ namespace HealthCare340B.Web.Controllers
         }
         public IActionResult Check()
         {
+            if (!isInSession())
+            {
+                return RedirectToAction("Index", "Auth");
+            }
+
+            if (!isPasien())
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             ViewBag.Title = "Cek Ketersediaan Jadwal";
             return View();
         }
 
         public IActionResult EmptySlot()
         {
+            if (!isInSession())
+            {
+                return RedirectToAction("Index", "Auth");
+            }
+
+            if (!isPasien())
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             ViewBag.Title = "Cek Ketersediaan Jadwal";
             return View();
         }
@@ -314,6 +437,14 @@ namespace HealthCare340B.Web.Controllers
         {
             try
             {
+                if (!isInSession() || !isPasien())
+                {
+                    VMResponse<VMTAppointment> responseUnauthorized = new VMResponse<VMTAppointment>();
+                    responseUnauthorized.StatusCode = HttpStatusCode.Forbidden;
+                    responseUnauthorized.Message = $"{HttpStatusCode.Forbidden} - You Are Not Authorized!";
+                    return responseUnauthorized;
+                }
+
                 // If custId = 0, find custId using biodataId session!
                 if (custId == 0)
                     custId = await appointment.GetCustId((long)HttpContext.Session.GetInt32("userBiodataId")!);
@@ -344,6 +475,16 @@ namespace HealthCare340B.Web.Controllers
 
         public async Task<IActionResult> RencanaKedatangan(int? pageNumber, int? currPageSize, string? orderBy, string? ascDesc, string? filter)
         {
+            if (!isInSession())
+            {
+                return RedirectToAction("Index", "Auth");
+            }
+
+            if (!isPasien())
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             List<VMMCustomerMember> dataMember = new List<VMMCustomerMember>();
             try
             {
@@ -491,7 +632,17 @@ namespace HealthCare340B.Web.Controllers
 
         public async Task<IActionResult> Update(long id, long doctorId, long custId, string custName, long medFacId, string medFacName, string appDate, string timeStart, string timeEnd, long treatmentId)
         {
-            VMMDoctor? dataDoctor = await appointment.GetDoctor(id);
+            if (!isInSession())
+            {
+                return RedirectToAction("Index", "Auth");
+            }
+
+            if (!isPasien())
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            VMMDoctor? dataDoctor = await appointment.GetDoctor(doctorId);
             ViewBag.AppointmentId = id;
             ViewBag.DoctorId = doctorId;
             ViewBag.CustomerId = custId;
@@ -511,6 +662,14 @@ namespace HealthCare340B.Web.Controllers
         {
             try
             {
+                if (!isInSession() || !isPasien())
+                {
+                    VMResponse<VMTAppointment> responseUnauthorized = new VMResponse<VMTAppointment>();
+                    responseUnauthorized.StatusCode = HttpStatusCode.Forbidden;
+                    responseUnauthorized.Message = $"{HttpStatusCode.Forbidden} - You Are Not Authorized!";
+                    return responseUnauthorized;
+                }
+
                 VMTAppointment data = new VMTAppointment
                 {
                     Id = id,
@@ -537,6 +696,17 @@ namespace HealthCare340B.Web.Controllers
         }
         public IActionResult DeleteOne(long appId, string custName, string appDate, string medFacName, string docName, string treatment)
         {
+            if (!isInSession())
+            {
+                return RedirectToAction("Index", "Auth");
+            }
+
+            if (!isPasien())
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.Title = "Hapus Kedatangan";
             ViewBag.AppointmentId = appId;
             ViewBag.CustomerName = custName;
             ViewBag.AppointmentDate = DateTime.Parse(appDate).ToString("dd MMMM yyyy");
@@ -549,10 +719,56 @@ namespace HealthCare340B.Web.Controllers
         [HttpPost]
         public async Task<VMResponse<VMTAppointment>> DeleteOneAsync(long id)
         {
+
+            if (!isInSession() || !isPasien())
+            {
+                VMResponse<VMTAppointment> responseUnauthorized = new VMResponse<VMTAppointment>();
+                responseUnauthorized.StatusCode = HttpStatusCode.Forbidden;
+                responseUnauthorized.Message = $"{HttpStatusCode.Forbidden} - You Are Not Authorized!";
+                return responseUnauthorized;
+            }
+
             VMResponse<VMTAppointment> data = new VMResponse<VMTAppointment>();
 
             data = await appointment.DeleteOne(id, long.Parse(HttpContext.Session.GetString("userId")!));
             HttpContext.Session.SetString("successMsg", "Janji berhasil dibatalkan!");
+            return data;
+        }
+
+        [HttpPost]
+        public IActionResult DeleteMultiple(List<long> id)
+        {
+            if (!isInSession())
+            {
+                return RedirectToAction("Index", "Auth");
+            }
+
+            if (!isPasien())
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.Title = "Hapus Kedatangan";
+            ViewBag.AppointmentCount = id.Count;
+            ViewBag.AppointmentIds = JsonConvert.SerializeObject(id);
+            return View();
+        }
+
+        [HttpDelete]
+        public async Task<VMResponse<List<VMTAppointment>>> DeleteMultipleAsync(List<long> id)
+        {
+            if (!isInSession() || !isPasien())
+            {
+                VMResponse<List<VMTAppointment>> responseUnauthorized = new VMResponse<List<VMTAppointment>>();
+                responseUnauthorized.StatusCode = HttpStatusCode.Forbidden;
+                responseUnauthorized.Message = $"{HttpStatusCode.Forbidden} - You Are Not Authorized!";
+                return responseUnauthorized;
+            }
+
+            VMResponse<List<VMTAppointment>> data = new VMResponse<List<VMTAppointment>>();
+
+            data = await appointment.DeleteMultiple(id, long.Parse(HttpContext.Session.GetString("userId")!));
+            HttpContext.Session.SetString("successMsg", $"{data.Data!.Count} Janji berhasil dibatalkan!");
             return data;
         }
     }

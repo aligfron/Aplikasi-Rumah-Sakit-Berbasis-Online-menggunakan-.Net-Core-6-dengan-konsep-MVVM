@@ -60,7 +60,32 @@ namespace HealthCare340B.API.Controllers
             }
             catch (Exception e)
             {
-                Console.WriteLine("AppointmentController.Delete: " + e.Message);
+                Console.WriteLine("AppointmentController.DeleteOne: " + e.Message);
+
+                throw new Exception(response.Message);
+            }
+        }
+
+        [HttpPut("[action]/{userId}")]
+        public async Task<ActionResult> DeleteMultiple(List<long> id, long userId)
+        {
+            VMResponse<List<VMTAppointment>?> response = new VMResponse<List<VMTAppointment>?>();
+            try
+            {
+                response = await Task.Run(() => appointment.DeleteMultiple(id, userId));
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    throw new Exception(response.Message);
+                }
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("AppointmentController.DeleteMultiple: " + e.Message);
 
                 throw new Exception(response.Message);
             }

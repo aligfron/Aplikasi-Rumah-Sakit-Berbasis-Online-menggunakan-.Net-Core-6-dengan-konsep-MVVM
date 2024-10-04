@@ -585,8 +585,49 @@ namespace HealthCare340B.Web.Models
             catch (Exception e)
             {
                 //Logging
-                Console.WriteLine("AppointmentModel.Delete: " + e.Message);
-                throw new Exception("AppointmentModel.Delete: " + e.Message);
+                Console.WriteLine("AppointmentModel.DeleteOne: " + e.Message);
+                throw new Exception("AppointmentModel.DeleteOne: " + e.Message);
+            }
+            return response;
+        }
+
+        public async Task<VMResponse<List<VMTAppointment>>> DeleteMultiple(List<long> id, long userId)
+        {
+            VMResponse<List<VMTAppointment>>? response = new VMResponse<List<VMTAppointment>>();
+            try
+            {
+
+                jsonData = JsonConvert.SerializeObject(id);
+                content = new StringContent(    // Create a blank HttpRequest Document
+                    jsonData,               // Put the Request Body (data)
+                    Encoding.UTF8,          // Assign the Request body's character set
+                    "application/json"      // Assain the Request body's format / Content-Type
+                    );
+                response =
+                   JsonConvert.DeserializeObject<VMResponse<List<VMTAppointment>>?>(     // Convert the Json string to a class
+                       await httpClient.PutAsync($"{apiUrl}Appointment/DeleteMultiple/{userId}", content)    // Call the API
+                       .Result                                                     // Read the Result
+                       .Content                                                    // Get the Content Result
+                       .ReadAsStringAsync()                                        // Convert the content as string
+                   );
+
+                if (response != null)
+                {
+                    if (response.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new Exception(response.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Appointment API could not be reached");
+                }
+            }
+            catch (Exception e)
+            {
+                //Logging
+                Console.WriteLine("AppointmentModel.DeleteMultiple: " + e.Message);
+                throw new Exception("AppointmentModel.DeleteMultiple: " + e.Message);
             }
             return response;
         }

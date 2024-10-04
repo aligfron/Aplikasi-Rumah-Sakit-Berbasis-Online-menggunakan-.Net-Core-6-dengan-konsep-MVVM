@@ -73,6 +73,12 @@
 </div>
 &nbsp;
 
+<div class="d-flex justify-content-flex-start">
+    <button id="btnMultipleDelete" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#staticModalLg" disabled>Batalkan</button>
+</div>
+
+&nbsp;
+
 
 @if (Model.Count > 0)
 {
@@ -80,7 +86,7 @@
     {
         <div class="row d-flex justify-content-between" style="border: 2px solid rgb(0, 255, 255)">
             <div class="col-1 d-flex justify-content-center">
-                <input data-id="@app.Id" type="checkbox" />
+                <input data-id="@app.Id" class="app-checkbox" type="checkbox" />
             </div>
             <div class="col-7">
                 <div>
@@ -105,7 +111,7 @@
                     data-appDate="@(app.AppointmentDate?.ToString("yyyy-MM-dd"))" data-doctorName="@app.DoctorName"
                     data-medFacName="@app.MedicalFacilityName" data-treatment="@app.Treatment" 
                     data-bs-toggle="modal" data-bs-target="#staticModalLg"
-                    class="btn btn-outline-danger" style="height: 25%; margin-top: 50px;">Batal</button>
+                    class="btn btn-danger" style="height: 25%; margin-top: 50px;">Batal</button>
                </div>
            </div>
         </div>
@@ -305,11 +311,11 @@ else
         var timeStart = $(this).attr("data-timeStart");
         var timeEnd = $(this).attr("data-timeEnd");
         var treatmentId = $(this).attr("data-treatmentId");
-        //debugger;
+        debugger;
         $("#staticModalBody").load(`/Appointment/Update?id=${id}&custId=${customerId}&custName=${customerName}&doctorId=${doctorId}&medFacId=${medFacId}&medFacName=${medFacName}&appDate=${appDate}&timeStart=${timeStart}&timeEnd=${timeEnd}&treatmentId=${treatmentId}`);
     });
 
-    $(".btn-outline-danger").click(function (e) {
+    $(".btn-danger").click(function (e) {
         $("#staticModalLgBody").html(spinner);
         var id = $(this).attr("data-id");
         var customerName = $(this).attr("data-customerName");
@@ -322,5 +328,39 @@ else
         var treatment = $(this).attr("data-treatment");
         treatment = encodeURIComponent(treatment.trim());
         $("#staticModalLgBody").load(`/Appointment/DeleteOne?appId=${id}&custName=${customerName}&appDate=${appDate}&medFacName=${medFacName}&docName=${doctorName}&treatment=${treatment}`)
+    });
+
+    var listId = [];
+
+    $(document).ready(() => {
+        $(".app-checkbox").change(function (e) {
+            var id = $(this).attr("data-id");
+            if (this.checked) {          
+                listId.push(id);
+                debugger;
+                $("#btnMultipleDelete").prop("disabled", false);
+                $("#btnMultipleDelete").text(`Batalkan ${listId.length} Kedatangan`)
+            }
+            else {
+                const index = listId.indexOf(id);
+                if (index > -1) { // only splice array when item is found
+                    listId.splice(index, 1); // 2nd parameter means remove one item only
+                    debugger;
+                }
+                if (listId.length < 1) {
+                    $("#btnMultipleDelete").prop("disabled", true);
+                    $("#btnMultipleDelete").text(`Batalkan`)
+                }
+                else {
+                    $("#btnMultipleDelete").text(`Batalkan ${listId.length} Kedatangan`)
+                }
+            }
+        });
+
+        $("#btnMultipleDelete").click(function (e) {
+            $("#staticModalLgBody").html(spinner);
+            //debugger;
+            $("#staticModalLgBody").load(`/Appointment/DeleteMultiple`, {"id": listId});
+        })
     });
 </script>

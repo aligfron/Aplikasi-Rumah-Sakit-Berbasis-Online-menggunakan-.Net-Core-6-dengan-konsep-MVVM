@@ -163,12 +163,14 @@ namespace HealthCare340B.DataAccess
                 response.Data = (
                     from d in db.MDoctors
                     join b in db.MBiodata on d.BiodataId equals b.Id
+                    where d.IsDelete == false && d.Id == id
                     select new VMMDoctor
                     {
                         Id = d.Id,
                         BiodataId = d.BiodataId,
                         Str = d.Str,
-                        Fullname = b.Fullname
+                        Fullname = b.Fullname,
+                        ImagePath = b.ImagePath
                     }
                     ).FirstOrDefault();
 

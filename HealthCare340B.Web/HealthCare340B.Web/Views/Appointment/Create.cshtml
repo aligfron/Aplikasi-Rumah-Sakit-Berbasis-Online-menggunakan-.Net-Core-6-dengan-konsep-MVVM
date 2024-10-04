@@ -11,12 +11,12 @@
     <div class="card-body">
         <div class="row d-flex justify-content-between">
             <div class="col-3">
-                <img id="profileImage" src="~/@ViewBag.imgFolder/@(Model.ImagePath ?? "blank-profile-picture.png")" alt="Avatar" class="img-thumbnail rounded-circle">
+                <img id="profileImage" src="~/@ViewBag.ImgFolder/@(Model.ImagePath ?? "blank-profile-picture.png")" alt="Avatar" class="img-thumbnail rounded-circle">
             </div>
             <div class="col-2"></div>
             <div class="col-7">
                 <h3>@Model.Fullname</h3>
-                <h5>@Model.Str</h5>
+                <p>@Model.Str</p>
             </div>
         </div>
         &nbsp;
@@ -72,6 +72,8 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
+    var isError = false;
+
     $(document).ready(() => {
         $.ajax({
             url: "/Appointment/GetMemberById",
@@ -97,7 +99,10 @@
                             }
                         );
                     }
-
+                }
+                else {
+                    isError = true;
+                    toastAlert(response.message + ". Try to refresh the page.", "error");
                 }
             },
             error: function (errResponse) {
@@ -131,6 +136,10 @@
                         );
                     }
                 }
+                else {
+                    isError = true;
+                    toastAlert(response.message + ". Try to refresh the page.", "error");
+                }
             },
             error: function (errResponse) {
                 console.error("errResponse", errResponse)
@@ -150,7 +159,7 @@
             var emptySlotDate = null;
             var startDate = null;
             var endDate = null;
-            if ($(this).val() != 0) {
+            if ($(this).val() != 0 && isError == false) {
                 $.ajax({
                     url: "/Appointment/GetStartDate",
                     data: {
@@ -166,6 +175,8 @@
                     error: function (errResponse) {
                         debugger;
                         console.log(errResponse);
+                        //toastAlert("Something's wrong when getting the available date", "error");
+                        location.reload();
                     }
                 });
 
@@ -184,6 +195,8 @@
                     error: function (errResponse) {
                         debugger;
                         console.log(errResponse);
+                        //toastAlert("Something's wrong when getting the available date", "error");
+                        location.reload();
                     }
                 });
 
@@ -202,6 +215,8 @@
                     error: function (errResponse) {
                         debugger;
                         console.log(errResponse);
+                        //toastAlert("Something's wrong when getting the available date", "error");
+                        location.reload();
                     }
                 });
 
@@ -233,7 +248,7 @@
                                                 emptySlotDate,
                                                 function (idx2, data2) {
 
-                                                    debugger;
+                                                    //debugger;
                                                     var dateDate = date.getDate();
                                                     if (dateDate < 10) {
                                                         dateDate = "0" + dateDate;
@@ -245,14 +260,14 @@
                                                     var dateYear = date.getFullYear();
                                                     var fullDate = (dateYear + "-" + dateMonth + "-" + dateDate + "T00:00:00")
                                                     if (fullDate == data2) {
-                                                        debugger;
+                                                        //debugger;
                                                         checkSlotDate = false;
                                                         return
                                                     }
                                                 }
                                             )
                                             if (date.getDay() === data && checkSlotDate) {
-                                                debugger;
+                                                //debugger;
                                                 checkDay = true;
                                                 return;
                                             }
@@ -319,6 +334,7 @@
                     async: false,
                     beforeSend: () => { },
                     success: function (response) {
+                        debugger;
                         $("#sesi").empty();
                         $.each(
                             response,
@@ -337,108 +353,117 @@
             });
         });
 
-        $("#btnSave").click(function (e) {
-            var dofId = null;
-            var dosId = null;
-            var dateString = $("#date").val().split("-");
-            var dateChoice = new Date(dateString[0], dateString[1] - 1, dateString[2]);
-            var dateDate = dateChoice.getDate();
-            if (dateDate < 10) {
-                dateDate = "0" + dateDate;
-            }
-            var dateMonth = dateChoice.getMonth() + 1;
-            if (dateMonth < 10) {
-                dateMonth = "0" + dateMonth;
-            }
-            var dateYear = dateChoice.getFullYear();
-            var fullDate = (dateYear + "-" + dateMonth + "-" + dateDate + " " + $("#sesi").val() + ":00");
-            console.log(fullDate);
-            $.ajax({
-                url: "/Appointment/GetDoctorOfficeId",
-                data: {
-                    medFacId: $("#medFac").val(),
-                    doctorId: @ViewBag.DoctorId
-                },
-                async: false,
-                beforeSend: () => { },
-                success: function (response) {
-                    debugger;
-                    dofId = response;
-                },
-                error: function (errResponse) {
-                    debugger;
-                    console.log(errResponse);
-                    location.reload()
-                }
-            });
-
-            $.ajax({
-                url: "/Appointment/GetDoctorOfficeScheduleId",
-                data: {
-                    doctorId: @ViewBag.DoctorId,
-                    medFacId: $("#medFac").val(),
-                    day: dateChoice.getDay(),
-                    timeStart: $("#sesi").val()
-                    },
-                async: false,
-                beforeSend: () => { },
-                success: function (response) {
-                    debugger;
-                    dosId = response;
-                },
-                error: function (errResponse) {
-                    debugger;
-                    console.log(errResponse);
-                    location.reload()
-                }
-            });
-
+        $("#btnSave").click(function (e) {        
             $("#frmAppointment").submit(function (e) {
                 e.preventDefault();
             });
 
-            $("#staticModalLgBody").html();
-            $("#staticModalLgBody").load("/Appointment/Check/");
-
-            $.ajax({
-                url: "/Appointment/Create",
-                type: "post",
-                data: {
-                    custId: $("#member").val(),
-                    dofId: dofId,
-                    dosId: dosId,
-                    dotId: $("#tindakan").val(),
-                    appDate: fullDate
-                },
-                beforeSend: () => { 
-                   
-                },
-                success: function (response) {
-                    if (response.statusCode == 200 || response.statusCode == 201) {
-                        //alert("success");
-                        $("#staticModalLg").modal("hide");
-                        location.href = "/Appointment/RencanaKedatangan";
-                    }
-                    else {
-                        $("#staticModalLgBody").html();
-                        $("#staticModalLgBody").load("/Appointment/EmptySlot/");                       
-                        //$("#staticModalLg").modal("show");
-                        $("#tindakan").val("");
-                        $("#tindakan").empty();
-                        $("#tindakan").prop("disabled", true);
-                        $("#date").val("");
-                        $("#date").prop("disabled", true);
-                        $("#sesi").val("");
-                        $("#sesi").empty();
-                        $("#sesi").prop("disabled", true);
-                    }
-                },
-                error: function (errResponse) {
-                    console.log(errResponse);
-                    debugger;
+            $("#frmAppointment").validate({
+                rules: {
+                    Member: "required",
+                    MedFac: "required",
+                    AppointmentDate: "required",
+                    Sesi: "required",
+                    Tindakan: "required"
                 }
             });
+          
+            if ($("#frmAppointment").valid()) {
+                var dofId = null;
+                var dosId = null;
+                var dateString = $("#date").val().split("-");
+                var dateChoice = new Date(dateString[0], dateString[1] - 1, dateString[2]);
+                var dateDate = dateChoice.getDate();
+                if (dateDate < 10) {
+                    dateDate = "0" + dateDate;
+                }
+                var dateMonth = dateChoice.getMonth() + 1;
+                if (dateMonth < 10) {
+                    dateMonth = "0" + dateMonth;
+                }
+                var dateYear = dateChoice.getFullYear();
+                var fullDate = (dateYear + "-" + dateMonth + "-" + dateDate + " " + $("#sesi").val() + ":00");
+                console.log(fullDate);
+                $.ajax({
+                    url: "/Appointment/GetDoctorOfficeId",
+                    data: {
+                        medFacId: $("#medFac").val(),
+                        doctorId: @ViewBag.DoctorId
+                        },
+                    async: false,
+                    beforeSend: () => { },
+                    success: function (response) {
+                        debugger;
+                        dofId = response;
+                    },
+                    error: function (errResponse) {
+                        debugger;
+                        console.log(errResponse);
+                        location.reload()
+                    }
+                });
 
+                $.ajax({
+                    url: "/Appointment/GetDoctorOfficeScheduleId",
+                    data: {
+                        doctorId: @ViewBag.DoctorId,
+                        medFacId: $("#medFac").val(),
+                        day: dateChoice.getDay(),
+                        timeStart: $("#sesi").val()
+                    },
+                    async: false,
+                    beforeSend: () => { },
+                    success: function (response) {
+                        debugger;
+                        dosId = response;
+                    },
+                    error: function (errResponse) {
+                        debugger;
+                        console.log(errResponse);
+                        location.reload()
+                    }
+                });
+
+                $.ajax({
+                    url: "/Appointment/Create",
+                    type: "post",
+                    data: {
+                        custId: $("#member").val(),
+                        dofId: dofId,
+                        dosId: dosId,
+                        dotId: $("#tindakan").val(),
+                        appDate: fullDate
+                    },
+                    beforeSend: () => {
+                        $("#staticModalLgBody").html();
+                        $("#staticModalLgBody").load("/Appointment/Check/");
+                    },
+                    success: function (response) {
+                        if (response.statusCode == 200 || response.statusCode == 201) {
+                            //alert("success");
+                            $("#staticModalLg").modal("hide");
+                            location.href = "/Appointment/RencanaKedatangan";
+                        }
+                        else {
+                            $("#staticModalLgBody").html();
+                            $("#staticModalLgBody").load("/Appointment/EmptySlot/");
+                            //$("#staticModalLg").modal("show");
+                            $("#tindakan").val("");
+                            $("#tindakan").empty();
+                            $("#tindakan").prop("disabled", true);
+                            $("#date").val("");
+                            $("#date").prop("disabled", true);
+                            $("#sesi").val("");
+                            $("#sesi").empty();
+                            $("#sesi").prop("disabled", true);
+                        }
+                    },
+                    error: function (errResponse) {
+                        console.log(errResponse);
+                        debugger;
+                    }
+                });
+            }
         });
     });
 </script>

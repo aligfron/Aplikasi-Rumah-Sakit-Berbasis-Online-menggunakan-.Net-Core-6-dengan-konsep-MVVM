@@ -1,0 +1,50 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = null;
+}
+
+<div class="card">
+    <div class="card-body">
+        <p>Anda yakin akan membatalkan @ViewBag.AppointmentCount rencana kedatangan berikut?</p>
+        &nbsp;
+    </div>
+    <div class="d-flex justify-content-between">
+        <div class="w-10"></div>
+        <div class="w-30"><button id="btnCancel" class="btn btn-outline-info">Cancel</button></div>
+        <div class="w-10"></div>
+        <div class="w-30"><button id="btnDelete" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#staticModalLg">Batalkan Janji</button></div>
+        <div class="w-10"></div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(() => {
+        $("#btnDelete").click(function (e) {
+            debugger;
+            $.ajax({
+                url: "/Appointment/DeleteMultiple",
+                type: "DELETE",
+                data: {
+                    id: @ViewBag.AppointmentIds
+                        },
+                dataType: "json",
+                success: function (response) {
+                    debugger;
+                    if (response.statusCode == 200) {
+                        $("#staticModalLg").modal("hide");
+                        location.href = "/Appointment/RencanaKedatangan";
+                    }
+                    else {
+                        toastAlert(response.message, "error");
+                    }
+                },
+                error: function (errResponse) {
+                    console.log(errResponse);
+                    debugger;
+                }
+            });
+        });
+    });
+</script>
