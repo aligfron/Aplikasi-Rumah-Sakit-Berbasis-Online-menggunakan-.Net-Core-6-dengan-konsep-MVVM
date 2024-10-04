@@ -29,7 +29,7 @@
             <div class="text-center">dan</div>
             <div class="text-center mb-6 text-lg fs-10">
                 <label>Belum Memiliki akun?</label>
-                <a id="btnDaftar" data-bs-toggle="modal" data-bs-target="#staticModalLg" class="text-blue" style="text-decoration; cursor: pointer;">Daftar</a>
+                <a id="btnDaftarLogin" data-bs-toggle="modal" data-bs-target="#staticModalLg" class="text-blue" style="text-decoration; cursor: pointer;">Daftar</a>
             </div>
         </div>
     </div>
@@ -43,7 +43,7 @@
         $("#staticModalLgBody").load("/User/Update/");
     });
 
-    $("#btnDaftar").click(function () {
+    $("#btnDaftarLogin").click(function () {
         $("#staticModalLgBody").html("");
         $("#staticModalLgBody").load("/Register/EmailConfirm");
     });

@@ -23,13 +23,13 @@ namespace HealthCare340B.Web.Controllers
         {
             var response = await register.EmailConfirmAsync(email);
 
-            if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Created) // Misalnya, ada properti IsSuccess dalam VMResponse
+            if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Created) 
             {
-                // Jika berhasil, kembalikan tampilan untuk modal OTP
-                return response; // Ganti dengan nama view yang sesuai
+                
+                return response; 
             }
 
-            // Jika tidak berhasil, kembalikan pesan error
+            
             return response;
         }
 
@@ -45,13 +45,10 @@ namespace HealthCare340B.Web.Controllers
         {
             var response = await register.VerifyOtpAsync(otp);
 
-            if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Created) // Misalnya, ada properti IsSuccess dalam VMResponse
+            if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Created) 
             {
-                // Jika berhasil, kembalikan tampilan untuk modal OTP
-                return response; // Ganti dengan nama view yang sesuai
+                return response; 
             }
-
-            // Jika tidak berhasil, kembalikan pesan error
             return response;
         }
             
@@ -66,7 +63,7 @@ namespace HealthCare340B.Web.Controllers
 
         public IActionResult Register() 
         {
-            ViewBag.Title = "Set Password";
+            ViewBag.Title = "Pendaftaran Password";
             return View();
         }
         public async Task<VMResponse<VMMUser>> ResgisterAsync(VMMUser data) =>

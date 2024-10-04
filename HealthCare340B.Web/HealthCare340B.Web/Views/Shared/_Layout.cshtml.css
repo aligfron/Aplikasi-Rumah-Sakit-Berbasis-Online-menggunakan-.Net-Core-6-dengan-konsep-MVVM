@@ -40,9 +40,17 @@ button.accept-policy {
 }
 
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
+    position: fixed; /* Mengubah dari absolute ke fixed */
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px;
+    background-color: #f8f9fa; /* Warna latar belakang footer */
+    border-top: 1px solid #e5e5e5; /* Menambahkan border atas untuk pemisah */
+    text-align: center; /* Memusatkan teks */
+    z-index: 1000; /* Memastikan footer berada di atas konten lainnya */
+}
+
+#main-content {
+    padding-bottom: 70px; /* Sesuaikan dengan tinggi footer */
 }

@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var dataMenu = ViewBag.dataCoba as List<VMMMenuRole>;
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -26,7 +30,7 @@
     <script src="~/lib/mazer/static/js/initTheme.js"></script>
     <div id="app">
         <!-- Sidebar -->
-        <partial name="_Sidebar" />
+        <partial name="_Sidebar" model="dataMenu"/>
 
 
 

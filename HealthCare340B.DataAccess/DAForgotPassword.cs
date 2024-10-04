@@ -202,9 +202,91 @@ namespace HealthCare340B.DataAccess
             return response;
         }
 
+
+
+        public VMResponse<VMTToken> GetByOTPEmail(string email)
+        {
+            VMResponse<VMTToken?> response = new VMResponse<VMTToken?>();
+            try
+            {
+                response.Data = (
+                    from t in db.TTokens
+                    where t.Email == email &&
+                    t.IsDelete == false && t.IsExpired == false
+                    select new VMTToken
+                    {
+                        Id = t.Id,
+                        Email = t.Email,
+                        UserId = t.UserId,
+                        Token = t.Token,
+                        ExpiredOn = t.ExpiredOn,
+                        IsExpired = t.IsExpired,
+                        UsedFor = t.UsedFor,
+                        CreatedBy = t.CreatedBy,
+                        CreatedOn = t.CreatedOn,
+                        ModifiedBy = t.ModifiedBy,
+                        ModifiedOn = t.ModifiedOn,
+                        DeletedBy = t.DeletedBy,
+                        DeletedOn = t.DeletedOn,
+                        IsDelete = t.IsDelete,
+                    }
+                    ).FirstOrDefault();
+                response.StatusCode = (response.Data != null) ?
+                        HttpStatusCode.OK :
+                        HttpStatusCode.NotFound;
+                response.Message = (response.Data != null) ?
+                    $"{HttpStatusCode.OK} - Token succesfully fetched!"
+                    : $"{HttpStatusCode.NotFound} - Token does not exist!";
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.NoContent} - {ex.Message}";
+            }
+            return response;
+        }
+
+
+
         public VMResponse<VMTToken> GenerateOTP(string email)
         {
             VMResponse<VMTToken> response = new VMResponse<VMTToken>();
+            bool isExpire = false;
+            var sendExist = GetByOTPEmail(email).Data;
+            if (sendExist != null)
+            {
+                isExpire = true;
+                using (IDbContextTransaction dbTran = db.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        TToken updateIsExpire = new TToken()
+                        {
+                            Id = sendExist.Id,
+                            Email = sendExist.Email,
+                            UserId = sendExist.UserId,
+                            Token = sendExist.Token,
+                            ExpiredOn = sendExist.ExpiredOn,
+                            IsExpired = isExpire,
+                            UsedFor = sendExist.UsedFor,
+                            CreatedBy = sendExist.CreatedBy,
+                            CreatedOn = sendExist.CreatedOn,
+                            ModifiedBy = sendExist.ModifiedBy,
+                            ModifiedOn = sendExist.ModifiedOn,
+                            DeletedBy = sendExist.DeletedBy,
+                            DeletedOn = sendExist.DeletedOn,
+                            IsDelete = sendExist.IsDelete,
+                        };
+                        db.Update(updateIsExpire);
+                        db.SaveChanges(); // Simpan perubahan
+                        dbTran.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        dbTran.Rollback();
+                        //response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+                    }
+                }
+            }
             var userExist = GetByEmail(email).Data;
             if (userExist == null)
             {
@@ -214,7 +296,7 @@ namespace HealthCare340B.DataAccess
             }
             var OTP = new Random().Next(1000000, 9999999).ToString();
             var Expire = DateTime.Now.AddMinutes(10);
-            bool isExpire = false;
+            isExpire = false;
             using (IDbContextTransaction dbTran = db.Database.BeginTransaction())
             {
                 try

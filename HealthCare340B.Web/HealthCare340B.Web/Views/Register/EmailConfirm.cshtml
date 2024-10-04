@@ -3,9 +3,8 @@
 *@
 @{
     Layout = null;
-    //Url.Action("EmailConfirmAsync", "Register")
 }
-<form id="frmLogin">
+<form id="frmConfirm" >
     <div class="card mb-0">
         <div>
             Masukkan email Anda. Kami akan melakukan pengecekan
@@ -13,12 +12,12 @@
         <div class="card-body">
             <div class="input-group mb-3">
                 <label class="input-group-text col-3 text-white-600" for="txtEmail">E-Mail</label>
-                <input id="txtEmail" type="email" class="form-control col-9" name="Email" required />
+                <input id="txtEmail" type="email" class="form-control col-9" name="Email" />
             </div>
         </div>
         <div class="card-footer">
             <div class="text-center">
-                <button type="button" class="btn btn-primary text-lg fs-10" id="btnsendOTP">
+                <button  type="submit" class="btn btn-primary text-lg fs-10" id="btnsendOTP">
                     <span>Kirim OTP</span>
                 </button>
                 <small class="form-text text-muted">kirim Otp dalam</small>
@@ -30,69 +29,36 @@
 <script>
     $("#staticModalLabelLg").text("@ViewBag.Title");
 
-    $("#btnsendOTP").click(function (e) {
-        e.preventDefault(); // Mencegah pengiriman formulir default
-
-        // Ambil email dari input
+    $("#frmConfirm").on('submit', function (e) {
+        e.preventDefault();
+        debugger;
         var email = $("#txtEmail").val();
+        console.log(email); 
+        
 
-        // Kirim permintaan AJAX
         $.ajax({
             url: "Register/EmailConfirm",
             type: "POST",
-            data: $("#frmLogin").serialize(),
-            dataType: "json",
-            beforeSend: () => {},
-
+            data: { email: email }, 
+            beforeSend: function () {
+                
+            },
             success: function (response) {
-                if (response.statusCode == 201 || response.statusCode ==200) {
-                    // Tampilkan pesan error jika ada
-                    
-                    $("#staticModalLgBody").load("/Register/VerifyOtp");
+                if (response.statusCode === 200 || response.statusCode === 201) {
+                    $("#staticModalLgBody").html("");
+                    $("#staticModalLgBody").load("/Register/VerifyOtp"); 
                     $("#staticModalLg").modal('show');
-                    
                 } else {
-                    // Tampilkan modal OTP jika berhasil
+                    
                     alert(response.message);
                 }
             },
             error: function (errResponse) {
                 console.error(errResponse);
-                debugger;
                 alert("Terjadi kesalahan. Silakan coba lagi.");
             }
         });
-    });
-
-    let timer;
-    function startCountdown() {
-        let timeLeft = 180;
-        timer = setInterval(function () {
-            let minutes = Math.floor(timeLeft / 60);
-            let seconds = timeLeft % 60;
-            if (seconds < 10) seconds = '0' + seconds;
-            $("#countdown").text('${minutes} : ${seconds}');
-            if (timeLeft <= 0) {
-                clearInterval(timer);
-                $('#countdown').text('Kirim ulang OTP');
-            }
-            timeLeft--;
-        }, 1000)
-    }
-
-    
+    });   
 </script>
 
 
-    @*$("#staticModalLabelLg").text("@ViewBag.Title");
-
-    $("#btnsendOTP").click(function () {
-        //e.preventDefault();
-        $("#staticModalLgBody").html("");
-        $("#staticModalLgBody").load("/Register/VerifyOtp");
-    });
-
-
-
-    
-</script>*@
