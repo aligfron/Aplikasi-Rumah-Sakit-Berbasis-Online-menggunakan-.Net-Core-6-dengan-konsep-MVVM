@@ -178,12 +178,11 @@ namespace HealthCare340B.Web.Controllers
 
                 // Set the custom page size dynamically based on prescription count
                 float pageWidth = 80 * 2.83465f; // 80mm converted to points
-                float baseHeight = 77 * 2.83465f; // Base height for 1 prescription (77mm)
-                float additionalHeight = (96 - 77) * 2.83465f; // Additional height per prescription
+                float baseHeight = 71 * 2.83465f; // Base height for 1 prescription (77mm)
+                float additionalHeight = (90 - 71) * 2.83465f; // Additional height per prescription
 
                 int numPrescriptions = data.Prescriptions?.Count ?? 0;
-                float pageHeight =
-                    baseHeight + (additionalHeight * Math.Max(0, numPrescriptions - 1));
+                float pageHeight = baseHeight + (additionalHeight * Math.Max(0, numPrescriptions - 1));
 
                 converter.Options.PdfPageCustomSize = new SizeF(pageWidth, pageHeight);
 
