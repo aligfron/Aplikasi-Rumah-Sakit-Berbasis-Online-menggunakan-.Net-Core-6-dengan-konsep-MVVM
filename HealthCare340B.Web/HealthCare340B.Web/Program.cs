@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
+
 namespace HealthCare340B.Web
 {
     public class Program
@@ -11,7 +14,6 @@ namespace HealthCare340B.Web
 
             builder.Services.AddSession(opt =>
             {
-
                 opt.IdleTimeout = TimeSpan.FromMinutes(30);
             });
 
@@ -25,6 +27,19 @@ namespace HealthCare340B.Web
                 app.UseHsts();
             }
 
+            var defaultDateCulture = "id-ID";
+            var ci = new CultureInfo(defaultDateCulture);
+
+            // Configure the Localization middleware
+            app.UseRequestLocalization(
+                new RequestLocalizationOptions
+                {
+                    DefaultRequestCulture = new RequestCulture(ci),
+                    SupportedCultures = new List<CultureInfo> { ci },
+                    SupportedUICultures = new List<CultureInfo> { ci },
+                }
+            );
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -36,7 +51,8 @@ namespace HealthCare340B.Web
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Home}/{action=Index}/{id?}"
+            );
 
             app.Run();
         }

@@ -133,7 +133,6 @@
 <script>
     $(document).ready(function () {
         $("#staticModalLabel").text("@ViewBag.Title");
-    
 
         $("#btnSave").click((e) => $("#frmCustomerMember").submit());
 
@@ -150,7 +149,7 @@
 
             if ($("#frmCustomerMember").valid()) {
                 $.ajax({
-                    url: "/Profile/Pasien/Edit",
+                    url: "/CustomerMember/Edit",
                     type: "POST",
                     data: $("#frmCustomerMember").serialize(),
                     dataType: "json",
@@ -269,6 +268,19 @@
             altInput: true,
             altFormat: "j F Y",
             dateFormat: "Y-m-d",
+            allowInput: true,
+            onReady: function (selectedDates, dateStr, instance) {
+                if (this.altInput) {
+                    this.altInput.name = this.input.name;
+                }
+            },
+            onOpen: function (selectedDates, dateStr, instance) {
+                $(instance.altInput).prop('readonly', true);
+            },
+            onClose: function (selectedDates, dateStr, instance) {
+                $(instance.altInput).prop('readonly', false);
+                $(instance.altInput).blur();
+            }
         });
     });
 </script>

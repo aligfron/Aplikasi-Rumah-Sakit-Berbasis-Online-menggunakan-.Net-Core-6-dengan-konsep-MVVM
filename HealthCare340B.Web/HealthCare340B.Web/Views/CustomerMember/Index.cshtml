@@ -121,7 +121,7 @@
     $("#orderBy").val("@ViewBag.OrderBy");
 
     function RefreshPage(filter, pageNumber, currPageSize, orderBy, orderDirection) {
-        location.href = `/Profile/Pasien?filter=${filter}&pageNumber=${pageNumber}&currPageSize=${currPageSize}&orderBy=${orderBy}&orderDirection=${orderDirection}`;
+        location.href = `/CustomerMember?filter=${filter}&pageNumber=${pageNumber}&currPageSize=${currPageSize}&orderBy=${orderBy}&orderDirection=${orderDirection}`;
     }
 
     $("#frmPageSize").submit(function (e) {
@@ -162,17 +162,17 @@
 
     $("#btnAdd").click(function (e) {
         $("#staticModalBody").html(spinner);
-        $("#staticModalBody").load("/Profile/Pasien/Create/");
+        $("#staticModalBody").load("/CustomerMember/Create/");
     });
 
     $(".btnEdit").click(function (e) {
         $("#staticModalBody").html(spinner);
-        $("#staticModalBody").load("/Profile/Pasien/Edit/" + $(this).data("id"));
+        $("#staticModalBody").load("/CustomerMember/Edit/" + $(this).data("id"));
     });
 
     $(".btnDelete").click(function (e) {
         $("#staticModalBody").html(spinner);
-        $("#staticModalBody").load("/Profile/Pasien/Delete?ids=" + $(this).data("id"));
+        $("#staticModalBody").load("/CustomerMember/Delete?ids=" + $(this).data("id"));
     });
 
     $("#btnMultipleDelete").click(function (e) {
@@ -189,7 +189,7 @@
         var idsQueryString = selectedIds.join(",");
 
         $("#staticModalBody").html(spinner);
-        $("#staticModalBody").load("/Profile/Pasien/Delete?ids=" + idsQueryString);
+        $("#staticModalBody").load("/CustomerMember/Delete?ids=" + idsQueryString);
     });
 
     // mengaktifkan atau menonaktifkan tombol Multiple Delete

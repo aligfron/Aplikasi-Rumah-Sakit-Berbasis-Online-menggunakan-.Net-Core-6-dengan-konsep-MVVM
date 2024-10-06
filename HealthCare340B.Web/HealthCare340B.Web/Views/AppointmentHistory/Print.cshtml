@@ -40,6 +40,8 @@
                 success: function (response) {
                     if (response.statusCode == 200 || response.statusCode == 201) {
                         let pdfUrl = "/AppointmentHistory/PrescriptionPdf?appointmentId=" + @Model;
+                        let customerFullname = '@ViewBag.CustomerFullname';
+                        let printAttempt = '@ViewBag.PrintAttempt';
                         fetch(pdfUrl)
                             .then(response => response.blob()) // Get the PDF as a Blob
                             .then(blob => {
@@ -47,7 +49,7 @@
                                 let link = document.createElement('a');
                                 let url = window.URL.createObjectURL(blob);
                                 link.href = url;
-                                link.download = "Resep-Digital.pdf";
+                                link.download = `Resep-Digital-${customerFullname}-${printAttempt}.pdf`;
                                 document.body.appendChild(link);
                                 link.click(); // Trigger the download
                                 link.remove(); // Remove the link after triggering download

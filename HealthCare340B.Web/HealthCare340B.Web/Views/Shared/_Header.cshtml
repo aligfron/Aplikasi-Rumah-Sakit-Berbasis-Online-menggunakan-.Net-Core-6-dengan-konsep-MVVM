@@ -1,21 +1,5 @@
 ﻿<header>
     <nav class="navbar navbar-expand navbar-light navbar-top">
-        <div class="container mt-0">
-            <!-- Search Bar -->
-            <div>
-                <div class="row justify-content-center align-items-center">
-                    <div class="col-12">
-                        <form class="d-flex justify-content-center">
-                            <div class="input-group" style="max-width: 600px; width: 100%;">
-                                <input type="search" class="form-control" placeholder="Cari Dokter atau Faskes" aria-label="Search" aria-describedby="search-addon">
-                                <button class="btn btn-primary" type="submit" id="search-addon">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
         @if (!string.IsNullOrEmpty(Context.Session.GetString("userId")))
         {
 
@@ -23,6 +7,15 @@
                 <a href="#" class="burger-btn d-block">
                     <i class="bi bi-justify fs-3"></i>
                 </a>
+
+                <form class="d-flex justify-content-center">
+                    <div class="input-group" style="max-width: 600px; width: 100%;">
+                        <input type="search" class="form-control" placeholder="Cari Dokter atau Faskes" aria-label="Search" aria-describedby="search-addon">
+                        <button class="btn btn-primary" type="submit" id="search-addon">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -36,12 +29,12 @@
                             <div class="user-menu d-flex">
                                 <div class="user-name text-end me-3">
                                     <h6 class="mb-0 text-gray-600"> Hello, @Context.Session.GetString("userName")</h6>
-                                    <p class="mb-0 text-sm text-gray-600">@Context.Session.GetString("userRole")!.Substring(5,Context.Session.GetString("userRole")!.Length-5)</p>
+                                    <p class="mb-0 text-sm text-gray-600">@Context.Session.GetString("userRole")!.Substring(5, Context.Session.GetString("userRole")!.Length - 5)</p>
                                 </div>
                                 <div class="user-img d-flex align-items-center">
                                     <div class="avatar avatar-md">
                                         <img src="~/Images/@(string.IsNullOrEmpty(Context.Session.GetString("userImagePath")) ? "blank-profile-picture.png" : Context.Session.GetString("userImagePath"))"
-                                             style="object-fit: cover; border-radius: 50%;" alt="User Profile">
+                                                style="object-fit: cover; border-radius: 50%;" alt="User Profile">
 
                                     </div>
                                 </div>
@@ -94,7 +87,6 @@
             </div>*@
 
         }
-        </div>
     </nav>
 </header>
 

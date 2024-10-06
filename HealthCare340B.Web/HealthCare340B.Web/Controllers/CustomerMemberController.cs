@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HealthCare340B.Web.Controllers
 {
-    [Route("Profile/Pasien")]
     public class CustomerMemberController : Controller
     {
         private readonly CustomerMemberModel _customerMemberModel;
@@ -43,7 +42,6 @@ namespace HealthCare340B.Web.Controllers
             return _roleCode == "ROLE_PASIEN";
         }
 
-        [Route("")]
         public async Task<IActionResult> Index(
             string? filter,
             int? pageNumber,
@@ -139,7 +137,6 @@ namespace HealthCare340B.Web.Controllers
             );
         }
 
-        [Route("Create")]
         public async Task<IActionResult> Create()
         {
             if (!isInSession())
@@ -169,7 +166,6 @@ namespace HealthCare340B.Web.Controllers
         }
 
         [HttpPost]
-        [Route("Create")]
         public async Task<VMResponse<VMMCustomerMember>?> CreateAsync(VMMCustomerMember data)
         {
             VMResponse<VMMCustomerMember>? response = null;
@@ -198,7 +194,6 @@ namespace HealthCare340B.Web.Controllers
             return response;
         }
 
-        [Route("Edit/{id}")]
         public async Task<IActionResult> Edit(long id)
         {
             if (!isInSession())
@@ -231,7 +226,6 @@ namespace HealthCare340B.Web.Controllers
         }
 
         [HttpPost]
-        [Route("Edit")]
         public async Task<VMResponse<VMMCustomerMember>?> EditAsync(VMMCustomerMember data)
         {
             VMResponse<VMMCustomerMember>? response = null;
@@ -259,7 +253,6 @@ namespace HealthCare340B.Web.Controllers
             return response;
         }
 
-        [Route("Delete")]
         public async Task<IActionResult> Delete(string ids)
         {
             if (!isInSession())
@@ -308,7 +301,6 @@ namespace HealthCare340B.Web.Controllers
         }
 
         [HttpPost]
-        [Route("Delete")]
         public async Task<VMResponse<VMMCustomerMember>?> DeleteAsync(long id)
         {
             VMResponse<VMMCustomerMember>? response = null;
@@ -337,7 +329,6 @@ namespace HealthCare340B.Web.Controllers
         }
 
         [HttpPost]
-        [Route("MultipleDelete")]
         public async Task<VMResponse<VMMCustomerMember>?> MultipleDeleteAsync(string ids)
         {
             VMResponse<VMMCustomerMember>? response = null;
