@@ -1,6 +1,7 @@
 ﻿using HealthCare340B.ViewModel;
 using HealthCare340B.Web.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HealthCare340B.Web.Controllers
@@ -27,6 +28,7 @@ namespace HealthCare340B.Web.Controllers
         public IActionResult Login()
         {
             ViewBag.Title = "Masuk";
+            //ViewBag.Url = url;
             return View();
         }
         [HttpPost]
@@ -75,7 +77,7 @@ namespace HealthCare340B.Web.Controllers
             return RedirectToAction("Index", "Home");
         }
         [HttpPost]
-        public async Task<IActionResult> Login2(VMMUser data) 
+        public async Task<string> Login2(VMMUser data) 
         {
             try
             {
@@ -99,7 +101,10 @@ namespace HealthCare340B.Web.Controllers
                             HttpContext.Session.SetString("userImagePath", dataApi.ImagePath);
                         }
                         HttpContext.Session.SetString("userSince", dataApi.CreatedOn.ToString("yyyy"));
-                        return RedirectToAction("Index", "Home");
+
+                        HttpContext.Session.SetString("successMsg", "Anda berhasil login!");
+
+                        return "success";
                     }
                     else
                     {
@@ -114,8 +119,9 @@ namespace HealthCare340B.Web.Controllers
             catch (Exception ex) 
             {
                 HttpContext.Session.SetString("errMsg", ex.Message);
+                return "error";
             }
-            return RedirectToAction("Index","Home");
+            //return RedirectToAction("Index","Home");
         }
     }
 }

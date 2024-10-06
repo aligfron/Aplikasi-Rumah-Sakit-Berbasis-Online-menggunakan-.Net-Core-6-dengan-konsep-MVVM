@@ -38,7 +38,7 @@ namespace HealthCare340B.API.Controllers
             {
                 Console.WriteLine("AppointmentController.Update: " + e.Message);
 
-                throw new Exception(response.Message);
+                return BadRequest(response);
             }
         }
 
@@ -186,11 +186,14 @@ namespace HealthCare340B.API.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(VMTAppointment data)
         {
+            VMResponse<VMTAppointment> response = new VMResponse<VMTAppointment>();
             try
             {
-                VMResponse<VMTAppointment> response = await Task.Run(() => appointment.Create(data));
+                response = await Task.Run(() => appointment.Create(data));
                 if (response.StatusCode == HttpStatusCode.Created)
                     return Created("api/Appointment", response);
+                else if (response.StatusCode == HttpStatusCode.Found)
+                    throw new Exception(response.Message);
                 else
                     throw new Exception(response.Message);
             }
@@ -198,7 +201,7 @@ namespace HealthCare340B.API.Controllers
             {
                 Console.WriteLine("AppointmentController.Create: " + e.Message);
 
-                return BadRequest(e.Message);
+                return BadRequest(response);
             }
         }
     }

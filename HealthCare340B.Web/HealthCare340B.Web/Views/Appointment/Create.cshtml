@@ -75,6 +75,8 @@
     var isError = false;
 
     $(document).ready(() => {
+        $("#staticModalLabel").text("@ViewBag.Title");
+
         $.ajax({
             url: "/Appointment/GetMemberById",
             data: {
@@ -277,6 +279,12 @@
                                 }
                             ]
                         });
+                    },
+                    error: function (errResponse) {
+                        debugger;
+                        console.log(errResponse);
+                        //toastAlert("Something's wrong when getting the available date", "error");
+                        location.reload();
                     }
                 });
 
@@ -306,12 +314,14 @@
                         }
                     },
                     error: function (errResponse) {
-                        console.error("errResponse", errResponse)
                         debugger;
+                        console.log(errResponse);
+                        location.reload();
                     }
                 });
             }
             else {
+                $("#medFac").val(0);
                 $("#tindakan").val("");
                 $("#tindakan").empty();
                 $("#tindakan").prop("disabled", true);
@@ -348,6 +358,7 @@
                     error: function (errResponse) {
                         debugger;
                         console.log(errResponse);
+                        location.reload();
                     }
                 });
             });
@@ -445,8 +456,10 @@
                             location.href = "/Appointment/RencanaKedatangan";
                         }
                         else {
+                            debugger;
                             $("#staticModalLgBody").html();
-                            $("#staticModalLgBody").load("/Appointment/EmptySlot/");
+                            var message = encodeURIComponent(response.message.trim());
+                            $("#staticModalLgBody").load(`/Appointment/EmptySlot/?message=${message}`);
                             //$("#staticModalLg").modal("show");
                             $("#tindakan").val("");
                             $("#tindakan").empty();
@@ -459,8 +472,9 @@
                         }
                     },
                     error: function (errResponse) {
-                        console.log(errResponse);
                         debugger;
+                        console.log(errResponse);
+                        location.reload();
                     }
                 });
             }

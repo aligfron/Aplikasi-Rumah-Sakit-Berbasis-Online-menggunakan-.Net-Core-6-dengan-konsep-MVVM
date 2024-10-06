@@ -19,7 +19,7 @@
         </div>
         <div class="card-footer ">
             <div class="text-center">
-                <button type="submit" class="btn btn-primary text-lg fs-10">
+                <button id="btnLoginModal" type="submit" class="btn btn-primary text-lg fs-10">
                     <span>Login</span>
                 </button>
             </div>
@@ -36,15 +36,40 @@
 </form>
 
 <script>
-    $("#staticModalLabel").text("@ViewBag.Title");
+    $(document).ready(() => {
+        $("#staticModalLabel").text("@ViewBag.Title");
 
-    $("#btnForgot").click(function () {
-        $("#staticModalLgBody").html("");
-        $("#staticModalLgBody").load("/User/Update/");
-    });
+        $("#btnForgot").click(function () {
+            $("#staticModalLgBody").html("");
+            $("#staticModalLgBody").load("/User/Update/");
+        });
 
-    $("#btnDaftarLogin").click(function () {
-        $("#staticModalLgBody").html("");
-        $("#staticModalLgBody").load("/Register/EmailConfirm");
+        $("#btnDaftarLogin").click(function () {
+            $("#staticModalLgBody").html("");
+            $("#staticModalLgBody").load("/Register/EmailConfirm");
+        });
+
+        $("#frmLogin").submit(function (e) {
+            e.preventDefault();
+        });
+
+        $("#btnLoginModal").click(function (e) {
+            $.ajax({
+                url: "/Auth/Login2",
+                type: "post",
+                data: $("#frmLogin").serialize(),
+                dataType: "html",
+                success: function(response) {
+                    debugger;
+                    location.reload();
+                },
+                error: function(errResponse) {
+                    debugger;
+                    console.log(errResponse);
+                    location.reload();
+                }
+            })
+        });
     });
+    
 </script>

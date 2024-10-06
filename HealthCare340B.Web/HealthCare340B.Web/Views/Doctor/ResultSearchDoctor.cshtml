@@ -96,17 +96,17 @@
                                             @if (doctor.IsOnline && doctor.IsAvailable)
                                             {
                                                 <button class="btn btn-primary">Chat</button>
-                                                <button class="btn btn-success mt-2">Buat Janji</button>
+                                                <button data-id="@doctor.Id" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticModal">Buat Janji</button>
                                             }
                                             else if (doctor.IsOnline && !doctor.IsAvailable)
                                             {
                                                 <button class="btn btn-primary" disabled>Chat</button>
-                                                <button class="btn btn-success mt-2" disabled>Buat Janji</button>
+                                                <button data-id="@doctor.Id" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticModal" disabled>Buat Janji</button>
                                             }
                                             else
                                             {
                                                 <span class="text-muted">Offline</span>
-                                                <button id="btnAppointment" data-id="@doctor.Id" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticModal">Buat Janji</button>
+                                                <button data-id="@doctor.Id" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticModal">Buat Janji</button>
                                             }
                                         </div>
                                     </div>
@@ -139,13 +139,38 @@
         $("#staticModalBody").load("/Doctor/SearchDoctor")
     });
 
-    $("#btnAppointment").click(function (e) {
-        $("#staticModalBody").html(spinner);
-        $("#staticModalBody").load("/Appointment/Create/" + $(this).attr("data-id"));
-    });
     $("#DetailDocter").click(function (e) {
         var doctorId = $(this).attr("data-id");  // Mengambil nilai dari atribut data-id
         window.location.href = "/Doctor/DetailDoctor/" + doctorId;  // Mengarahkan ke halaman detail berdasarkan doctorId
     });
 
 </script>
+
+@if (@Context.Session.GetString("userId") != null && @Context.Session.GetString("userRoleCode") == "ROLE_PASIEN")
+{
+    <script>
+        $(".btn-success").click(function (e) {
+            $("#staticModalBody").html(spinner);
+            $("#staticModalBody").load("/Appointment/Create/" + $(this).attr("data-id"));
+        });
+    </script>
+}
+else if (@Context.Session.GetString("userId") != null && @Context.Session.GetString("userRoleCode") != "ROLE_PASIEN")
+{
+    <script>
+        $(".btn-success").click(function (e) {
+           toastAlert("You're not authorized!", "error")
+        });
+    </script>
+}
+else
+{
+    <script>
+        $(".btn-success").click(function (e) {
+            $("#staticModalBody").html(spinner);
+            var doctorId = $(this).attr("data-id");
+            var redirectUrl = ($(location).attr('protocol') + "//" + $(location).attr('host') + "/Doctor/DetailDoctor/" + doctorId);
+            $("#staticModalBody").load(`/Auth/Login?url=${redirectUrl}`);
+        });
+    </script>
+}

@@ -7,13 +7,13 @@
 
 <div class="card">
     <div class="card-body">
-        <p>Mohon maaf, waktu yang anda pilih telah terisi penuh. Silahkan memilih waktu kedatangan atau faskes yang lain.</p>
+        <p>@ViewBag.Message</p>
     </div>
     <div class="d-flex justify-content-between">
         <div class="w-10"></div>
-        <div class="w-30"><button id="btnCancel" class="btn btn-outline-info">Cancel</button></div>
+        <div class="w-30"><button id="btnCancelEmpty" class="btn btn-outline-info">Cancel</button></div>
         <div class="w-10"></div>
-        <div class="w-30"><button id="btnSave" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#staticModalLg">Pilih Jadwal Lain</button></div>
+        <div class="w-30"><button id="btnReturn" class="btn btn-info" data-bs-target="#staticModalLg">Pilih Jadwal Lain</button></div>
         <div class="w-10"></div>
     </div>
 </div>
@@ -22,11 +22,12 @@
     $(document).ready(() => {
         $("#staticModalLgLabel").text("@ViewBag.Title");
         
-        $("#btnCancel").click(function (e) {
+        $("#btnCancelEmpty").click(function (e) {
             location.reload();
         });
 
-        $("#btnSave").click(function (e) {
+        $("#btnReturn").click(function (e) {
+            $("#staticModalLg").html();
             $("#staticModalLg").modal("hide");
         })
     });

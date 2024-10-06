@@ -424,7 +424,7 @@ namespace HealthCare340B.Web.Models
 
                 if (apiResponse != null)
                 {
-                    if (apiResponse.StatusCode != HttpStatusCode.Created)
+                    if (apiResponse.StatusCode != HttpStatusCode.Created && apiResponse.StatusCode != HttpStatusCode.Found)
                     {
                         throw new Exception(apiResponse.Message);
                     }
@@ -438,7 +438,7 @@ namespace HealthCare340B.Web.Models
             {
                 //Logging
                 Console.WriteLine("AppointmentModel.Create: " + e.Message);
-                throw new Exception("AppointmentModel.Create: " + e.Message);
+                throw new Exception(e.Message);
             }
 
             return apiResponse;
@@ -538,7 +538,7 @@ namespace HealthCare340B.Web.Models
 
                 if (response != null)
                 {
-                    if (response.StatusCode != HttpStatusCode.OK)
+                    if (response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.Found)
                     {
                         throw new Exception(response.Message);
                     }

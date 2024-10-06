@@ -80,50 +80,60 @@
 &nbsp;
 
 
-@if (Model.Count > 0)
-{
-    foreach (VMTAppointment app in Model)
-    {
-        <div class="row d-flex justify-content-between" style="border: 2px solid rgb(0, 255, 255)">
-            <div class="col-1 d-flex justify-content-center">
-                <input data-id="@app.Id" class="app-checkbox" type="checkbox" />
-            </div>
-            <div class="col-7">
-                <div>
-                    <p>@app.CustomerName</p>
-                </div>
-                <div>
-                    <p>@(app.AppointmentDate?.ToString("dd MMMM yyyy")) - @app.MedicalFacilityName</p>
-                </div>
-                <div>
-                    <p>@app.DoctorName - @app.Treatment</p>
-                </div>
-            </div>
-            <div class="col-4 d-flex justify-content-center" style="text-align: center; vertical-align: middle;">
-                <div class="btn-group" style="text-align: center;">
-                   <button data-id="@app.Id" data-customerId="@app.CustomerId" data-customerName="@app.CustomerName" 
-                   data-doctorId="@app.DoctorId" data-medFacId="@app.MedicalFacilityId" data-medFacName="@app.MedicalFacilityName" 
-                   data-appDate="@(app.AppointmentDate?.ToString("yyyy-MM-dd"))" data-timeStart="@app.TimeStart"
-                   data-timeEnd="@app.TimeEnd" data-treatmentId="@app.TreatmentId"
-                   data-bs-toggle="modal" data-bs-target="#staticModal" 
-                   class="btn btn-outline-info" style="height: 25%; margin-top: 50px;">Ubah</button>
-                    <button data-id="@app.Id" data-customerName="@app.CustomerName" 
-                    data-appDate="@(app.AppointmentDate?.ToString("yyyy-MM-dd"))" data-doctorName="@app.DoctorName"
-                    data-medFacName="@app.MedicalFacilityName" data-treatment="@app.Treatment" 
-                    data-bs-toggle="modal" data-bs-target="#staticModalLg"
-                    class="btn btn-danger" style="height: 25%; margin-top: 50px;">Batal</button>
-               </div>
-           </div>
-        </div>
-        <text>&nbsp;</text>
-    }
-}
-else
-{
-    <div>
-
-    </div>
-}
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th style="width: 5%;"></th>
+                <th style="width: 65%;"></th>
+                <th style="text-align: right; width: 30%; vertical-align: middle;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.TotalData > 0)
+            {
+                foreach (VMTAppointment app in Model)
+                {
+                    <tr>
+                        <td class="checkbox">
+                            <input class="app-checkbox" type="checkbox" />
+                        </td>
+                        <td>
+                            <div>
+                                <h6 class="mb-0">@app.CustomerName</h6>
+                                <p class="mb-0">@(app.AppointmentDate?.ToString("dd MMMM yyyy")) - @app.MedicalFacilityName</p>
+                                <p class="mb-0">@app.DoctorName - @app.Treatment</p>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <button data-id="@app.Id" data-customerId="@app.CustomerId" data-customerName="@app.CustomerName"
+                                    data-doctorId="@app.DoctorId" data-medFacId="@app.MedicalFacilityId" data-medFacName="@app.MedicalFacilityName"
+                                    data-appDate="@(app.AppointmentDate?.ToString("yyyy-MM-dd"))" data-timeStart="@app.TimeStart"
+                                    data-timeEnd="@app.TimeEnd" data-treatmentId="@app.TreatmentId"
+                                    data-bs-toggle="modal" data-bs-target="#staticModal"
+                                    class="btn btn-outline-info" style="height: 25%; margin-top: 50px;">
+                                Ubah
+                            </button>
+                            <button data-id="@app.Id" data-customerName="@app.CustomerName"
+                                    data-appDate="@(app.AppointmentDate?.ToString("yyyy-MM-dd"))" data-doctorName="@app.DoctorName"
+                                    data-medFacName="@app.MedicalFacilityName" data-treatment="@app.Treatment"
+                                    data-bs-toggle="modal" data-bs-target="#staticModalLg"
+                                    class="btn btn-danger" style="height: 25%; margin-top: 50px;">
+                                Batal
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center">-- No Customer Member Data --</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 &nbsp;
 
@@ -255,7 +265,7 @@ else
               asp-controller="Appointment" asp-action="RencanaKedatangan">
             <div class="input-group">
                 <span class="input-group-text">Show</span>
-                <input class="form-control" type="text" id="pageSize" name="currPageSize" value="@ViewBag.PageSize" />
+                <input class="form-control" type="number" id="pageSize" name="currPageSize" min="1" max="100" value="@ViewBag.PageSize" />
                 <span class="input-group-text"> Entries</span>
             </div>
             <input name="filter" type="hidden" value="@ViewBag.Filter" />

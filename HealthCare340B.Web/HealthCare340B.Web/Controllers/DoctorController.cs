@@ -69,6 +69,11 @@ namespace HealthCare340B.Web.Controllers
                 dataFilter.Treatment?.Trim()
             );
 
+            ViewBag.Fullname = dataFilter.Fullname?.Trim();
+            ViewBag.MedFacName = dataFilter.MedicalFacilityName?.Trim();
+            ViewBag.Specialization = dataFilter.Specialization?.Trim();
+            ViewBag.Treatment = dataFilter.Treatment?.Trim();
+
             if (data != null)
             {
                 // Log or Debug the received data

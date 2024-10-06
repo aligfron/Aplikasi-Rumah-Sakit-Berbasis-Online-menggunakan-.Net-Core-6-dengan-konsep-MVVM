@@ -416,7 +416,7 @@ namespace HealthCare340B.Web.Controllers
             return View();
         }
 
-        public IActionResult EmptySlot()
+        public IActionResult EmptySlot(string message)
         {
             if (!isInSession())
             {
@@ -429,6 +429,7 @@ namespace HealthCare340B.Web.Controllers
             }
 
             ViewBag.Title = "Cek Ketersediaan Jadwal";
+            ViewBag.Message = message;
             return View();
         }
 
@@ -459,7 +460,8 @@ namespace HealthCare340B.Web.Controllers
                 };
 
                 VMResponse<VMTAppointment> response = await appointment.Create(data);
-                HttpContext.Session.SetString("successMsg", "Janji berhasil dibuat!");
+                if (response.StatusCode == HttpStatusCode.OK)
+                    HttpContext.Session.SetString("successMsg", "Janji berhasil dibuat!");
                 return response;
             }
             catch (Exception e)
@@ -682,7 +684,8 @@ namespace HealthCare340B.Web.Controllers
                 };
 
                 VMResponse<VMTAppointment>? response = await appointment.Update(data);
-                HttpContext.Session.SetString("successMsg", "Janji berhasil diubah!");
+                if (response!.StatusCode == HttpStatusCode.OK)
+                    HttpContext.Session.SetString("successMsg", "Janji berhasil diubah!");
                 return response!;
             }
             catch (Exception e)

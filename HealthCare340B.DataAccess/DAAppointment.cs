@@ -539,13 +539,13 @@ namespace HealthCare340B.DataAccess
                         else
                         {
                             response.StatusCode = HttpStatusCode.Found;
-                            response.Message = $"{HttpStatusCode.Found} - Slot is Full!";
+                            response.Message = "Mohon maaf, waktu yang anda pilih telah terisi penuh. Silahkan memilih waktu kedatangan atau faskes yang lain.";
                         }
                     }      
                     else
                     {
                         response.StatusCode = HttpStatusCode.Found;
-                        response.Message = $"{HttpStatusCode.Found} - You already have other appointment in that time!";
+                        response.Message = "Mohon maaf, Anda sudah mempunyai rencana kadatangan di waktu ini. Silahkan memilih waktu kedatangan yang lain.";
                     }
                 }
                 catch (Exception e)
@@ -656,13 +656,13 @@ namespace HealthCare340B.DataAccess
                         else
                         {
                             response.StatusCode = HttpStatusCode.Found;
-                            response.Message = $"{HttpStatusCode.Found} - Slot is Full!";
+                            response.Message = "Mohon maaf, waktu yang anda pilih telah terisi penuh. Silahkan memilih waktu kedatangan atau faskes yang lain.";
                         }
                     }
                     else
                     {
                         response.StatusCode = HttpStatusCode.Found;
-                        response.Message = $"{HttpStatusCode.Found} - You already have other appointment in that time!";
+                        response.Message = "Mohon maaf, Anda sudah mempunyai rencana kadatangan di waktu ini. Silahkan memilih waktu kedatangan yang lain.";
                     }
                 }
                 catch (Exception e)

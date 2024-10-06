@@ -65,7 +65,7 @@
         <div class="w-10"></div>
         <div class="w-30"><button id="btnCancel" class="btn btn-outline-danger">Cancel</button></div>
         <div class="w-10"></div>
-        <div class="w-30"><button id="btnSave" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#staticModalLg" disabled>Buat Janji</button></div>
+        <div class="w-30"><button type="button" id="btnSave" class="btn btn-outline-info" data-bs-target="#staticModalLg" disabled>Buat Janji</button></div>
         <div class="w-10"></div>
     </div>
 </div>
@@ -73,6 +73,8 @@
 
 <script>
     $(document).ready(() => {
+        $("#staticModalLabel").text("@ViewBag.Title");
+
         var emptySlotDate = null;
         var startDate = null;
         var endDate = null;
@@ -91,6 +93,8 @@
             error: function (errResponse) {
                 debugger;
                 console.log(errResponse);
+                //toastAlert("Something's wrong when getting the available date", "error");
+                location.reload();
             }
         });
 
@@ -109,6 +113,8 @@
             error: function (errResponse) {
                 debugger;
                 console.log(errResponse);
+                //toastAlert("Something's wrong when getting the available date", "error");
+                location.reload();
             }
         });
 
@@ -127,6 +133,8 @@
             error: function (errResponse) {
                 debugger;
                 console.log(errResponse);
+                //toastAlert("Something's wrong when getting the available date", "error");
+                location.reload();
             }
         });
 
@@ -193,6 +201,12 @@
                         }
                     ]
                 });
+            },
+            error: function (errResponse) {
+                debugger;
+                console.log(errResponse);
+                //toastAlert("Something's wrong when getting the available date", "error");
+                location.reload();
             }
         });
 
@@ -224,8 +238,9 @@
                 }
             },
             error: function (errResponse) {
-                console.error("errResponse", errResponse)
                 debugger;
+                console.log(errResponse);
+                location.reload();
             }
         });
       
@@ -274,6 +289,7 @@
                 error: function (errResponse) {
                     debugger;
                     console.log(errResponse);
+                    location.reload();
                 }
             });
         });
@@ -305,6 +321,7 @@
         });
 
         $("#btnSave").click(function (e) {
+            debugger;
             $("#frmAppointment").submit(function (e) {
                 e.preventDefault();
             });
@@ -389,6 +406,7 @@
                     beforeSend: () => {
                         $("#staticModalLgBody").html();
                         $("#staticModalLgBody").load("/Appointment/Check/");
+                        $("#staticModalLg").modal("show");
                     },
                     success: function (response) {
                         if (response.statusCode == 200) {
@@ -398,21 +416,18 @@
                         }
                         else {
                             $("#staticModalLgBody").html();
-                            $("#staticModalLgBody").load("/Appointment/EmptySlot/");
+                            var message = encodeURIComponent(response.message.trim());
+                            $("#staticModalLgBody").load(`/Appointment/EmptySlot/?message=${message}`);
                             //$("#staticModalLg").modal("show");
-                            $("#tindakan").val("");
-                            $("#tindakan").empty();
-                            $("#tindakan").prop("disabled", true);
-                            $("#date").val("");
-                            $("#date").prop("disabled", true);
                             $("#sesi").val("");
                             $("#sesi").empty();
-                            $("#sesi").prop("disabled", true);
+                            $("#sesi").prop("disabled", true);                 
                         }
                     },
                     error: function (errResponse) {
-                        console.log(errResponse);
                         debugger;
+                        console.log(errResponse);
+                        location.reload();
                     }
                 });
             }
