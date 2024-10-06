@@ -45,7 +45,7 @@ namespace HealthCare340B.Web.Controllers
             return true;
         }
 
-        private string ModifyString(string dataName)
+        private string? ModifyString(string dataName)
         {
             try
             {

@@ -31,7 +31,7 @@
             </div>
             <div class="row mb-3">
                 <div class="col-4">Faskes<span class="text-danger">*</span></div>
-                <div class="col-8">
+                <div class="col-8 mb-1">
                     <select id="medFac" name="MedFac" class="form-select">
                         <option value="0">-- Select MedFac --</option>
                     </select>
@@ -39,8 +39,8 @@
             </div>
             <div class="row mb-3">
                 <div class="col-4">Waktu Kedatangan<span class="text-danger">*</span></div>
-                <div class="col-8">
-                    <input id="date" name="AppointmentDate" type="datetime" size="29" disabled />
+                <div class="col-8 flatpickr">
+                    <input class="form-control" id="date" name="AppointmentDate" type="text" placeholder="Click here to select date" disabled />
                 </div>
             </div>
             <div class="row mb-3">
@@ -63,9 +63,9 @@
     </div>
     <div class="d-flex justify-content-between">
         <div class="w-10"></div>
-        <div class="w-30"><button id="btnCancel" class="btn btn-outline-danger">Cancel</button></div>
+        <div class="w-30"><button id="btnCancelCreate" class="btn btn-outline-danger">Cancel</button></div>
         <div class="w-10"></div>
-        <div class="w-30"><button id="btnSave" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#staticModalLg">Buat Janji</button></div>
+        <div class="w-30"><button id="btnSave" class="btn btn-outline-info" data-bs-target="#staticModalLg">Buat Janji</button></div>
         <div class="w-10"></div>
     </div>
 </div>
@@ -460,7 +460,7 @@
                             $("#staticModalLgBody").html();
                             var message = encodeURIComponent(response.message.trim());
                             $("#staticModalLgBody").load(`/Appointment/EmptySlot/?message=${message}`);
-                            //$("#staticModalLg").modal("show");
+                            $("#staticModalLg").modal("show");
                             $("#tindakan").val("");
                             $("#tindakan").empty();
                             $("#tindakan").prop("disabled", true);
@@ -478,6 +478,10 @@
                     }
                 });
             }
+        });
+
+        $("#btnCancelCreate").click(function (e) {
+            $("#staticModal").modal("hide");
         });
     });
 </script>

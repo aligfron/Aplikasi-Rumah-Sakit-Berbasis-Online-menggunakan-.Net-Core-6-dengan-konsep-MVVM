@@ -61,7 +61,7 @@
         <form class="col-sm-12 col-md-5 col-lg-5" id="frmProductFilter" method="get" asp-controller="Appointment" asp-action="RencanaKedatangan">
             <div class="input-group">
                 <span class="input-group-text">Search: </span>
-                <input class="form-control" type="text" id="filter" name="Filter" value="@ViewBag.filter" />
+                <input class="form-control" type="text" id="filter" name="Filter" value="@ViewBag.filter" placeholder="Cari Pasien atau Dokter..." />
                 <button id="btnProductFilter" type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
                 <input name="currPageSize" type="hidden" value="@ViewBag.PageSize" />
                 <input name="pageNumber" type="hidden" value="@Model.PageIndex" />
@@ -96,7 +96,7 @@
                 {
                     <tr>
                         <td class="checkbox">
-                            <input class="app-checkbox" type="checkbox" />
+                            <input data-id="@app.Id" class="app-checkbox" type="checkbox" />
                         </td>
                         <td>
                             <div>
