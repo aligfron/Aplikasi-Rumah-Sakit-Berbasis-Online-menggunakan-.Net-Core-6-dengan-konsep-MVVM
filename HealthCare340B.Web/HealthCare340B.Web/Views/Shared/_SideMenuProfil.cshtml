@@ -17,9 +17,7 @@
                 <a class="nav-link" id="v-pills-riwayatkedatangan-tab" asp-controller="AppointmentHistory" asp-action="Index">Riwayat Kedatangan</a>
             </div>
         </div>
-    </div>
-
-    <script>
+    </div><script>
         $(document).ready(function () {
             // Menambahkan kelas 'active' pada nav-link sesuai dengan URL
             var currentUrl = window.location.pathname;
@@ -63,4 +61,8 @@
             });
         });
     </script>
+}
+else
+{
+    <p>Belum ada menu untuk role ini</p>
 }

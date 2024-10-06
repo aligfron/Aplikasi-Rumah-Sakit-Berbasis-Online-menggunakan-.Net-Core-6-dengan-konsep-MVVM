@@ -258,6 +258,16 @@ namespace HealthCare340B.DataAccess
 
                         if (cr != null)
                         {
+                            // Pengecekan apakah relasi digunakan di tempat lain
+                            bool isRelationInUse = _db.MCustomerMembers.Any(cm => cm.CustomerRelationId == id && cm.IsDelete == false);
+
+                            if (isRelationInUse)
+                            {
+                                response.Message = $"{HttpStatusCode.Conflict} - Customer relation is currently in use and cannot be deleted.";
+                                response.StatusCode = HttpStatusCode.Conflict;
+                                return response;
+                            }
+
                             cr.IsDelete = true;
                             cr.DeletedBy = deletedBy;
                             cr.DeletedOn = DateTime.Now;

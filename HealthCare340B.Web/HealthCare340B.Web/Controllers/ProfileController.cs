@@ -32,17 +32,11 @@ namespace HealthCare340B.Web.Controllers
 
             return _userId != null;
         }
-        private bool isInRolePasien()
+        private bool isInRole(string role)
         {
             _roleCode = HttpContext.Session.GetString("userRoleCode") ?? null;
 
-            return _roleCode == "ROLE_PASIEN";
-        }
-        private bool isInRoleDokter()
-        {
-            _roleCode = HttpContext.Session.GetString("userRoleCode") ?? null;
-
-            return _roleCode == "ROLE_DOKTER";
+            return _roleCode == role;
         }
 
         public async Task<IActionResult> Index()
@@ -72,6 +66,9 @@ namespace HealthCare340B.Web.Controllers
                     return RedirectToAction("IndexDoctorProfile");
 
                 case "ROLE_ADMIN":
+                    return RedirectToAction("IndexAdminProfile");
+
+                case "ROLE_FASKES":
                     break;
             }
 
@@ -84,7 +81,7 @@ namespace HealthCare340B.Web.Controllers
             {
                 HttpContext.Session.SetString("errMsg", "Please login first!");
             }
-            if (!isInRoleDokter())
+            if (!isInRole("ROLE_DOKTER"))
             {
                 HttpContext.Session.SetString("errMsg", "You are not authorized!");
                 return RedirectToAction("Index", "Home");
@@ -111,7 +108,30 @@ namespace HealthCare340B.Web.Controllers
             {
                 HttpContext.Session.SetString("errMsg", "Please login first!");
             }
-            if (!isInRolePasien())
+            if (!isInRole("ROLE_PASIEN"))
+            {
+                HttpContext.Session.SetString("errMsg", "You are not authorized!");
+                return RedirectToAction("Index", "Home");
+            }
+            ViewBag.Title = "Profil";
+            ViewBag.imgFolder = imageFolder;
+
+            ViewBag.Breadcrumb = new List<BreadcrumbItem>
+            {
+                new BreadcrumbItem { Name = "Beranda", Controller = "Home", Action = "Index" },
+                new BreadcrumbItem { Name = "Profile", IsActive = true }
+            };
+
+            return View();
+        }
+
+        public async Task<IActionResult> IndexAdminProfile()
+        {
+            if (!isInSession())
+            {
+                HttpContext.Session.SetString("errMsg", "Please login first!");
+            }
+            if (!isInRole("ROLE_ADMIN"))
             {
                 HttpContext.Session.SetString("errMsg", "You are not authorized!");
                 return RedirectToAction("Index", "Home");

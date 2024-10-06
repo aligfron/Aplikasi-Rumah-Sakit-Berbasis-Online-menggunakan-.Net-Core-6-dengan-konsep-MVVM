@@ -34,7 +34,7 @@ namespace HealthCare340B.Web.Models
 
                 if (apiResponse != null)
                 {
-                    if (apiResponse.StatusCode == HttpStatusCode.OK)
+                    if (apiResponse.StatusCode == HttpStatusCode.OK || apiResponse.StatusCode == HttpStatusCode.NoContent)
                     {
                         data = apiResponse.Data;
                     }
@@ -78,7 +78,7 @@ namespace HealthCare340B.Web.Models
 
                 if (apiResponse != null)
                 {
-                    if (apiResponse.StatusCode == HttpStatusCode.OK)
+                    if (apiResponse.StatusCode == HttpStatusCode.OK || apiResponse.StatusCode == HttpStatusCode.NoContent)
                     {
                         data = apiResponse.Data;
                     }
