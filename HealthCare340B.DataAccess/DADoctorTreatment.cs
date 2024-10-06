@@ -26,17 +26,10 @@ namespace HealthCare340B.DataAccess
                 var query = from m in db.TDoctorTreatments
                             select new VMTDoctorTreatment
                             {
-                                Id = m.Id,
                                 Name = m.Name,
-                                CreatedBy = m.CreatedBy,
-                                CreatedOn = m.CreatedOn,
-                                ModifiedBy = m.ModifiedBy,
-                                ModifiedOn = m.ModifiedOn,
-                                DeletedBy = m.DeletedBy,
-                                DeletedOn = m.DeletedOn,
                                 IsDelete = m.IsDelete,
                             };
-                var result = query.ToList();
+                var result = query.Distinct().ToList();
                 Console.WriteLine($"Query returned {result.Count} treatment");
 
                 response.Data = result;

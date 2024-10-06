@@ -84,7 +84,7 @@
                 </div>
             </div>
 
-            <input type="hidden" name="ModifiedBy" value="1" />
+            <input type="hidden" name="ModifiedBy" value="@Context.Session.GetString("userId")" />
             <input type="hidden" name="Id" value="@Model.Id" />
 
             <!-- Buttons -->
@@ -151,7 +151,8 @@
                     success: function (response) {
                         if (response.statusCode == 200 || response.statusCode == 201) {
                             alert(response.statusCode + "-" + response.message);
-                            window.location.href = "/Profile/IndexCustomerProfile";
+                            $("#staticModal").modal("hide")
+                            $("#alamat").load('/Profile/TabAlamat')
                         } else {
                             alert(response.statusCode + "-" + response.message);
                         }

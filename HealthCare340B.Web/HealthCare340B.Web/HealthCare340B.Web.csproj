@@ -27,7 +27,6 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\lib\mazer\" />
-    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
 </Project>

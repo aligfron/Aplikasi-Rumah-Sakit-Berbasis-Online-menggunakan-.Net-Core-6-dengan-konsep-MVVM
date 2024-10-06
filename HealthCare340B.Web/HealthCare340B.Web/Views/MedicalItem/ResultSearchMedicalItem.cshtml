@@ -54,7 +54,7 @@
                         <span>Harga Minial: @ViewBag.PriceMin</span>
                         <br />
                     }
-                    @if ((ViewBag.Name == ViewBag.Indication) != null)
+                    @if (!string.IsNullOrEmpty(ViewBag.Name) && !string.IsNullOrEmpty(ViewBag.Indication))
                     {
                         <span>Nama atau Indikasi : @ViewBag.Name</span>
                         <br />
@@ -98,8 +98,16 @@
 
                             <!-- Right: Image Placeholder -->
                             <div class="col-md-4">
-                                <img id="profileImage" src="~/images/paracetamol.jpeg" alt="Avatar" class="rounded-circle" style="width: 180px; height: 180px;">
+                                @if (!string.IsNullOrEmpty(item.ImagePath))
+                                {
+                                    <img id="profileImage" src="@Url.Content($"~/images/{item.ImagePath}")" alt="Avatar" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                                }
+                                else
+                                {
+                                    <img id="profileImage" src="@Url.Content("~/images/drug.jpg")" alt="Avatar" class="rounded-circle" style="width: 100px; height: 100px;">
+                                }
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -137,6 +145,19 @@
         let cartItems = {}; // Menyimpan item dalam keranjang berdasarkan nama produk
         let totalPrice = 0;
 
+        // Fungsi untuk menyimpan cartItems ke localStorage
+        function saveCartToLocalStorage() {
+            localStorage.setItem("cartItems", JSON.stringify(cartItems));
+        }
+
+        // Fungsi untuk mengambil cartItems dari localStorage
+        function loadCartFromLocalStorage() {
+            const storedCart = localStorage.getItem("cartItems");
+            if (storedCart) {
+                cartItems = JSON.parse(storedCart);
+            }
+        }
+
         // Fungsi untuk memperbarui ringkasan keranjang
         function updateCartSummary() {
             let totalProductTypes = 0;
@@ -156,6 +177,25 @@
             }
         }
 
+        // Fungsi untuk merestore keranjang dari localStorage dan menampilkan kembali selector jumlah
+        function restoreCartState() {
+            $.each(cartItems, function (productName, item) {
+                const productCard = $(".card").filter(function () {
+                    return $(this).find("h3").text() === productName;
+                });
+
+                // Menampilkan selector jumlah dan menyembunyikan tombol "Tambah ke Keranjang"
+                productCard.find(".add-to-cart-btn").hide();
+                productCard.find(".quantity-selector").show();
+                productCard.find(".quantity-selector .quantity").text(item.quantity);
+            });
+            updateCartSummary();
+        }
+
+        // Load keranjang dari localStorage saat halaman dimuat
+        loadCartFromLocalStorage();
+        restoreCartState(); // Mengembalikan status keranjang saat halaman dimuat
+
         // Fungsi untuk menangani pagination
         function handlePagination(button) {
             let pageNumber = button.data("pagenumber");
@@ -167,13 +207,14 @@
 
             $.ajax({
                 url: "/MedicalItem/ResultSearchMedicalItem",
-                type: "get",
+                type: "post",
                 data: {
                     "pageNumber": pageNumber,
                     "currentPageSize": currentPageSize,
                 },
                 success: function (response) {
                     $("#medicalItemsContainer").html(response);
+                    restoreCartState(); // Mengembalikan status keranjang setelah pencarian ulang
                 },
                 error: function (errResponse) {
                     console.error(errResponse);
@@ -208,6 +249,7 @@
             $(this).next(".quantity-selector").show(); // Menampilkan selector jumlah
             $(this).hide(); // Menyembunyikan tombol "Tambah ke Keranjang"
 
+            saveCartToLocalStorage(); // Menyimpan keranjang ke localStorage
             updateCartSummary(); // Memperbarui ringkasan keranjang
         });
 
@@ -225,6 +267,7 @@
                 cartItems[productName].quantity = currentQuantity;
             }
 
+            saveCartToLocalStorage(); // Menyimpan keranjang ke localStorage
             updateCartSummary(); // Memperbarui ringkasan keranjang
         });
 
@@ -252,6 +295,7 @@
                 delete cartItems[productName];
             }
 
+            saveCartToLocalStorage(); // Menyimpan keranjang ke localStorage
             updateCartSummary(); // Memperbarui ringkasan keranjang
         });
 
@@ -259,9 +303,14 @@
         $("#researchBtn").click(function (e) {
             $("#staticModalBody").html("");
             $("#staticModalBody").load("/MedicalItem/SearchMedicalItem");
+            restoreCartState(); // Mengembalikan status keranjang setelah pencarian ulang
         });
     });
 
 </script>
+
+
+
+
 
 

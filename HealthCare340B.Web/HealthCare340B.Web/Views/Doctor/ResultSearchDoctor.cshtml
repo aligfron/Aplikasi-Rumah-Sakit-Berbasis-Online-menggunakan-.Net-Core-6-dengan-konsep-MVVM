@@ -8,22 +8,23 @@
     Layout = "_HasilDokterView";
 }
 
+<!-- Breadcrumb -->
+<div class="p-2 rounded" style="background-color: #F5F8FF;">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-controller="Home" asp-action="Index" class="text-dark">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-dark" aria-current="page">
+                <span>Cari Dokter</span>
+            </li>
+        </ol>
+    </nav>
+</div>
 <div class="container mt-3">
-    <!-- Breadcrumb -->
-    <div class="p-2 rounded" style="background-color: #F5F8FF;">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a asp-controller="Home" asp-action="Index" class="text-dark">
-                        <span>Home</span>
-                    </a>
-                </li>
-                <li class="breadcrumb-item active text-dark" aria-current="page">
-                    <span>Cari Dokter</span>
-                </li>
-            </ol>
-        </nav>
-    </div>
+
 
     <!-- Header Summary -->
     <div class="container mt-4">
@@ -79,7 +80,10 @@
                                         <h5 class="card-title">@doctor.Fullname</h5>
                                         <p class="text-secondary">@doctor.Specialization</p>
                                         <p class="text-danger">Pengalaman: @doctor.ExperienceYears tahun</p>
-                                        <p><i class="fas fa-hospital"></i> @doctor.MedicalFacilityName</p>
+                                        @foreach (var medfac in doctor.DoctorOffice)
+                                        {
+                                            <p><i class="fas fa-hospital"></i> @medfac.MedicalFacilityName</p>
+                                        }
                                         <button class="btn btn-outline-info mt-2" data-id="@doctor.Id" id="DetailDocter">Lihat info lebih banyak</button>
                                     </div>
                                     <!-- Right side for doctor actions -->
@@ -95,17 +99,17 @@
                                         <div class="d-grid gap-2">
                                             @if (doctor.IsOnline && doctor.IsAvailable)
                                             {
-                                                <button class="btn btn-primary">Chat</button>
+                                                <button class="btn btn-primary mt-2">Chat</button>
                                                 <button data-id="@doctor.Id" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticModal">Buat Janji</button>
                                             }
                                             else if (doctor.IsOnline && !doctor.IsAvailable)
                                             {
-                                                <button class="btn btn-primary" disabled>Chat</button>
+                                                <button class="btn btn-primary mt-2" disabled>Chat</button>
                                                 <button data-id="@doctor.Id" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticModal" disabled>Buat Janji</button>
                                             }
                                             else
                                             {
-                                                <span class="text-muted">Offline</span>
+                                                <span class="text-muted mt-4">Offline</span>
                                                 <button data-id="@doctor.Id" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticModal">Buat Janji</button>
                                             }
                                         </div>

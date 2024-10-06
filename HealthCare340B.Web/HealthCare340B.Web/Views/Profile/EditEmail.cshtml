@@ -47,7 +47,7 @@
                 success: function (otpResponse) {
                     if (otpResponse.statusCode === 201 || otpResponse.statusCode === 200) {
                         $("#staticModalLgBody").html("");
-                        $("#staticModalBody").load("/Profile/OTPEmai?email=" + encodeURIComponent(newEmail), function () {
+                        $("#staticModalBody").load("/Profile/OTPEmail?email=" + encodeURIComponent(newEmail), function () {
                             console.log("Modal loaded, starting countdown...");
 
                             var countdownDuration = 90;

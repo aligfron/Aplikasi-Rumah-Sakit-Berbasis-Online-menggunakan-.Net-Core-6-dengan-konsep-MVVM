@@ -28,6 +28,7 @@ namespace HealthCare340B.DataAccess
                 response.Data = (
                     from m in db.MBiodataAddresses
                     join l in db.MLocations on m.LocationId equals l.Id
+                    join b in db.MBiodata on m.BiodataId equals b.Id
                     where m.IsDelete == false && m.Id == id
                     select new VMMBiodataAddress
                     {
@@ -228,24 +229,17 @@ namespace HealthCare340B.DataAccess
                     VMMBiodataAddress? existingData = GetById(data.Id).Data;
                     if (existingData != null)
                     {
-                        MBiodataAddress updateData = new MBiodataAddress()
-                        {
-                            Id = data.Id,
-                            Label = data.Label,
-                            Recipient = data.Recipient,
-                            RecipientPhoneNumber = data.RecipientPhoneNumber,
-                            LocationId = data.LocationId,
-                            PostalCode = data.PostalCode,
-                            Address = data.Address,
-                            ModifiedBy = data.ModifiedBy,
-                            ModifiedOn = DateTime.Now,
+                        MBiodataAddress updateData = db.MBiodataAddresses.Find(data.Id)!;
 
-                            DeletedBy = existingData.DeletedBy,
-                            DeletedOn = existingData.DeletedOn,
-                            IsDelete = existingData.IsDelete,
-                            CreatedBy = existingData.CreatedBy,
-                            CreatedOn = existingData.CreatedOn,
-                        };
+                        updateData.Label = data.Label;
+                        updateData.Recipient = data.Recipient;
+                        updateData.RecipientPhoneNumber = data.RecipientPhoneNumber;
+                        updateData.LocationId = data.LocationId;
+                        updateData.PostalCode = data.PostalCode;
+                        updateData.Address = data.Address;
+                        updateData.ModifiedBy = data.ModifiedBy;
+                        updateData.ModifiedOn = DateTime.Now;
+                        
                         db.Update(updateData);
                         db.SaveChanges();
 
@@ -284,6 +278,7 @@ namespace HealthCare340B.DataAccess
                         {
                             Id = existingData.Id,
                             Label = existingData.Label,
+                            BiodataId = existingData.BiodataId,
                             Recipient = existingData.Recipient,
                             RecipientPhoneNumber = existingData.RecipientPhoneNumber,
                             LocationId = existingData.LocationId,

@@ -8,12 +8,13 @@
             <div class="form-group">
                 <label style="font-weight: bold" for="otp">Masukkan kode OTP yang telah dikirimkan ke email anda</label>
                 <input type="text" class="form-control" id="otp" name="otp">
-                <small style="font-size: 0.875rem" class="text-danger">* Kode OTP kadaluarsa, silakan kirim ulang OTP</small>
+                <small id="expOTP" style="font-size: 0.875rem; display : none" class="text-danger">* Kode OTP kadaluarsa, silakan kirim ulang OTP</small>
             </div>
             <div class="form-group">
                 <small id="countdown" style="font-size: 0.875rem" class="text-muted">Kirim ulang kode OTP dalam 01:30</small>
             </div>
             <div class="modal-footer">
+                <button id="resendOtpBtn" style="width: 150px; display: none;" type="button" class="btn btn-primary btn-custom">Kirim Ulang OTP</button>
                 <button id="confirmOtpBtn" style="width: 150px" type="button" class="btn btn-primary btn-custom">Konfirmasi OTP</button>
             </div>
         </form>
@@ -38,12 +39,47 @@
             display.textContent = `Kirim ulang kode OTP dalam ${minutes}:${seconds}`;
 
             if (--timer < 0) {
-                clearInterval(interval); 
-                display.textContent = "Kode OTP telah kadaluarsa"; 
-                console.log("Countdown selesai."); 
+                clearInterval(interval);
+                display.textContent = "Kode OTP telah kadaluarsa";
+                console.log("Countdown selesai.");
+                $("#expOTP").show();
+                $("#resendOtpBtn").show();
+                $("#confirmOtpBtn").attr("disabled", true);
             }
         }, 1000);
-    }
+    };
+
+    $("#resendOtpBtn").click(function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: '/Profile/GenerateOTP',
+            type: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({
+                email: "@ViewBag.Email"
+            }),
+            success: function (otpResponse) {
+                if (otpResponse.statusCode === 200 || otpResponse.statusCode === 201) {
+                    $("#staticModalBody").html("");
+                    $("#staticModalBody").load("/Profile/OTPEmail?email=" + encodeURIComponent("@ViewBag.Email"), function () {
+                        const countdownDuration = 60;
+                        const display = document.querySelector('#countdown');
+                        if (display) {
+                            startCountdown(countdownDuration, display);
+                        } else {
+                            console.error("Elemen #countdown tidak ditemukan");
+                        }
+                    });
+                } else {
+                    console.error("Error generating OTP: ", otpResponse.message);
+                }
+            },
+            error: function (error) {
+                console.error("Error generating OTP:", error);
+            }
+        });
+    });
 
     window.onload = function () {
         var countdownDuration = 300; 
@@ -81,7 +117,7 @@
                         dataType: 'json',
                         data: JSON.stringify({
                             email: "@ViewBag.Email",
-                            id: 4
+                            id: @Context.Session.GetString("userId")
                         }),
                         success: function (response) {
                             console.log("Email updated to: " + "@ViewBag.Email");

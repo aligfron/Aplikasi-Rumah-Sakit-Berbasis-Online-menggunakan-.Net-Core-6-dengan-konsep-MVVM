@@ -68,7 +68,8 @@
                 </div>
             </div>
 
-            <input type="hidden" name="CreatedBy" value="1" />
+            <input type="hidden" name="CreatedBy" value="@Context.Session.GetString("userId")" />
+            <input type="hidden" name="BiodataId" value="@Context.Session.GetInt32("userBiodataId")" />
 
             <!-- Buttons -->
             <div class="d-flex justify-content-between mt-5">
@@ -126,10 +127,12 @@
                 dataType: "json",
                 beforeSend: () => { },
                 success: function (response) {
+                    console.log(response)
                     if (response.statusCode == 200 || response.statusCode == 201) {
                         alert(response.statusCode + " - " + response.message);
 
-                        $("#alamat").html(response)
+                        $("#staticModal").modal("hide")
+                        $("#alamat").load('/Profile/TabAlamat')
                     }
                     else {
                         alert(response.statusCode + " - " + response.message);

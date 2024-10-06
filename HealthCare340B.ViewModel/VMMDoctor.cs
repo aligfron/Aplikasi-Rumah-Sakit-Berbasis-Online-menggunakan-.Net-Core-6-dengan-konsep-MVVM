@@ -32,6 +32,7 @@ namespace HealthCare340B.ViewModel
         public string? ImagePath { get; set; }
 
         public List<VMTDoctorTreatment>? TreatmentName { get; set; }
+        public List<VMTDoctorTreatment>? Treatments { get; set; }
         //tindakan medis
         public string? SpecializationName { get; set; }
         public long SpecializationId { get; set; }
@@ -51,6 +52,8 @@ namespace HealthCare340B.ViewModel
         public int Obrolan { get; set; }
         //jadwal praktek
         public List<VMMMedicalFacilitySchedule>? JadwalPraktek { get; set; }
+
+        //doctor
 
         //harga konsul mulai 
         public decimal? HargaKonsulMulai { get; set; }
