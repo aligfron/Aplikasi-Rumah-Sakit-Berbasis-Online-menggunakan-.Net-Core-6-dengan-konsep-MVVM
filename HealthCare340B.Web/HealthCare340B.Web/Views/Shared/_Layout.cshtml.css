@@ -54,3 +54,9 @@ button.accept-policy {
 #main-content {
     padding-bottom: 70px; /* Sesuaikan dengan tinggi footer */
 }
+
+.custom-search {
+    padding-left: 4px; /* Atur sesuai kebutuhan */
+    padding-right: 4px; /* Atur sesuai kebutuhan */
+    width: auto; /* Atur lebar sesuai kebutuhan */
+}

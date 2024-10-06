@@ -2,79 +2,44 @@
     ViewData["Title"] = "Home Page";
 }
 
-<button id="test" data-bs-toggle="modal" data-bs-target="#staticModal"></button>
-
-<div class="container text-center">
+<div class="container mt-5">
     <div class="row">
-        <div class="col d-flex justify-content-center">
-            <div class="card w-100" data-bs-target="#staticModal" id="btnSearchDoctor" data-bs-toggle="modal" style="max-width: 200px;">
-                <div class="card-body d-flex flex-column justify-content-center align-items-center text-center p-3">
-                    <a id="test" class="text-decoration-none d-flex flex-column align-items-center">
-                        <div class="icon-wrapper mb-3 d-flex justify-content-center align-items-center" style="width: 80px; height: 80px;">
-                            <i class="fas fa-search text-primary" style="font-size: 50px;"></i>
-                        </div>
-                        <p class="menu-name mb-0 font-weight-bold">Cari Dokter</p>
-                    </a>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-stethoscope fa-3x mb-3"></i>
+                    <h5 class="card-title">Cari Dokter</h5>
+                    <p class="card-text">Temukan dokter terbaik untuk kebutuhan Anda.</p>
+                    <button id="btnDokter" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticModal">
+                        Cari Sekarang
+                    </button>
                 </div>
             </div>
         </div>
-
-        <div class="col d-flex justify-content-center">
-            <div class="card w-100" style="max-width: 200px;">
-                <div class="card-body d-flex flex-column justify-content-center align-items-center text-center p-3">
-                    <a href="/MedicalItem/SearchMedicalItem" class="text-decoration-none d-flex flex-column align-items-center">
-                        <div class="icon-wrapper mb-3 d-flex justify-content-center align-items-center" style="width: 80px; height: 80px;">
-                            <i class="fas fa-user-md text-primary" style="font-size: 50px;"></i>
-                        </div>
-                        <p class="menu-name mb-0 font-weight-bold">Detail Dokter</p>
-                    </a>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-file-medical-alt fa-3x mb-3"></i>
+                    <h5 class="card-title">Detail Dokter</h5>
+                    <p class="card-text">Lihat informasi lengkap tentang dokter.</p>
+                    <button id="btnDetailDoctor" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticModal">
+                         Detail Dokter
+                    </button>
                 </div>
             </div>
         </div>
-
-        <div class="col d-flex justify-content-center">
-            <div class="card w-100" data-bs-target="#staticModal" id="btnSearchMedicalItem" data-bs-toggle="modal" style="max-width: 200px;">
-                <div class="card-body d-flex flex-column justify-content-center align-items-center text-center p-3">
-                    <a class="text-decoration-none d-flex flex-column align-items-center">
-                        <div class="icon-wrapper mb-3 d-flex justify-content-center align-items-center" style="width: 80px; height: 80px;">
-                            <i class="fas fa-pills mb-3 text-primary" style="font-size: 50px;"></i>
-                        </div>
-                        <p class="menu-name mb-0 font-weight-bold">Cari Obat</p>
-                    </a>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-capsules fa-3x mb-3"></i>
+                    <h5 class="card-title">Cari Obat</h5>
+                    <p class="card-text">Temukan informasi obat yang Anda butuhkan.</p>
+                    <button id="btnCariObat" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticModal">
+                        Cari Obat
+                    </button>
                 </div>
             </div>
         </div>
-
-        @*@if (Model != null)
-        {
-            @foreach (var menu in ViewBag.dataCoba as List<VMMMenuRole>)
-            {
-                @if (menu.ParentId != null && menu.RoleId == null)
-                {
-                    <div class="col-md-3 ">
-                        <div class="card">
-                            <div class="card-body text-center">
-                                <a href="@menu.Url">
-                                    <i class="fas @menu.BigIcon text-center" style="font-size: 50px;"></i>
-                                    <p class="menu-name">@menu.Name</p>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                }
-            }
-        }*@
-        @*@for (int i = 0; i < 10; i++)
-        {
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Nama</h5>
-                        <p class="card-text">Nama Menu</p>
-                    </div>
-                </div>
-            </div>
-        }*@
     </div>
 </div>
 

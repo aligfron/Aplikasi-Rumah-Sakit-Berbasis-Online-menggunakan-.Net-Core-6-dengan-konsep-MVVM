@@ -4,7 +4,7 @@
 @{
     Layout = null;
 }
-<form id="frmConfirm" >
+<form id="frmSendEmail">
     <div class="card mb-0">
         <div>
             Masukkan email Anda. Kami akan melakukan pengecekan
@@ -17,7 +17,7 @@
         </div>
         <div class="card-footer">
             <div class="text-center">
-                <button  type="submit" class="btn btn-primary text-lg fs-10" id="btnsendOTP">
+                <button type="submit" class="btn btn-primary text-lg fs-10" id="btnsendOTP">
                     <span>Kirim OTP</span>
                 </button>
             </div>
@@ -32,23 +32,23 @@
         e.preventDefault();
         debugger;
         var email = $("#txtEmail").val();
-        console.log(email); 
-        
+        console.log(email);
+
 
         $.ajax({
-            url: "Register/EmailConfirm",
+            url: "ForgotPassword/SendEmail",
             type: "POST",
-            data: { email: email }, 
+            data: { email: email },
             beforeSend: function () {
-                
+
             },
             success: function (response) {
                 if (response.statusCode === 200 || response.statusCode === 201) {
                     $("#staticModalBody").html("");
-                    $("#staticModalBody").load("/Register/VerifyOtp"); 
+                    $("#staticModalBody").load("/ForgotPassword/VerifyOtp");
                     $("#staticModal").modal('show');
                 } else {
-                    
+
                     alert(response.message);
                 }
             },
@@ -57,7 +57,5 @@
                 alert("email anda sudah terdaftar silahkan ke menu login/lupa password");
             }
         });
-    });   
+    });
 </script>
-
-

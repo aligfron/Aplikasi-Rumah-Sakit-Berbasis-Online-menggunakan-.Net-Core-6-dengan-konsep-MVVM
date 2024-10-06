@@ -1,0 +1,71 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = null;
+}
+
+<form id="frmSignUp">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <div class="input-group">
+                        <span class="input-group-text">Name</span>
+                        <input type="text" class="form-control" id="txtName" name="Name">
+                    </div>
+                    <div>No HP</div>
+                    <div class="input-group mt-3">
+                        <span class="input-group-text">+62</span>
+                        <input type="text" class="form-control" id="txtPhone" name="MobilePhone">
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="input-group">
+                        <span class="input-group-text">Role <span class="text-danger">*</span> </span>
+                        <select class="form-select" id="selectRole" name="RoleId">
+                            <option value="">-- Select Role Access --</option>
+                            <option value="1">Admin</option>
+                            <option value="2">Pasien</option>
+                            <option value="3">Dokter</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+            <button id="btnRegisterForm" type="submit" class="btn btn-primary"><span>Register</span></button>
+        </div>
+    </div>
+</form>
+<script>
+    $("#staticModalLabel").text("@ViewBag.Title");
+
+    $("#frmSignUp").on('submit', function (e) {
+        e.preventDefault();
+        debugger;
+
+        $.ajax({
+            url: "/Register/SignUp", // Pastikan mengarah ke method POST
+            type: "POST",
+            data: $("#frmSignUp").serialize(),
+            dataType: "json", // Perbaikan penulisan
+            beforeSend: function () {
+                // Opsional: tambahkan loader atau efek lainnya
+            },
+            success: function (response) {
+                if (response.statusCode === 200) {
+                    var message = response.message;
+                    var typeMessage = "infoMsg"; // Definisikan typeMessage sebelum digunakan
+                    location.href = `/Home/Index?message=${encodeURIComponent(message)}&typeMessage=${encodeURIComponent(typeMessage)}`;
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (errResponse) {
+                console.error(errResponse);
+                alert("email anda sudah terdaftar silahkan ke menu login/lupa password");
+            }
+        });
+    });
+</script>

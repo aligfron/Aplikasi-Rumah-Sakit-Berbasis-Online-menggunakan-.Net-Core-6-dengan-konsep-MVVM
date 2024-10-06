@@ -19,6 +19,9 @@ namespace HealthCare340B.API.Controllers
             user = new DARegister(_db);
             db = _db;
         }
+
+        [HttpGet]
+
         [HttpPost("[action]/{email?}")]
         public async Task<ActionResult> GenerateOTP(string email) 
         {
@@ -53,7 +56,7 @@ namespace HealthCare340B.API.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
-        [HttpPost("[action]")]
+        [HttpPost("[action]/{OTP?}")]
         public async Task<ActionResult> VerifyOTP(string OTP)
         {
             try
@@ -74,7 +77,7 @@ namespace HealthCare340B.API.Controllers
             }
 
         }
-        [HttpPost("[action]")]
+        [HttpPost("[action]/{password?}/{confirmPassword}")]
 
         public async Task<ActionResult> ConfirmPassword(string password, string confirmPassword) 
         {

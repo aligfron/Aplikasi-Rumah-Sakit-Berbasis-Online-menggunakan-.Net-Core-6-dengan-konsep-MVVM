@@ -68,6 +68,49 @@ namespace HealthCare340B.DataAccess
             return response!;
         }
 
+        public VMResponse<VMMUser> GetByEmailNull(string Email)
+        {
+            VMResponse<VMMUser?> response = new VMResponse<VMMUser?>();
+            try
+            {
+                response.Data = (
+                    from u in db.MUsers
+                    where u.IsDelete == false && u.Email == Email
+                    select new VMMUser()
+                    {
+                        Id = u.Id,
+                        BiodataId = u.BiodataId,
+                        RoleId = u.RoleId,
+                        Email = u.Email,
+                        Password = u.Password,
+                        LoginAttempt = u.LoginAttempt,
+                        IsLocked = u.IsLocked,
+                        LastLogin = u.LastLogin,
+                        CreatedBy = u.CreatedBy,
+                        CreatedOn = u.CreatedOn,
+                        ModifiedBy = u.ModifiedBy,
+                        ModifiedOn = u.ModifiedOn,
+                        DeletedBy = u.DeletedBy,
+                        DeletedOn = u.DeletedOn,
+                        IsDelete = false,
+                    }
+                    ).FirstOrDefault();
+                response.StatusCode = (response.Data != null) ?
+                        HttpStatusCode.OK :
+                        HttpStatusCode.NotFound;
+                response.Message = (response.Data != null) ?
+                    $"{HttpStatusCode.OK} - User succesfully fetched!"
+                    : $"{HttpStatusCode.NotFound} - User does not exist!";
+
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.NoContent} - {ex.Message}";
+            }
+            return response!;
+        }
+
+
         public VMResponse<VMMUser> GetPasswordNull(string? filter)
         {
             VMResponse<VMMUser?> response = new VMResponse<VMMUser?>();

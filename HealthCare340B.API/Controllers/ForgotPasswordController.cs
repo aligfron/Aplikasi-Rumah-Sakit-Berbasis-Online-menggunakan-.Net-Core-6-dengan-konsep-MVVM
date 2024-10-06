@@ -65,7 +65,7 @@ namespace HealthCare340B.API.Controllers
         }*/
 
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]/{OTP}")]
         public async Task<ActionResult> VerifyOTP(string OTP)
         {
             try
@@ -87,7 +87,7 @@ namespace HealthCare340B.API.Controllers
 
         }
 
-        [HttpPost("[action]")]
+        [HttpPost("[action]/{password}/{confirmPassword}")]
 
         public async Task<ActionResult> ConfirmPassword(string password, string confirmPassword)
         {

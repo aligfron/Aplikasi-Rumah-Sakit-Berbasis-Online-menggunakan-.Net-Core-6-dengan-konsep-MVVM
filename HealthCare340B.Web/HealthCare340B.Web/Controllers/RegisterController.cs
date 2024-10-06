@@ -2,6 +2,7 @@
 using HealthCare340B.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using static System.Net.WebRequestMethods;
 
 namespace HealthCare340B.Web.Controllers
 {
@@ -41,16 +42,33 @@ namespace HealthCare340B.Web.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<VMResponse<VMTToken>> VerifyOtpAsync(string otp) 
+        public async Task<VMResponse<VMTToken>> VerifyOtpAsync(string OTP) 
         {
-            var response = await register.VerifyOtpAsync(otp);
 
-            if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Created) 
+            var response = await register.VerifyOtpAsync(OTP);
+
+           /* var email = */
+
+            if (response.StatusCode == HttpStatusCode.OK) 
             {
                 return response; 
             }
             return response;
         }
+
+        public async Task<VMResponse<VMTToken>> ResendToken(string OTP) 
+        {
+            var emailResponse = await register.VerifyOtpAsync(OTP);
+            var email = emailResponse.Data.Email;
+            var response = await register.EmailConfirmAsync(email);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return response;
+            }
+            return response;
+        }
+        
             
 
         public IActionResult ConfirmPassword() 
@@ -58,15 +76,31 @@ namespace HealthCare340B.Web.Controllers
             ViewBag.Title = "Set Password";
             return View();
         }
-        public async Task<VMResponse<VMMUser>> ConfirmPasswordAsync(string password, string confirmPassword) =>
-            await register.ConfirmPasswordAsync(password, confirmPassword);
-
-        public IActionResult Register() 
+        [HttpPost]
+        public async Task<VMResponse<VMMUser>> ConfirmPasswordAsync(string password, string confirmPassword)
         {
-            ViewBag.Title = "Pendaftaran Password";
+            var response = await register.ConfirmPasswordAsync(password, confirmPassword);
+            if (response.StatusCode == HttpStatusCode.OK) 
+            {
+                return response;
+            }
+            return response;
+        }
+
+        public IActionResult SignUp() 
+        {
+            ViewBag.Title = "Daftar";
             return View();
         }
-        public async Task<VMResponse<VMMUser>> ResgisterAsync(VMMUser data) =>
-            await register.RegisterAsync(data);
+        [HttpPost]
+        public async Task<VMResponse<VMMUser>> SignUpAsync(VMMUser data) 
+        {
+            VMResponse<VMMUser> response = await register.SignUpAsync(data);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return response;
+            }
+            return response;
+        }
     }
 }
