@@ -18,13 +18,13 @@ namespace HealthCare340B.API.Controllers
             appointment = new DAAppointment(_db);
         }
 
-        [HttpPut]
-        public async Task<ActionResult> Update(VMTAppointment data)
+        [HttpPut("[action]/{originalDate}")]
+        public async Task<ActionResult> Update(VMTAppointment data, string originalDate)
         {
             VMResponse<VMTAppointment?> response = new VMResponse<VMTAppointment?>();
             try
             {
-                response = await Task.Run(() => appointment.Update(data));
+                response = await Task.Run(() => appointment.Update(data, originalDate));
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     return Ok(response);

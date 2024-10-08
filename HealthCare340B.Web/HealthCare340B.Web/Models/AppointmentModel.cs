@@ -516,7 +516,7 @@ namespace HealthCare340B.Web.Models
             }
         }
 
-        public async Task<VMResponse<VMTAppointment>?> Update(VMTAppointment data)
+        public async Task<VMResponse<VMTAppointment>?> Update(VMTAppointment data, string originalDate)
         {
             VMResponse<VMTAppointment>? response = new VMResponse<VMTAppointment>();
             try
@@ -530,7 +530,7 @@ namespace HealthCare340B.Web.Models
 
                 response =
                    JsonConvert.DeserializeObject<VMResponse<VMTAppointment>?>(     // Convert the Json string to a class
-                       await httpClient.PutAsync($"{apiUrl}Appointment", content)    // Call the API
+                       await httpClient.PutAsync($"{apiUrl}Appointment/Update/{originalDate}", content)    // Call the API
                        .Result                                                     // Read the Result
                        .Content                                                    // Get the Content Result
                        .ReadAsStringAsync()                                        // Convert the content as string

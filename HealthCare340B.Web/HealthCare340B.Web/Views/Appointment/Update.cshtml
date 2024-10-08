@@ -65,7 +65,7 @@
         <div class="w-10"></div>
         <div class="w-30"><button id="btnCancelUpdate" class="btn btn-outline-danger">Cancel</button></div>
         <div class="w-10"></div>
-        <div class="w-30"><button type="button" id="btnSave" class="btn btn-outline-info" data-bs-target="#staticModalLg" disabled>Buat Janji</button></div>
+        <div class="w-30"><button type="button" id="btnSave" class="btn btn-outline-info" data-bs-target="#staticModalLg" disabled>Ubah Janji</button></div>
         <div class="w-10"></div>
     </div>
 </div>
@@ -225,6 +225,9 @@
                 if (response.statusCode == 200) {
                     if (response.data.length > 0) {
                         $("#tindakan").prop("disabled", false);
+                        $("#tindakan").append(
+                            `<option value="0">-- Tidak memilih tindakan --</option>`
+                        );
                         $.each(
                             response.data,
                             function (idx, data) {
@@ -234,16 +237,16 @@
                             }
                         );
                         $("#tindakan").val("@ViewBag.TreatmentId");
-                        if ($("#tindakan").val() == null) {
-                            $("#tindakan").append(
-                                `<option value="" selected>-- Tidak memilih tindakan --</option>`
-                            );
-                        }
-                        else {
-                            $("#tindakan").append(
-                                `<option value="">-- Tidak memilih tindakan --</option>`
-                            );
-                        }
+                        // if ($("#tindakan").val() == 0) {
+                        //     $("#tindakan").append(
+                        //         `<option value="0" selected>-- Tidak memilih tindakan --</option>`
+                        //     );
+                        // }
+                        // else {
+                        //     $("#tindakan").append(
+                        //         `<option value="0">-- Tidak memilih tindakan --</option>`
+                        //     );
+                        // }
                     }
                 }
             },
@@ -416,7 +419,8 @@
                         dofId: dofId,
                         dosId: dosId,
                         dotId: $("#tindakan").val(),
-                        appDate: fullDate
+                        appDate: fullDate,
+                        originalDate: "@ViewBag.AppointmentDate"
                     },
                     beforeSend: () => {
                         $("#staticModalLgBody").html();

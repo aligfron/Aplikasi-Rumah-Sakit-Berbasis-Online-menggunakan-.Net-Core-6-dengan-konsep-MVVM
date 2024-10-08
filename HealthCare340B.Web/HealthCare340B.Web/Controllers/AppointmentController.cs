@@ -499,7 +499,6 @@ namespace HealthCare340B.Web.Controllers
 
             long userCustId = await appointment.GetCustId((long)HttpContext.Session.GetInt32("userBiodataId")!);
             List<long> custId = new List<long>();
-            custId.Add(userCustId);
 
             if (dataMember.Count > 0)
             {
@@ -794,7 +793,7 @@ namespace HealthCare340B.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<VMResponse<VMTAppointment>> Update(long id, long custId, long dofId, long dosId, long? dotId, string appDate)
+        public async Task<VMResponse<VMTAppointment>> Update(long id, long custId, long dofId, long dosId, long? dotId, string appDate, string originalDate)
         {
             try
             {
@@ -820,7 +819,7 @@ namespace HealthCare340B.Web.Controllers
                     ModifiedBy = long.Parse(HttpContext.Session.GetString("userId")!)
                 };
 
-                VMResponse<VMTAppointment>? response = await appointment.Update(data);
+                VMResponse<VMTAppointment>? response = await appointment.Update(data, originalDate);
                 if (response!.StatusCode == HttpStatusCode.OK)
                     HttpContext.Session.SetString("successMsg", "Janji berhasil diubah!");
                 return response!;
