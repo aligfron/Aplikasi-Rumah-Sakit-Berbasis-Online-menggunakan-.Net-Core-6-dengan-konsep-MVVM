@@ -1,7 +1,7 @@
-﻿using HealthCare340B.ViewModel;
-using Newtonsoft.Json;
-using System.Net;
+﻿using System.Net;
 using System.Text;
+using HealthCare340B.ViewModel;
+using Newtonsoft.Json;
 
 namespace HealthCare340B.Web.Models
 {
@@ -34,7 +34,10 @@ namespace HealthCare340B.Web.Models
 
                 if (apiResponse != null)
                 {
-                    if (apiResponse.StatusCode == HttpStatusCode.OK || apiResponse.StatusCode == HttpStatusCode.NoContent)
+                    if (
+                        apiResponse.StatusCode == HttpStatusCode.OK
+                        || apiResponse.StatusCode == HttpStatusCode.NoContent
+                    )
                     {
                         data = apiResponse.Data;
                     }
@@ -77,7 +80,10 @@ namespace HealthCare340B.Web.Models
 
                 if (apiResponse != null)
                 {
-                    if (apiResponse.StatusCode == HttpStatusCode.OK || apiResponse.StatusCode == HttpStatusCode.NoContent)
+                    if (
+                        apiResponse.StatusCode == HttpStatusCode.OK
+                        || apiResponse.StatusCode == HttpStatusCode.NoContent
+                    )
                     {
                         data = apiResponse.Data;
                     }
@@ -96,6 +102,49 @@ namespace HealthCare340B.Web.Models
                 // Logging
                 Console.WriteLine("CustomerMemberModel.GetByFilter: " + e.Message);
                 throw new Exception("CustomerMemberModel.GetByFilter: " + e.Message);
+            }
+
+            return data;
+        }
+
+        public async Task<List<int>> GetTotalChatAppointment(long parentId)
+        {
+            List<int>? data = null;
+
+            try
+            {
+                VMResponse<List<int>>? apiResponse = JsonConvert.DeserializeObject<
+                    VMResponse<List<int>>
+                >(
+                    await _httpClient
+                        .GetAsync($"{_apiUrl}CustomerMember/GetTotalChatAppointment/{parentId}")
+                        .Result.Content.ReadAsStringAsync()
+                );
+
+                if (apiResponse != null)
+                {
+                    if (
+                        apiResponse.StatusCode == HttpStatusCode.OK
+                        || apiResponse.StatusCode == HttpStatusCode.NoContent
+                    )
+                    {
+                        data = apiResponse.Data;
+                    }
+                    else
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Customer Member API could not be reached");
+                }
+            }
+            catch (Exception e)
+            {
+                // Logging
+                Console.WriteLine("CustomerMemberModel.GetTotalChatAppointment: " + e.Message);
+                throw new Exception("CustomerMemberModel.GetTotalChatAppointment: " + e.Message);
             }
 
             return data;
@@ -176,7 +225,6 @@ namespace HealthCare340B.Web.Models
             }
 
             return apiResponse;
-
         }
 
         public async Task<VMResponse<VMMCustomerMember>> UpdateAsync(VMMCustomerMember data)

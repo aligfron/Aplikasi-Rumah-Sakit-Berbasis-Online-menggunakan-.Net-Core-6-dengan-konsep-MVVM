@@ -73,26 +73,45 @@
 
                     @foreach (var item in Model)
                     {
-                        <tr>
-                            <td>
-                                <input type="checkbox" class="form-check-input checkboxId" data-id="@item.Id">
-                            </td>
-                            <td>
-                                <div>
-                                    <h6 class="mb-0"><b>@item.Fullname</b></h6>
-                                    <p class="mb-0">@item.CustomerRelationName, @item.Age Tahun</p>
-                                    <p class="mb-0">@item.TotalChat Chat Online, @item.TotalAppointment Janji Dokter</p>
-                                </div>
-                            </td>
-                            <td style="text-align: right;">
-                                <button data-id="@item.Id" class="btn text-primary btnEdit icon icon-left" title="Ubah.." data-bs-toggle="modal" data-bs-target="#staticModal">
-                                    <i class="fas fa-pencil-alt"></i> Ubah
-                                </button>
-                                <button data-id="@item.Id" class="btn text-primary btnDelete icon icon-left" title="Hapus..." data-bs-toggle="modal" data-bs-target="#staticModal">
-                                    <i class="fas fa-trash"></i> Hapus
-                                </button>
-                            </td>
-                        </tr>
+                        if (@item.Fullname == @Context.Session.GetString("userName"))
+                        {
+                            <tr>
+                                <td>
+                                </td>
+                                <td>
+                                    <div>
+                                        <h6 class="mb-0"><b>@item.Fullname</b></h6>
+                                        <p class="mb-0">Anda, @item.Age Tahun</p>
+                                        <p class="mb-0">@item.TotalChat Chat Online, @item.TotalAppointment Janji Dokter</p>
+                                    </div>
+                                </td>
+                                <td>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input checkboxId" data-id="@item.Id">
+                                </td>
+                                <td>
+                                    <div>
+                                        <h6 class="mb-0"><b>@item.Fullname</b></h6>
+                                        <p class="mb-0">@item.CustomerRelationName, @item.Age Tahun</p>
+                                        <p class="mb-0">@item.TotalChat Chat Online, @item.TotalAppointment Janji Dokter</p>
+                                    </div>
+                                </td>
+                                <td style="text-align: right;">
+                                    <button data-id="@item.Id" class="btn text-primary btnEdit icon icon-left" title="Ubah.." data-bs-toggle="modal" data-bs-target="#staticModal">
+                                        <i class="fas fa-pencil-alt"></i> Ubah
+                                    </button>
+                                    <button data-id="@item.Id" class="btn text-primary btnDelete icon icon-left" title="Hapus..." data-bs-toggle="modal" data-bs-target="#staticModal">
+                                        <i class="fas fa-trash"></i> Hapus
+                                    </button>
+                                </td>
+                            </tr>
+                        }
                     }
                 }
                 else

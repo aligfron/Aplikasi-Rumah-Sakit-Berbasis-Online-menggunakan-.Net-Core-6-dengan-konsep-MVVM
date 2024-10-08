@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -66,6 +67,32 @@ namespace HealthCare340B.DataAccess
                     }
                 ).ToList();
 
+                VMMCustomerMember? parentMember = (
+                    from c in _db.MCustomers
+                    join b in _db.MBiodata on c.BiodataId equals b.Id
+                    where
+                        b.Fullname!.Contains(filter)
+                        && c.IsDelete == false
+                        && b.IsDelete == false
+                        && c.BiodataId == parentId
+                    select new VMMCustomerMember
+                    {
+                        CustomerId = c.Id,
+                        Fullname = b.Fullname,
+                        Dob = c.Dob,
+                        Age = (int)((DateTime.Now - c.Dob!.Value).TotalDays / 365.242199),
+                        Gender = c.Gender,
+                        BloodGroupId = c.BloodGroupId,
+                        RhesusType = c.RhesusType,
+                        Height = c.Height,
+                        Weight = c.Weight,
+                        TotalChat = 0,
+                        TotalAppointment = 0,
+                    }
+                ).FirstOrDefault();
+
+                customerMembers.Add(parentMember!);
+
                 foreach (var member in customerMembers)
                 {
                     member.TotalChat = _db.TCustomerChats.Count(x =>
@@ -77,6 +104,41 @@ namespace HealthCare340B.DataAccess
                 }
 
                 response.Data = customerMembers;
+                response.Message =
+                    (response.Data.Count > 0)
+                        ? $"{HttpStatusCode.OK} - {response.Data.Count} customer member data(s) successfully fetched"
+                        : $"{HttpStatusCode.NoContent} - No customer member data found";
+                response.StatusCode =
+                    (response.Data.Count > 0) ? HttpStatusCode.OK : HttpStatusCode.NoContent;
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+            }
+
+            return response;
+        }
+
+        public VMResponse<List<int>> GetTotalChatAppointment(long parentId)
+        {
+            VMResponse<List<int>> response = new VMResponse<List<int>>();
+            try
+            {
+                long cusId = _db.MCustomers.Where(x => x.BiodataId == parentId).FirstOrDefault().Id;
+
+                List<int> simpan = new List<int>();
+
+                int totChat = _db.TCustomerChats.Count(x =>
+                            x.CustomerId == cusId
+                        );
+                int totAppo = _db.TAppointments.Count(x =>
+                    x.CustomerId == cusId
+                );
+
+                simpan.Add(totChat);
+                simpan.Add(totAppo);
+
+                response.Data = simpan;
                 response.Message =
                     (response.Data.Count > 0)
                         ? $"{HttpStatusCode.OK} - {response.Data.Count} customer member data(s) successfully fetched"

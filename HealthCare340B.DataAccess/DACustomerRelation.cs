@@ -28,6 +28,8 @@ namespace HealthCare340B.DataAccess
             {
                 response.Data = (
                     from cr in _db.MCustomerRelations
+                    join u in _db.MUsers on cr.CreatedBy equals u.Id
+                    join b in _db.MBiodata on u.BiodataId equals b.Id
                     where cr.Name.Contains(filter) && cr.IsDelete == false
                     select new VMMCustomerRelation
                     {
@@ -35,6 +37,7 @@ namespace HealthCare340B.DataAccess
                         Name = cr.Name,
                         CreatedBy = cr.CreatedBy,
                         CreatedOn = cr.CreatedOn,
+                        CreatedName = b.Fullname,
                         ModifiedBy = cr.ModifiedBy,
                         ModifiedOn = cr.ModifiedOn,
                         DeletedBy = cr.DeletedBy,

@@ -154,67 +154,65 @@ For more information on enabling MVC for empty projects, visit https://go.micros
 </section>
 
 <script>
-    $(document).ready(function () {
-        $("#orderBy").val("@ViewBag.OrderBy");
+    $("#orderBy").val("@ViewBag.OrderBy");
 
-        function RefreshPage(filter, pageNumber, currPageSize, orderBy, orderDirection) {
-            location.href = `/AppointmentHistory?filter=${filter}&pageNumber=${pageNumber}&currPageSize=${currPageSize}&orderBy=${orderBy}&orderDirection=${orderDirection}`;
+    function RefreshPage(filter, pageNumber, currPageSize, orderBy, orderDirection) {
+        location.href = `/AppointmentHistory?filter=${filter}&pageNumber=${pageNumber}&currPageSize=${currPageSize}&orderBy=${orderBy}&orderDirection=${orderDirection}`;
+    }
+
+    $("#frmPageSize").submit(function (e) {
+        e.preventDefault();
+        RefreshPage("@ViewBag.Filter", "@Model.PageIndex", $("#pageSize").val(), "@ViewBag.OrderBy", "@ViewBag.OrderDirection");
+    });
+
+    $("#frmAppointmentHistoryFilter").submit(function (e) {
+        e.preventDefault();
+        RefreshPage($("#filter").val(), "@Model.PageIndex", "@ViewBag.PageSize", "@ViewBag.OrderBy", "@ViewBag.OrderDirection");
+    });
+
+    $("#btnPrev").click(function (e) {
+        RefreshPage("@ViewBag.Filter", "@(Model.PageIndex <= 1 ? Model.PageIndex : Model.PageIndex - 1)", "@ViewBag.PageSize", "@ViewBag.OrderBy", "@ViewBag.OrderDirection");
+    });
+
+    $("#btnNext").click(function (e) {
+        RefreshPage("@ViewBag.Filter", "@(Model.PageIndex >= Model.TotalPages ? Model.PageIndex : Model.PageIndex + 1)", "@ViewBag.PageSize", "@ViewBag.OrderBy", "@ViewBag.OrderDirection");
+    });
+
+    $("#orderBy").change(function () {
+        RefreshPage("@ViewBag.Filter", "@Model.PageIndex", "@ViewBag.PageSize", $(this).val(), "@ViewBag.OrderDirection");
+    });
+
+    $("#sortButton").click(function () {
+        var orderBy = $("#orderBy").val(); // Mendapatkan nilai dropdown
+        if (!orderBy) {
+            alert("Pilih kolom yang akan diurutkan");
+            return;
         }
 
-        $("#frmPageSize").submit(function (e) {
-            e.preventDefault();
-            RefreshPage("@ViewBag.Filter", "@Model.PageIndex", $("#pageSize").val(), "@ViewBag.OrderBy", "@ViewBag.OrderDirection");
+        currentOrderDirection = "@ViewBag.OrderDirection" === 'asc' ? 'desc' : 'asc';
+
+        $(this).text(currentOrderDirection === 'asc' ? 'A-Z' : 'Z-A');
+
+        RefreshPage("@ViewBag.Filter", "@Model.PageIndex", "@ViewBag.PageSize", orderBy, currentOrderDirection);
+    });
+
+    $(".btnDetail").click(function (e) {
+        var id = $(this).data("id");
+        var collapseElement = $("#collapse-" + id);
+        var btnTextElement = $("#btnText-" + id);
+
+        // Toggle text after collapse animation completes
+        collapseElement.on('shown.bs.collapse', function () {
+            btnTextElement.text("Tutup detail kedatangan");
         });
 
-        $("#frmAppointmentHistoryFilter").submit(function (e) {
-            e.preventDefault();
-            RefreshPage($("#filter").val(), "@Model.PageIndex", "@ViewBag.PageSize", "@ViewBag.OrderBy", "@ViewBag.OrderDirection");
+        collapseElement.on('hidden.bs.collapse', function () {
+            btnTextElement.text("Lihat detail kedatangan");
         });
+    });
 
-        $("#btnPrev").click(function (e) {
-            RefreshPage("@ViewBag.Filter", "@(Model.PageIndex <= 1 ? Model.PageIndex : Model.PageIndex - 1)", "@ViewBag.PageSize", "@ViewBag.OrderBy", "@ViewBag.OrderDirection");
-        });
-
-        $("#btnNext").click(function (e) {
-            RefreshPage("@ViewBag.Filter", "@(Model.PageIndex >= Model.TotalPages ? Model.PageIndex : Model.PageIndex + 1)", "@ViewBag.PageSize", "@ViewBag.OrderBy", "@ViewBag.OrderDirection");
-        });
-
-        $("#orderBy").change(function () {
-            RefreshPage("@ViewBag.Filter", "@Model.PageIndex", "@ViewBag.PageSize", $(this).val(), "@ViewBag.OrderDirection");
-        });
-
-        $("#sortButton").click(function () {
-            var orderBy = $("#orderBy").val(); // Mendapatkan nilai dropdown
-            if (!orderBy) {
-                alert("Pilih kolom yang akan diurutkan");
-                return;
-            }
-
-            currentOrderDirection = "@ViewBag.OrderDirection" === 'asc' ? 'desc' : 'asc';
-
-            $(this).text(currentOrderDirection === 'asc' ? 'A-Z' : 'Z-A');
-
-            RefreshPage("@ViewBag.Filter", "@Model.PageIndex", "@ViewBag.PageSize", orderBy, currentOrderDirection);
-        });
-
-        $(".btnDetail").click(function (e) {
-            var id = $(this).data("id");
-            var collapseElement = $("#collapse-" + id);
-            var btnTextElement = $("#btnText-" + id);
-
-            // Toggle text after collapse animation completes
-            collapseElement.on('shown.bs.collapse', function () {
-                btnTextElement.text("Tutup detail kedatangan");
-            });
-
-            collapseElement.on('hidden.bs.collapse', function () {
-                btnTextElement.text("Lihat detail kedatangan");
-            });
-        });
-
-        $(".btnCetak").click(function (e) {
-            $("#staticModalBody").html(spinner);
-            $("#staticModalBody").load("/AppointmentHistory/Print?appointmentId=" + encodeURIComponent($(this).data("id")) + "&name=" + encodeURIComponent($(this).data("name")) + "&attempt=" + encodeURIComponent($(this).data("attempt")));
-        });
+    $(".btnCetak").click(function (e) {
+        $("#staticModalBody").html(spinner);
+        $("#staticModalBody").load("/AppointmentHistory/Print?appointmentId=" + encodeURIComponent($(this).data("id")) + "&name=" + encodeURIComponent($(this).data("name")) + "&attempt=" + encodeURIComponent($(this).data("attempt") + 1));
     });
 </script>

@@ -62,6 +62,7 @@ namespace HealthCare340B.Web.Controllers
             }
 
             List<VMMCustomerMember>? data = new List<VMMCustomerMember>();
+            List<int> dataTotChatAppo = new List<int>();
 
             try
             {

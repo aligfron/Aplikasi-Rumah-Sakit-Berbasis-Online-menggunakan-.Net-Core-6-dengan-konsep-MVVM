@@ -12,6 +12,7 @@ namespace HealthCare340B.ViewModel
         public string? Name { get; set; }
         public long CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
+        public string? CreatedName { get; set; }
         public long? ModifiedBy { get; set; }
         public DateTime? ModifiedOn { get; set; }
         public long? DeletedBy { get; set; }

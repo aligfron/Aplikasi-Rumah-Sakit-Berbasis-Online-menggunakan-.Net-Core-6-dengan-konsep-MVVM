@@ -70,6 +70,32 @@ namespace HealthCare340B.API.Controllers
             }
         }
 
+        [HttpGet("[action]/{parentId}")]
+        public async Task<ActionResult> GetTotalChatAppointment(long parentId)
+        {
+            try
+            {
+                VMResponse<List<int>> response = await Task.Run(() => _customerMember.GetTotalChatAppointment(parentId));
+
+                if (response.Data != null)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    Console.WriteLine("CustomerMemberController.GetTotalChatAppointment: " + response.Message);
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception e)
+            {
+                // Console Logging
+                Console.WriteLine("CustomerMemberController.GetTotalChatAppointment: " + e.Message);
+
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpGet("[action]/{parentId}/{filter}")]
         public async Task<ActionResult> GetByFilter(string filter, long parentId)
         {
