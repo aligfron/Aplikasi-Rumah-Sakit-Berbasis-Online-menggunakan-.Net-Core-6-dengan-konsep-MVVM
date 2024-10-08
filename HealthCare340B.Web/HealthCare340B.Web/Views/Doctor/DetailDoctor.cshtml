@@ -317,6 +317,7 @@ else
             $("#staticModalBody").html(spinner);
             var currentUrl = $(location).attr('href')
             $("#staticModalBody").load(`/Auth/Login`);
+            $("#staticModal").modal("show");
         });
     </script>
 }
