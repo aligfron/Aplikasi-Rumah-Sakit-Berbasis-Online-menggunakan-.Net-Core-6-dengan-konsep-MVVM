@@ -96,13 +96,21 @@
                 {
                     <tr>
                         <td class="checkbox">
-                            <input data-id="@app.Id" class="app-checkbox" type="checkbox" />
+                            <input data-id="@app.Id" class="form-check-input checkboxId app-checkbox" type="checkbox" />
                         </td>
                         <td>
                             <div>
                                 <h6 class="mb-0">@app.CustomerName</h6>
                                 <p class="mb-0">@(app.AppointmentDate?.ToString("dd MMMM yyyy")) - @app.MedicalFacilityName</p>
-                                <p class="mb-0">@app.DoctorName - @app.Treatment</p>
+                                @if (app.Treatment != null)
+                                {
+                                    <p class="mb-0">@app.DoctorName - @app.Treatment</p>
+                                }
+                                else
+                                {
+                                    <p class="mb-0">@app.DoctorName</p>
+                                }
+
                             </div>
                         </td>
                         <td style="text-align: right;">

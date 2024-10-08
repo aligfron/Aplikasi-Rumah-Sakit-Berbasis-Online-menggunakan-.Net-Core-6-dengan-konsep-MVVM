@@ -91,9 +91,9 @@ namespace HealthCare340B.DataAccess
                         join mf in db.MMedicalFacilities on dof.MedicalFacilityId equals mf.Id
                         join dos in db.TDoctorOfficeSchedules on a.DoctorOfficeScheduleId equals dos.Id
                         join mfs in db.MMedicalFacilitySchedules on dos.MedicalFacilityScheduleId equals mfs.Id
-                        join dot in db.TDoctorOfficeTreatments on a.DoctorOfficeTreatmentId equals dot.Id
-                        join dt in db.TDoctorTreatments on dot.DoctorTreatmentId equals dt.Id
-                        where a.CustomerId == id && a.IsDelete == false && a.AppointmentDate > DateTime.Now
+                        //join dot in db.TDoctorOfficeTreatments on a.DoctorOfficeTreatmentId equals dot.Id
+                        //join dt in db.TDoctorTreatments on dot.DoctorTreatmentId equals dt.Id
+                        where a.CustomerId == id && a.IsDelete == false && a.AppointmentDate >= DateTime.Now.Date
                         select new VMTAppointment
                         {
                             Id = a.Id,
@@ -108,8 +108,8 @@ namespace HealthCare340B.DataAccess
                             DoctorId = doc.Id,
                             MedicalFacilityId = mf.Id,
                             MedicalFacilityName = mf.Name,
-                            TreatmentId = dt.Id,
-                            Treatment = dt.Name,
+                            //TreatmentId = dt.Id,
+                            //Treatment = dt.Name,
                             CreatedBy = a.CreatedBy,
                             CreatedOn = a.CreatedOn,
                             ModifiedBy = a.ModifiedBy,
@@ -119,6 +119,26 @@ namespace HealthCare340B.DataAccess
                             IsDelete = a.IsDelete
                         }
                         ).ToList();
+
+                    foreach (VMTAppointment dataSelected in data)
+                    {
+                        if (dataSelected.DoctorOfficeTreatmentId != null)
+                        {
+                            dataSelected.TreatmentId = (
+                                from dot in db.TDoctorOfficeTreatments
+                                join dt in db.TDoctorTreatments on dot.DoctorTreatmentId equals dt.Id
+                                where dot.IsDelete == false && dot.Id == dataSelected.DoctorOfficeTreatmentId
+                                select dt.Id
+                                ).FirstOrDefault();
+
+                            dataSelected.Treatment = (
+                                from dot in db.TDoctorOfficeTreatments
+                                join dt in db.TDoctorTreatments on dot.DoctorTreatmentId equals dt.Id
+                                where dot.IsDelete == false && dot.Id == dataSelected.DoctorOfficeTreatmentId
+                                select dt.Name
+                                ).FirstOrDefault();
+                        }
+                    }
                         
                     if (data != null && data.Count > 0)
                     {
@@ -593,76 +613,68 @@ namespace HealthCare340B.DataAccess
                         response.Message = $"{HttpStatusCode.BadRequest} - Appointment does not exist!";
                         return response;
                     }
-
-                    if (GetByDate((DateTime)data.AppointmentDate!, (long)data.CustomerId!).Data == null)
+       
+                    if (GetByDateAndDoctorOfficeScheduleId((DateTime)data.AppointmentDate!, (long)data.DoctorOfficeScheduleId!).Data == null ||
+                        (GetByDateAndDoctorOfficeScheduleId((DateTime)data.AppointmentDate!, (long)data.DoctorOfficeScheduleId).Data != null &&
+                        GetByDateAndDoctorOfficeScheduleId((DateTime)data.AppointmentDate!, (long)data.DoctorOfficeScheduleId).Data!.Count <
+                        Slot((long)data.DoctorOfficeScheduleId)))
                     {
-                        if (GetByDateAndDoctorOfficeScheduleId((DateTime)data.AppointmentDate!, (long)data.DoctorOfficeScheduleId!).Data == null ||
-                            (GetByDateAndDoctorOfficeScheduleId((DateTime)data.AppointmentDate!, (long)data.DoctorOfficeScheduleId).Data != null &&
-                            GetByDateAndDoctorOfficeScheduleId((DateTime)data.AppointmentDate!, (long)data.DoctorOfficeScheduleId).Data!.Count <
-                            Slot((long)data.DoctorOfficeScheduleId)))
+                        TAppointment updatedData = new TAppointment();
+                        updatedData.Id = existedData.Id;
+                        updatedData.CustomerId = existedData.CustomerId;
+                        updatedData.DoctorOfficeId = existedData.DoctorOfficeId;
+                        updatedData.DoctorOfficeScheduleId = data.DoctorOfficeScheduleId;
+                        updatedData.DoctorOfficeTreatmentId = data.DoctorOfficeTreatmentId;
+                        updatedData.AppointmentDate = data.AppointmentDate;
+                        updatedData.CreatedBy = existedData.CreatedBy;
+                        updatedData.CreatedOn = existedData.CreatedOn;
+                        updatedData.ModifiedBy = data.ModifiedBy;
+                        updatedData.ModifiedOn = DateTime.Now;
+                        updatedData.DeletedBy = existedData.DeletedBy;
+                        updatedData.DeletedOn = existedData.DeletedOn;
+                        updatedData.IsDelete = existedData.IsDelete;
+
+                        db.Update(updatedData);
+                        db.SaveChanges();
+
+                        TAppointmentRescheduleHistory reschedule = new TAppointmentRescheduleHistory();
+                        reschedule.AppointmentId = existedData.Id;
+                        reschedule.DoctorOfficeScheduleId = data.DoctorOfficeScheduleId;
+                        reschedule.DoctorOfficeTreatmentId = data.DoctorOfficeTreatmentId;
+                        reschedule.AppointmentDate = data.AppointmentDate;
+                        reschedule.CreatedBy = (long)data.ModifiedBy!;
+                        reschedule.CreatedOn = (DateTime)updatedData.ModifiedOn;
+                        reschedule.IsDelete = existedData.IsDelete;
+
+                        db.Add(reschedule);
+                        db.SaveChanges();
+
+                        response.Data = new VMTAppointment
                         {
-                            TAppointment updatedData = new TAppointment();
-                            updatedData.Id = existedData.Id;
-                            updatedData.CustomerId = existedData.CustomerId;
-                            updatedData.DoctorOfficeId = existedData.DoctorOfficeId;
-                            updatedData.DoctorOfficeScheduleId = data.DoctorOfficeScheduleId;
-                            updatedData.DoctorOfficeTreatmentId = data.DoctorOfficeTreatmentId;
-                            updatedData.AppointmentDate = data.AppointmentDate;
-                            updatedData.CreatedBy = existedData.CreatedBy;
-                            updatedData.CreatedOn = existedData.CreatedOn;
-                            updatedData.ModifiedBy = data.ModifiedBy;
-                            updatedData.ModifiedOn = DateTime.Now;
-                            updatedData.DeletedBy = existedData.DeletedBy;
-                            updatedData.DeletedOn = existedData.DeletedOn;
-                            updatedData.IsDelete = existedData.IsDelete;
+                            Id = updatedData.Id,
+                            CustomerId = updatedData.CustomerId,
+                            DoctorOfficeId = updatedData.DoctorOfficeId,
+                            DoctorOfficeScheduleId = updatedData.DoctorOfficeScheduleId,
+                            DoctorOfficeTreatmentId = updatedData.DoctorOfficeTreatmentId,
+                            AppointmentDate = updatedData.AppointmentDate,
+                            CreatedBy = updatedData.CreatedBy,
+                            CreatedOn = updatedData.CreatedOn,
+                            ModifiedBy = updatedData.ModifiedBy,
+                            ModifiedOn = updatedData.ModifiedOn,
+                            DeletedBy = updatedData.DeletedBy,
+                            DeletedOn = updatedData.DeletedOn,
+                            IsDelete = updatedData.IsDelete
+                        };
 
-                            db.Update(updatedData);
-                            db.SaveChanges();
+                        dbTran.Commit();
 
-                            TAppointmentRescheduleHistory reschedule = new TAppointmentRescheduleHistory();
-                            reschedule.AppointmentId = existedData.Id;
-                            reschedule.DoctorOfficeScheduleId = data.DoctorOfficeScheduleId;
-                            reschedule.DoctorOfficeTreatmentId = data.DoctorOfficeTreatmentId;
-                            reschedule.AppointmentDate = data.AppointmentDate;
-                            reschedule.CreatedBy = (long)data.ModifiedBy!;
-                            reschedule.CreatedOn = (DateTime)updatedData.ModifiedOn;
-                            reschedule.IsDelete = existedData.IsDelete;
-
-                            db.Add(reschedule);
-                            db.SaveChanges();
-
-                            response.Data = new VMTAppointment
-                            {
-                                Id = updatedData.Id,
-                                CustomerId = updatedData.CustomerId,
-                                DoctorOfficeId = updatedData.DoctorOfficeId,
-                                DoctorOfficeScheduleId = updatedData.DoctorOfficeScheduleId,
-                                DoctorOfficeTreatmentId = updatedData.DoctorOfficeTreatmentId,
-                                AppointmentDate = updatedData.AppointmentDate,
-                                CreatedBy = updatedData.CreatedBy,
-                                CreatedOn = updatedData.CreatedOn,
-                                ModifiedBy = updatedData.ModifiedBy,
-                                ModifiedOn = updatedData.ModifiedOn,
-                                DeletedBy = updatedData.DeletedBy,
-                                DeletedOn = updatedData.DeletedOn,
-                                IsDelete = updatedData.IsDelete
-                            };
-
-                            dbTran.Commit();
-
-                            response.StatusCode = HttpStatusCode.OK;
-                            response.Message = $"{HttpStatusCode.OK} - Appointment successfully updated!";
-                        }
-                        else
-                        {
-                            response.StatusCode = HttpStatusCode.Found;
-                            response.Message = "Mohon maaf, waktu yang anda pilih telah terisi penuh. Silahkan memilih waktu kedatangan atau faskes yang lain.";
-                        }
+                        response.StatusCode = HttpStatusCode.OK;
+                        response.Message = $"{HttpStatusCode.OK} - Appointment successfully updated!";
                     }
                     else
                     {
                         response.StatusCode = HttpStatusCode.Found;
-                        response.Message = "Mohon maaf, Anda sudah mempunyai rencana kadatangan di waktu ini. Silahkan memilih waktu kedatangan yang lain.";
+                        response.Message = "Mohon maaf, waktu yang anda pilih telah terisi penuh. Silahkan memilih waktu kedatangan atau faskes yang lain.";
                     }
                 }
                 catch (Exception e)

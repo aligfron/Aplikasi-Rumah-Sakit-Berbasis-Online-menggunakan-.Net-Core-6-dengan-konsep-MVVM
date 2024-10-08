@@ -234,6 +234,16 @@
                             }
                         );
                         $("#tindakan").val("@ViewBag.TreatmentId");
+                        if ($("#tindakan").val() == null) {
+                            $("#tindakan").append(
+                                `<option value="" selected>-- Tidak memilih tindakan --</option>`
+                            );
+                        }
+                        else {
+                            $("#tindakan").append(
+                                `<option value="">-- Tidak memilih tindakan --</option>`
+                            );
+                        }
                     }
                 }
             },
@@ -276,9 +286,9 @@
                             }
                         }
                     )
-                    debugger;
                     var sesi = $("#sesi").val();
                     var treatment = $("#tindakan").val();
+                    debugger;
                     if (dateCheck == "@ViewBag.AppointmentDate" && sesi == "@ViewBag.TimeStart" && treatment == "@ViewBag.TreatmentId") {
                         $("#btnSave").prop("disabled", true);
                     }
@@ -305,6 +315,7 @@
             else {
                 $("#btnSave").prop("disabled", false);
             }
+           
         });
 
         $("#tindakan").change(function (e) {
@@ -331,8 +342,7 @@
                     Member: "required",
                     MedFac: "required",
                     AppointmentDate: "required",
-                    Sesi: "required",
-                    Tindakan: "required"
+                    Sesi: "required"
                 }
             });
 
@@ -392,6 +402,11 @@
                     }
                 });
 
+                var tindakanId = $("#tindakan").val();
+                if (tindakanId == "") {
+                    tindakanId = 0;
+                }
+
                 $.ajax({
                     url: "/Appointment/Update",
                     type: "post",
@@ -412,7 +427,7 @@
                         if (response.statusCode == 200) {
                             //alert("success");
                             $("#staticModalLg").modal("hide");
-                            location.href = "/Appointment/RencanaKedatangan";
+                            location.href = "/Appointment/RencanaKedatangan?pageNumber=1&currPageSize=5&orderBy=tanggalDibuat&ascDesc=desc";
                         }
                         else {
                             $("#staticModalLgBody").html();

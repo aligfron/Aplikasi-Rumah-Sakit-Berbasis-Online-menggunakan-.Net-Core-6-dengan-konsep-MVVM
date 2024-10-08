@@ -434,7 +434,7 @@ namespace HealthCare340B.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<VMResponse<VMTAppointment>> Create(long custId, long dofId, long dosId, long dotId, string appDate)
+        public async Task<VMResponse<VMTAppointment>> Create(long custId, long dofId, long dosId, long? dotId, string appDate)
         {
             try
             {
@@ -597,10 +597,144 @@ namespace HealthCare340B.Web.Controllers
                         switch (ascDesc)
                         {
                             case "asc":
-                                dataAppointment = dataAppointment?.OrderBy(p => p.CreatedOn).ToList();
+                                List<VMTAppointment>? dataModified = new List<VMTAppointment>();
+                                List<VMTAppointment>? dataCreated = new List<VMTAppointment>();
+                                foreach (VMTAppointment data in dataAppointment)
+                                {
+                                    if (data.ModifiedOn == null)
+                                        dataCreated.Add(data);
+                                    else
+                                        dataModified.Add(data);
+                                }
+                                dataModified = dataModified?.OrderBy(p => p.ModifiedOn).ToList();
+                                dataCreated = dataCreated?.OrderBy(p => p.CreatedOn).ToList();
+                                dataAppointment = new List<VMTAppointment>();
+
+                                if (dataCreated!.Count > 0 && dataModified!.Count < 1)
+                                {
+                                    foreach (VMTAppointment data in dataCreated)
+                                    {
+                                        dataAppointment.Add(data);
+                                    }
+                                }
+                                else if (dataModified!.Count > 0 && dataCreated!.Count < 1)
+                                {
+                                    foreach (VMTAppointment data in dataModified)
+                                    {
+                                        dataAppointment.Add(data);
+                                    }
+                                }
+                                else
+                                {
+                                    int pointModified = 0;
+                                    int pointCreated = 0;
+                                    while (true)
+                                    {
+                                        if (pointModified == dataModified.Count && pointCreated < dataCreated.Count)
+                                        {
+                                            for (int i = pointCreated; i < dataCreated.Count; i++)
+                                            {
+                                                dataAppointment.Add(dataCreated[i]);
+                                            }
+                                            break;
+                                        }
+
+                                        if (pointCreated == dataCreated.Count && pointModified < dataModified.Count)
+                                        {
+                                            for (int i = pointModified; i < dataModified.Count; i++)
+                                            {
+                                                dataAppointment.Add(dataModified[i]);
+                                            }
+                                            break;
+                                        }
+
+                                        if (pointModified == dataModified.Count && pointCreated == dataCreated.Count)
+                                        {
+                                            break;
+                                        }
+
+                                        if (dataCreated[pointCreated].CreatedOn < dataModified[pointModified].ModifiedOn)
+                                        {
+                                            dataAppointment.Add(dataCreated[pointCreated]);
+                                            pointCreated++;
+                                        }
+                                        else
+                                        {
+                                            dataAppointment.Add(dataModified[pointModified]);
+                                            pointModified++;
+                                        }
+                                    }
+                                }
                                 break;
                             case "desc":
-                                dataAppointment = dataAppointment?.OrderByDescending(p => p.CreatedOn).ToList();
+                                List<VMTAppointment>? dataModifiedDesc = new List<VMTAppointment>();
+                                List<VMTAppointment>? dataCreatedDesc = new List<VMTAppointment>();                               
+                                foreach (VMTAppointment data in dataAppointment)
+                                {
+                                    if (data.ModifiedOn == null)
+                                        dataCreatedDesc.Add(data);
+                                    else
+                                        dataModifiedDesc.Add(data);
+                                }
+                                dataModifiedDesc = dataModifiedDesc?.OrderByDescending(p => p.ModifiedOn).ToList();
+                                dataCreatedDesc = dataCreatedDesc?.OrderByDescending(p => p.CreatedOn).ToList();
+                                dataAppointment = new List<VMTAppointment>();
+
+                                if (dataCreatedDesc!.Count > 0 && dataModifiedDesc!.Count < 1)
+                                {
+                                    foreach (VMTAppointment data in dataCreatedDesc)
+                                    {
+                                        dataAppointment.Add(data);
+                                    }
+                                }
+                                else if (dataModifiedDesc!.Count > 0 && dataCreatedDesc!.Count < 1)
+                                {
+                                    foreach (VMTAppointment data in dataModifiedDesc)
+                                    {
+                                        dataAppointment.Add(data);
+                                    }
+                                }
+                                else
+                                {
+                                    int pointModified = 0;
+                                    int pointCreated = 0;
+                                    while (true)
+                                    {
+                                        if (pointModified == dataModifiedDesc.Count && pointCreated < dataCreatedDesc.Count)
+                                        {
+                                            for (int i = pointCreated; i < dataCreatedDesc.Count; i++)
+                                            {
+                                                dataAppointment.Add(dataCreatedDesc[i]);
+                                            }
+                                            break;
+                                        }
+
+                                        if (pointCreated == dataCreatedDesc.Count && pointModified < dataModifiedDesc.Count)
+                                        {
+                                            for (int i = pointModified; i < dataModifiedDesc.Count; i++)
+                                            {
+                                                dataAppointment.Add(dataModifiedDesc[i]);
+                                            }
+                                            break;
+                                        }
+
+                                        if (pointModified == dataModifiedDesc.Count && pointCreated == dataCreatedDesc.Count)
+                                        {
+                                            break;
+                                        }
+
+                                        if (dataCreatedDesc[pointCreated].CreatedOn < dataModifiedDesc[pointModified].ModifiedOn)
+                                        {
+                                            dataAppointment.Add(dataModifiedDesc[pointModified]);
+                                            pointModified++;
+                                        }
+                                        else
+                                        {
+                                            dataAppointment.Add(dataCreatedDesc[pointCreated]);
+                                            pointCreated++;
+                                        }
+                                    }
+                                }
                                 break;
                             default:
                                 dataAppointment = dataAppointment?.OrderBy(p => p.CreatedOn).ToList();
@@ -660,7 +794,7 @@ namespace HealthCare340B.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<VMResponse<VMTAppointment>> Update(long id, long custId, long dofId, long dosId, long dotId, string appDate)
+        public async Task<VMResponse<VMTAppointment>> Update(long id, long custId, long dofId, long dosId, long? dotId, string appDate)
         {
             try
             {
@@ -671,6 +805,9 @@ namespace HealthCare340B.Web.Controllers
                     responseUnauthorized.Message = $"{HttpStatusCode.Forbidden} - You Are Not Authorized!";
                     return responseUnauthorized;
                 }
+
+                if (dotId == 0)
+                    dotId = null;
 
                 VMTAppointment data = new VMTAppointment
                 {

@@ -302,6 +302,9 @@
                         if (response.statusCode == 200) {
                             if (response.data.length > 0) {
                                 $("#tindakan").prop("disabled", false);
+                                $("#tindakan").append(
+                                    `<option value="">-- Tidak memilih tindakan --</option>`
+                                );
                                 $.each(
                                     response.data,
                                     function (idx, data) {
@@ -374,8 +377,7 @@
                     Member: "required",
                     MedFac: "required",
                     AppointmentDate: "required",
-                    Sesi: "required",
-                    Tindakan: "required"
+                    Sesi: "required"
                 }
             });
           
@@ -453,7 +455,7 @@
                         if (response.statusCode == 200 || response.statusCode == 201) {
                             //alert("success");
                             $("#staticModalLg").modal("hide");
-                            location.href = "/Appointment/RencanaKedatangan";
+                            location.href = "/Appointment/RencanaKedatangan?pageNumber=1&currPageSize=5&orderBy=tanggalDibuat&ascDesc=desc";
                         }
                         else {
                             debugger;
