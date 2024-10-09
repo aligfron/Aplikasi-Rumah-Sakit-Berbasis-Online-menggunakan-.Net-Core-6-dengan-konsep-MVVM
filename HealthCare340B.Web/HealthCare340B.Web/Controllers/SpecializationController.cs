@@ -48,14 +48,20 @@ namespace HealthCare340B.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
             List<VMMSpecialization>? data = new List<VMMSpecialization>();
-            
+            try
+            {
+                
                 data = (string.IsNullOrEmpty(filter)) ? await spesialisasi.getByFilter("") : await spesialisasi.getByFilter(filter);
-
+            }
+            catch (Exception ex)
+            {
+                HttpContext.Session.SetString("errMsg", ex.Message);
+            }
             ViewBag.imgFolder = imageFolder;
             ViewBag.Title = "Spesialisasi Index";
             ViewBag.filter = filter;
             ViewBag.PageSize = (currPageSize ?? pageSize);
-
+            
             return View(Pagination<VMMSpecialization>.Create(data ?? new List<VMMSpecialization>(), pageNumber ?? 1, ViewBag.PageSize));
         }
         public async Task<IActionResult> Create()

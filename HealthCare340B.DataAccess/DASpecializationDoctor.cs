@@ -18,7 +18,7 @@ namespace HealthCare340B.DataAccess
         {
             db = _db;
         }
-        public VMResponse<VMTCurrentDoctorSpecialization?> GetById(int id)
+        public VMResponse<VMTCurrentDoctorSpecialization?> GetById(long id)
         {
             VMResponse<VMTCurrentDoctorSpecialization?> response = new VMResponse<VMTCurrentDoctorSpecialization?>();
             try
@@ -29,7 +29,7 @@ namespace HealthCare340B.DataAccess
 
                         from c in db.TCurrentDoctorSpecializations
                         where c.IsDelete == false
-                        && (c.Id == id)
+                        && (c.SpecializationId == id)
                         select new VMTCurrentDoctorSpecialization(c)
                     ).FirstOrDefault();
 

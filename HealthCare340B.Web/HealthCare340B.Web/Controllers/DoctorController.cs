@@ -132,7 +132,7 @@ namespace HealthCare340B.Web.Controllers
 
         //punya ali
 
-        public async Task<IActionResult> DetailDoctor(int? id)
+        public async Task<IActionResult> DetailDoctor(int id, bool? isOnline, bool? isAvailable)
         {
             ViewBag.Title = "Detail Dokter";
             ViewBag.imgFolder = imageFolder;
@@ -140,32 +140,19 @@ namespace HealthCare340B.Web.Controllers
 
             VMMDoctor? data = null;
 
-            if (id == null)
+            data = await profile.GetByDetailDokter(id);
+            if (data == null)
             {
-                int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
-                if (bioId == 0)
-                {
-                    return NotFound("Biodata ID not found in session.");
-                }
+                return NotFound("Doctor not found for the given ID.");
+            }
 
-                VMMDoctor? GetDoctorByBiodataId = await profile.GetDoctorByBiodataId(bioId);
-                if (GetDoctorByBiodataId == null)
-                {
-                    return NotFound("Doctor not found for the given Biodata ID.");
-                }
-                data = await profile.GetByDetailDokter(GetDoctorByBiodataId.Id);
-            }
-            else
-            {
-                data = await profile.GetByDetailDokter(id.Value);
-                if (data == null)
-                {
-                    return NotFound("Doctor not found for the given ID.");
-                }
-            }
+            // Ambil nilai isOnline dan isAvailable dari query string
+            ViewBag.IsOnline = isOnline ?? false;
+            ViewBag.IsAvailable = isAvailable ?? false;
 
             return View(data);
         }
+
 
     }
 }

@@ -194,7 +194,7 @@ namespace HealthCare340B.Web.Models
         }
 
         // ali model spesialisasi doctor
-        public async Task<VMTCurrentDoctorSpecialization?> GetByIdSpecializationDoctor(int id)
+        public async Task<VMTCurrentDoctorSpecialization?> GetByIdSpecializationDoctor(long id)
         {
             VMTCurrentDoctorSpecialization? data = null;
             try

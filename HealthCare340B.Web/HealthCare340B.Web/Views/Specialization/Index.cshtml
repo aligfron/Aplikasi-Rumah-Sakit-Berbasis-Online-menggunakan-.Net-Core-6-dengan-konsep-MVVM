@@ -34,21 +34,30 @@
                         <button id="btnAdd" class="btn btn-success mb-2" data-bs-toggle="modal" data-bs-target="#staticModal">
                             <i class="fas fa-plus"></i><b> Tambah</b>
                         </button>
-                        <form id="frmpage" method="get" asp-controller="Specialization" asp-action="Index" class="d-flex flex-wrap mx-md-5 mb-2">
-                            <div class="input-group">
-                                <span class="input-group-text">Show</span>
-                                <input class="form-control" type="number" id="pageSize" name="currPageSize" value="@ViewBag.PageSize" />
-                                <span class="input-group-text"> Entries</span>
-                            </div>
-                            <input type="hidden" name="filter" value="@ViewBag.filter" />
-                            <input type="hidden" name="pageNumber" value="@(Model.PageIndex)" />
-                        </form>
                         <form id="frmCategoryfilter" asp-controller="Specialization" asp-action="Index" class="d-flex flex-wrap mb-2">
                             <div class="input-group">
                                 <span class="input-group-text">Search:</span>
                                 <input class="form-control" type="text" id="filter" name="filter" value="@ViewBag.filter" />
                                 <button type="submit" class="btn btn-success input-group-text"><i class="fas fa-search"></i></button>
                             </div>
+                        </form>
+                        <form id="frmpage" method="get" asp-controller="Specialization" asp-action="Index" class="d-flex flex-wrap mx-md-5 mb-2">
+                            <div class="input-group">
+                                <span class="input-group-text">Tampilkan Jumlah Data : </span>
+                                <select class="form-control" id="currPageSize" name="currPageSize">
+                                   
+                                    <option value="10">5</option>
+                                    <option value="10">10</option>
+                                    <option value="10">15</option>
+                                    <option value="10">20</option>
+                                    
+                                    
+                                </select>
+                                <input type="hidden" name="filter" value="@ViewBag.filter" />
+                                <input type="hidden" name="pageNumber" value="@(Model.PageIndex)" />
+                            </div>
+                            
+                            
                         </form>
                     </div>
                 </div>
@@ -61,7 +70,9 @@
                                 <thead>
                                     <tr>
                                         <th class="col-2 text-center align-middle">No</th>
+                                        <th class="col-2 text-center align-middle">Created By</th>
                                         <th class="col-6 text-center align-middle">Name</th>
+                                        <th class="col-2 text-center align-middle">Modified By</th>
                                         <th class="col-4 text-center align-middle">Action</th>
                                     </tr>
                                 </thead>
@@ -71,13 +82,23 @@
                                     }
 
                                     @{
-                                        if (Model != null)
+                                        if (Model.TotalData > 0)
                                         {
                                             foreach (VMMSpecialization spesialisasi in Model)
                                             {
                                                 <tr>
                                                     <td class="text-center align-middle">@no</td>
+                                                    <td class="text-center align-middle">@spesialisasi.fullname</td>
                                                     <td class="text-center align-middle">@spesialisasi.Name</td>
+                                                    @if (spesialisasi.ModifiedBy == spesialisasi.IdUser)
+                                                        {
+                                                        <td class="text-center align-middle">@spesialisasi.fullname</td>
+                                                            
+                                                        }else{
+                                                        <td class="text-center align-middle"> - </td>
+                                                        }
+                                                    
+
 
                                                     <td class="text-center align-middle">
                                                         <div class="btn-group" role="group">
@@ -139,7 +160,8 @@
 
 
 <script>
-    
+    $("#currPageSize").change((e) => $("#frmpage").submit());
+
     $("#btnAdd").click(function (e) {
         $("#staticModalBody").html("");
         $("#staticModalBody").load("/Specialization/Create/");

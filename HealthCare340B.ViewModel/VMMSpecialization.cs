@@ -18,6 +18,8 @@ namespace HealthCare340B.ViewModel
         public long? DeletedBy { get; set; }
         public DateTime? DeletedOn { get; set; }
         public bool IsDelete { get; set; }
+        public string? fullname { get; set; }
+        public long IdUser { get; set; }
 
         public VMMSpecialization()
         {
@@ -33,6 +35,20 @@ namespace HealthCare340B.ViewModel
             DeletedBy = specialization.DeletedBy;
             DeletedOn = specialization.DeletedOn;
             IsDelete = specialization.IsDelete;
+        }
+        public VMMSpecialization(MSpecialization specialization,MUser user, MBiodatum biodata)
+        {
+            Id = specialization.Id;
+            Name = specialization.Name;
+            CreatedBy = specialization.CreatedBy;
+            CreatedOn = specialization.CreatedOn;
+            ModifiedBy = specialization.ModifiedBy;
+            ModifiedOn = specialization.ModifiedOn;
+            DeletedBy = specialization.DeletedBy;
+            DeletedOn = specialization.DeletedOn;
+            IsDelete = specialization.IsDelete;
+            fullname = biodata.Fullname;
+            IdUser = user.Id;
         }
     }
     

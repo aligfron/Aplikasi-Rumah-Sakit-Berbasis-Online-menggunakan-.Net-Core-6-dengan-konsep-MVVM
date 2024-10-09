@@ -114,7 +114,16 @@ namespace HealthCare340B.API.Controllers
                 {
                     return BadRequest("Input tidak boleh kosong atau hanya berisi spasi.");
                 }
-                return Created("api/spec", await Task.Run(() => spec.Create(Data)));
+                VMResponse<VMMSpecialization> datasama = await Task.Run(() => spec.GetByDataSama(Data.Name));
+                if (datasama != null && datasama?.Data?.Name == Data.Name)
+                {
+                    return BadRequest("Data spesialisasi dengan nama yang sama sudah ada.");
+                }
+                else
+                {
+                    return Created("api/spec", await Task.Run(() => spec.Create(Data)));
+                }
+                
             }
             catch (Exception ex)
             {
@@ -129,6 +138,10 @@ namespace HealthCare340B.API.Controllers
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(Data?.Name))
+                {
+                    return BadRequest("Input tidak boleh kosong atau hanya berisi spasi.");
+                }
                 VMResponse<VMMSpecialization?> response = await Task.Run(() => spec.Update(Data));
                 if (response.Data != null)
                 {

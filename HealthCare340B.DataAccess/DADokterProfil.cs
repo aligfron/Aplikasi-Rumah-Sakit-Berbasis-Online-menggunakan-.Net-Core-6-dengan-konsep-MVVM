@@ -45,11 +45,11 @@ namespace HealthCare340B.DataAccess
                                 select s.Name
                ).FirstOrDefault();
                 DetailDokter.SpecializationId = (
-                                from Cspesialisation in db.TCurrentDoctorSpecializations
-                                join s in db.MSpecializations on Cspesialisation.SpecializationId equals s.Id // untuk ngambil nama spesialisasi
-                                where Cspesialisation.DoctorId == DetailDokter.Id &&
-                                Cspesialisation.IsDelete == false
-                                select s.Id
+                                from ts in db.TCurrentDoctorSpecializations
+                                join sp in db.MSpecializations on ts.SpecializationId equals sp.Id // untuk ngambil nama spesialisasi
+                                where ts.DoctorId == DetailDokter.Id && 
+                                ts.IsDelete == false
+                                select ts.SpecializationId
                ).FirstOrDefault();
                 DetailDokter.TreatmentName = (
                                 from tindakanmedis in db.TDoctorTreatments
@@ -62,9 +62,11 @@ namespace HealthCare340B.DataAccess
                                 }
                  ).ToList();
                 DetailDokter.DoctorOffice = (
-                                    from riwayarpraktek in db.TDoctorOffices
-                                    join d in db.MMedicalFacilities on riwayarpraktek.MedicalFacilityId equals d.Id
-                                    join e in db.MLocations on d.LocationId equals e.Id // untuk ngambil nama lokasi rumah sakit dan spesialisasi
+                                    from riwayarpraktek in db.TDoctorOffices //spesialisasi, tahun
+                                    join d in db.MMedicalFacilities on riwayarpraktek.MedicalFacilityId equals d.Id //nama rumah sakit
+                                    join mfc in db.MMedicalFacilityCategories on d.MedicalFacilityCategoryId equals mfc.Id
+                                    
+                                    join e in db.MLocations on d.LocationId equals e.Id // untuk ngambil lokasi rumah sakit  
                                     where riwayarpraktek.DoctorId == DetailDokter.Id &&
                                     riwayarpraktek.IsDelete == false
                                     orderby riwayarpraktek.EndDate descending
@@ -76,7 +78,8 @@ namespace HealthCare340B.DataAccess
                                         StartDate = riwayarpraktek.StartDate,
                                         EndDate = riwayarpraktek.EndDate,
                                         FullAddress = d.FullAddress,
-                                        MedicalFacilityName = d.Name                                        
+                                        MedicalFacilityName = d.Name,
+                                        MedicalFacilityCategory = mfc.Name
                                     }
                             ).ToList();
                 DetailDokter.InstitutionName = (
@@ -250,8 +253,10 @@ namespace HealthCare340B.DataAccess
                  ).ToList();
                 DetailDokter.DoctorOffice = (
                                     from riwayarpraktek in db.TDoctorOffices
-                                    join d in db.MMedicalFacilities on riwayarpraktek.MedicalFacilityId equals d.Id
+                                    join d in db.MMedicalFacilities on riwayarpraktek.MedicalFacilityId equals d.Id //nama rumah sakit
+                                    join mfc in db.MMedicalFacilityCategories on d.MedicalFacilityCategoryId equals mfc.Id
                                     join e in db.MLocations on d.LocationId equals e.Id // untuk ngambil nama lokasi rumah sakit dan spesialisasi
+                                    join service in db.MServiceUnits on riwayarpraktek.ServiceUnitId equals service.Id
                                     where riwayarpraktek.DoctorId == DetailDokter.Id &&
                                     riwayarpraktek.IsDelete == false
                                     orderby riwayarpraktek.EndDate descending
@@ -264,6 +269,8 @@ namespace HealthCare340B.DataAccess
                                         EndDate = riwayarpraktek.EndDate,
                                         FullAddress = d.FullAddress,
                                         MedicalFacilityName = d.Name,
+                                        MedicalFacilityCategory = mfc.Name,
+                                        Servicename = service.Name,
                                         JadwalPraktek = (
                                                 from mfs in db.MMedicalFacilitySchedules
                                                 join mf in db.MMedicalFacilities on mfs.MedicalFacilityId equals mf.Id
@@ -289,13 +296,44 @@ namespace HealthCare340B.DataAccess
                                         ).Min()
                                     }
                             ).ToList();
-                DetailDokter.TotalYearsExperience = (
-                        from riwayarpraktek in db.TDoctorOffices
-                        where riwayarpraktek.DoctorId == DetailDokter.Id && riwayarpraktek.IsDelete == false
-                        select riwayarpraktek.EndDate.HasValue
-                            ? riwayarpraktek.EndDate.Value.Year - riwayarpraktek.StartDate.Year
-                            : 1
-                    ).Sum();
+                //DetailDokter.TotalYearsExperience = (
+                //        from riwayarpraktek in db.TDoctorOffices
+                //        where riwayarpraktek.DoctorId == DetailDokter.Id && riwayarpraktek.IsDelete == false
+                //        select riwayarpraktek.EndDate.HasValue
+                //            ? riwayarpraktek.EndDate.Value.Year - riwayarpraktek.StartDate.Year
+                //            : 1
+                //    ).Sum();
+                var maxTest = (
+                    from riwayarpraktek in db.TDoctorOffices
+                    where riwayarpraktek.DoctorId == DetailDokter.Id && riwayarpraktek.IsDelete == false
+                    select riwayarpraktek.EndDate.Value.Year
+                ).ToList();
+
+                var minTest = (
+                    from riwayarpraktek in db.TDoctorOffices
+                    where riwayarpraktek.DoctorId == DetailDokter.Id && riwayarpraktek.IsDelete == false
+                    select riwayarpraktek.StartDate.Year
+                ).ToList();
+                if ( maxTest.Count > 0)
+                {
+                    DetailDokter.maxendTotalYearsExperience = maxTest.Max();
+                }
+                else
+                {
+                    DetailDokter.maxendTotalYearsExperience = 0;
+                }
+
+                if (minTest.Count > 0)
+                {
+                    DetailDokter.minstartTotalYearsExperience = minTest.Min();
+                }
+                else
+                {
+                    DetailDokter.minstartTotalYearsExperience = 0;
+                }
+
+              
+
                 DetailDokter.InstitutionName = (
                                 from pendidikan in db.MDoctorEducations
                                 where pendidikan.DoctorId == DetailDokter.Id&&

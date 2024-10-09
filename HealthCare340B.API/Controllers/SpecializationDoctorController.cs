@@ -15,7 +15,7 @@ namespace HealthCare340B.API.Controllers
             dASpecializationDoctor = new DASpecializationDoctor(_db);
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetById(int id)
+        public async Task<ActionResult> GetById(long id)
         {
             try
             {

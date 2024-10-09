@@ -59,6 +59,8 @@ namespace HealthCare340B.DataAccess
 
 
         //ali tambah
+        
+
         public VMResponse<List<VMMSpecialization>> GetByFilter(string filter)
         {
             VMResponse<List<VMMSpecialization>> response = new VMResponse<List<VMMSpecialization>>();
@@ -66,9 +68,11 @@ namespace HealthCare340B.DataAccess
             {
                 response.Data = (
                     from a in db.MSpecializations
+                    join b in db.MUsers on a.CreatedBy equals b.Id
+                    join c in db.MBiodata on b.BiodataId equals c.Id
                     where a.IsDelete == false
                     && (a.Name.Contains(filter))
-                    select new VMMSpecialization(a)).ToList();
+                    select new VMMSpecialization(a, b, c)).ToList();
                 response.Message = (response.Data.Count > 0)
                     ? $"{response.Data.Count} of Spesialisasi(s) found successfully."
                     : $"{HttpStatusCode.NoContent} - No data found";
@@ -234,6 +238,32 @@ namespace HealthCare340B.DataAccess
                     dbTrans.Rollback();
                     response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
                 }
+            }
+            return response;
+        }
+
+        public VMResponse<VMMSpecialization> GetByDataSama(string filter)
+        {
+            VMResponse<VMMSpecialization> response = new VMResponse<VMMSpecialization>();
+            try
+            {
+                response.Data = (
+                    from a in db.MSpecializations
+                    where a.IsDelete == false
+                    && a.Name == filter
+                    select new VMMSpecialization { Name = a.Name }).FirstOrDefault();
+                response.Message = (response.Data != null)
+                    ? $"{response.Data} of Spesialisasi(s) found successfully."
+                    : $"{HttpStatusCode.NoContent} - No data found";
+
+                response.StatusCode = (response.Data != null)
+                    ? HttpStatusCode.OK
+                    : HttpStatusCode.NoContent;
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+                response.StatusCode = HttpStatusCode.InternalServerError;
             }
             return response;
         }

@@ -495,7 +495,7 @@ namespace HealthCare340B.Web.Controllers
             }
             return (response);
         }
-        public async Task<IActionResult> EditSpecializationDoctor(int id)
+        public async Task<IActionResult> EditSpecializationDoctor(long id)
         {
             VMTCurrentDoctorSpecialization? data = await profile.GetByIdSpecializationDoctor(id);
             ViewBag.Specialization = await specialization.getByFilter("");

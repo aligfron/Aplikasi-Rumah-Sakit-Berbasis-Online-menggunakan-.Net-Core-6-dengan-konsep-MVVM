@@ -84,7 +84,7 @@
                                         {
                                             <p><i class="fas fa-hospital"></i> @medfac.MedicalFacilityName</p>
                                         }
-                                        <button class="btn btn-outline-info mt-2" data-id="@doctor.Id" id="DetailDocter">Lihat info lebih banyak</button>
+                                        <button data-isonline="@doctor.IsOnline" data-isavailable="@doctor.IsAvailable" class="btn btn-outline-info mt-2" type="button" data-cariid="@doctor.Id" id="DetailDocter">Lihat info lebih banyak</button>
                                     </div>
                                     <!-- Right side for doctor actions -->
                                     <div class="col-md-4 text-center">
@@ -100,19 +100,20 @@
                                             @if (doctor.IsOnline && doctor.IsAvailable)
                                             {
                                                 <button class="btn btn-primary mt-2">Chat</button>
-                                                <button data-id="@doctor.Id" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticModal">Buat Janji</button>
+                                                <button data-isonline="@doctor.IsOnline" data-isavailable="@doctor.IsAvailable" id="researchBtn" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticModal">Buat Janji</button>
                                             }
                                             else if (doctor.IsOnline && !doctor.IsAvailable)
                                             {
                                                 <button class="btn btn-primary mt-2" disabled>Chat</button>
-                                                <button data-id="@doctor.Id" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticModal" disabled>Buat Janji</button>
+                                                <button data-isonline="@doctor.IsOnline" data-isavailable="@doctor.IsAvailable" id="researchBtn" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticModal" disabled>Buat Janji</button>
                                             }
                                             else
                                             {
                                                 <span class="text-muted mt-4">Offline</span>
-                                                <button data-id="@doctor.Id" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticModal">Buat Janji</button>
+                                                <button data-isonline="@doctor.IsOnline" data-isavailable="@doctor.IsAvailable" id="researchBtn" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticModal">Buat Janji</button>
                                             }
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -143,10 +144,15 @@
         $("#staticModalBody").load("/Doctor/SearchDoctor")
     });
 
-    $("#DetailDocter").click(function (e) {
-        var doctorId = $(this).attr("data-id");  // Mengambil nilai dari atribut data-id
-        window.location.href = "/Doctor/DetailDoctor/" + doctorId;  // Mengarahkan ke halaman detail berdasarkan doctorId
+    $(".btn-outline-info").click(function (e) {
+        let doctorId1 = $(this).data("cariid");           // Ambil doctorId dari data-cariid
+        let isOnline = $(this).data("isonline");          // Ambil isOnline dari data-isonline
+        let isAvailable = $(this).data("isavailable");    // Ambil isAvailable dari data-isavailable
+
+        // Redirect ke URL dengan mengirimkan doctorId, isOnline, dan isAvailable sebagai query string
+        window.location.href = "/Doctor/DetailDoctor/" + doctorId1 + "?isOnline=" + isOnline + "&isAvailable=" + isAvailable;
     });
+
 
 </script>
 
