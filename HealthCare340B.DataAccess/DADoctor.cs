@@ -133,6 +133,7 @@ namespace HealthCare340B.DataAccess
                                 
                             }
                         ).ToList(),
+
                         maxendTotalYearsExperience = (
                         db.TDoctorOffices.Where(dos => dos.DoctorId == d.Id && !dos.IsDelete).Select(dos => dos.EndDate.Value.Year)
                         ).Max(),
@@ -141,7 +142,8 @@ namespace HealthCare340B.DataAccess
                             from riwayarpraktek in db.TDoctorOffices
                             where riwayarpraktek.DoctorId == d.Id && !riwayarpraktek.IsDelete
                             select riwayarpraktek.StartDate.Year
-                        ).Min()
+                        ).Min(),
+
                     }
                     ).ToList();
 
@@ -199,6 +201,114 @@ namespace HealthCare340B.DataAccess
             catch (Exception e)
             {
                 response.Message = $"{HttpStatusCode.InternalServerError} - {e.Message}";
+                response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+
+            return response;
+        }
+
+        public VMResponse<List<VMMDoctor>?> GetByFilter2(string? location, string? doctorName, string? specialization, string? treatment)
+        {
+            VMResponse<List<VMMDoctor>?> response = new VMResponse<List<VMMDoctor>?>();
+            try
+            {
+
+                var query = from d in db.MDoctors
+                            join b in db.MBiodata on d.BiodataId equals b.Id
+                            join c in db.TCurrentDoctorSpecializations on d.Id equals c.DoctorId into temp
+                            from c in temp.DefaultIfEmpty()
+                            join s in db.MSpecializations on c.SpecializationId equals s.Id
+
+                            where d.IsDelete == false && s.Name.Contains(specialization)
+                            && (string.IsNullOrEmpty(doctorName) || b.Fullname.Contains(doctorName))
+                            select new VMMDoctor
+                            {
+                                Id = d.Id,
+                                Fullname = b.Fullname,
+                                SpecializationName = s.Name,
+                                ImagePath = b.ImagePath,
+                                DoctorOffice = (
+                                  from o in db.TDoctorOffices
+                                  join m in db.MMedicalFacilities on o.MedicalFacilityId equals m.Id
+                                  where o.DoctorId == d.Id && o.IsDelete == false
+                                  && (string.IsNullOrEmpty(location) || m.Name.Contains(location))
+                                  select new VMTDoctorOffice
+                                  {
+                                      Id = o.Id,
+                                      MedicalFacilityName = m.Name
+                                  }
+                                ).ToList(),
+                                Treatments = (
+                                  from t in db.TDoctorTreatments
+                                  where t.DoctorId == d.Id && t.IsDelete == false
+                                  && (string.IsNullOrEmpty(treatment) || t.Name.Contains(treatment))
+                                  select new VMTDoctorTreatment
+                                  {
+                                      Id = t.Id,
+                                      Name = t.Name
+                                  }
+                                ).ToList(),
+                                LastEducationEndYear = (
+                                  from e in db.MDoctorEducations
+                                  where e.DoctorId == d.Id && e.IsLastEducation == true && e.IsDelete == false
+                                  select e.EndYear
+                                ).FirstOrDefault(),
+                                JadwalPraktek = (
+                                  from h in db.TDoctorOfficeSchedules
+                                  join mfs in db.MMedicalFacilitySchedules on h.MedicalFacilityScheduleId equals mfs.Id
+                                  where h.DoctorId == d.Id && h.IsDelete == false
+                                  select new VMMMedicalFacilitySchedule
+                                  {
+                                      DoctorOfficeScheduleId = h.Id,
+                                      Day = mfs.Day,
+                                      TimeScheduleStart = mfs.TimeScheduleStart,
+                                      TimeScheduleEnd = mfs.TimeScheduleEnd
+                                  }
+                                ).ToList(),
+                                MedicalFacilityCategory = (
+                                  from mf in db.MMedicalFacilities
+                                  join mfc in db.MMedicalFacilityCategories on mf.MedicalFacilityCategoryId equals mfc.Id
+                                  join df in db.TDoctorOffices on mf.Id equals df.MedicalFacilityId
+                                  where mfc.IsDelete == false && df.DoctorId == d.Id
+                                  select mfc.Name
+                                ).FirstOrDefault(),
+                                Day = (
+                                from dos in db.TDoctorOfficeSchedules
+                                join mfs in db.MMedicalFacilitySchedules on dos.MedicalFacilityScheduleId equals mfs.Id
+                                join dof in db.TDoctorOffices on mfs.MedicalFacilityId equals dof.MedicalFacilityId
+                                where d.Id == dos.DoctorId && dos.IsDelete == false
+                                select mfs.Day
+                                ).ToList(),
+                                TimeScheduleEnd = (
+                                from dos in db.TDoctorOfficeSchedules
+                                join mfs in db.MMedicalFacilitySchedules on dos.MedicalFacilityScheduleId equals mfs.Id
+                                join dof in db.TDoctorOffices on mfs.MedicalFacilityId equals dof.MedicalFacilityId
+                                where d.Id == dos.DoctorId && dos.IsDelete == false
+                                select mfs.TimeScheduleEnd
+                                ).ToList(),
+                                TimeScheduleStart = (
+                                from dos in db.TDoctorOfficeSchedules
+                                join mfs in db.MMedicalFacilitySchedules on dos.MedicalFacilityScheduleId equals mfs.Id
+                                join dof in db.TDoctorOffices on mfs.MedicalFacilityId equals dof.MedicalFacilityId
+                                where d.Id == dos.DoctorId && dos.IsDelete == false
+                                select mfs.TimeScheduleStart
+                                ).ToList(),
+                            };
+
+                List<VMMDoctor> result = query.ToList();
+                Console.WriteLine($"Query returned {result.Count} doctors");
+
+                response.Data = result;
+                response.Message = (response.Data.Count > 0)
+                    ? $"{HttpStatusCode.OK} - {response.Data.Count} doctor(s) successfully fetched"
+                    : $"{HttpStatusCode.NoContent} - No doctor is found";
+                response.StatusCode = (response.Data.Count > 0)
+                    ? HttpStatusCode.OK
+                    : HttpStatusCode.NoContent;
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
                 response.StatusCode = HttpStatusCode.InternalServerError;
             }
 

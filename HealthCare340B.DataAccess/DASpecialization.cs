@@ -70,9 +70,23 @@ namespace HealthCare340B.DataAccess
                     from a in db.MSpecializations
                     join b in db.MUsers on a.CreatedBy equals b.Id
                     join c in db.MBiodata on b.BiodataId equals c.Id
+
+                    join d in db.MUsers on a.ModifiedBy equals d.Id into Haveuser from d in Haveuser.DefaultIfEmpty()
+                    join e in db.MBiodata on d.BiodataId equals e.Id into HaveBioModif from e in HaveBioModif.DefaultIfEmpty()
                     where a.IsDelete == false
                     && (a.Name.Contains(filter))
-                    select new VMMSpecialization(a, b, c)).ToList();
+                    select new VMMSpecialization
+                    {
+                       Id = a.Id,
+                       Name = a.Name,
+                       CreatedBy = a.CreatedBy,
+                       ModifiedBy = a.ModifiedBy,
+                       IsDelete = a.IsDelete,
+                       fullname = c.Fullname,
+                       fullnameMod = e.Fullname,
+                       IdUser = b.Id
+
+                    }).ToList();
                 response.Message = (response.Data.Count > 0)
                     ? $"{response.Data.Count} of Spesialisasi(s) found successfully."
                     : $"{HttpStatusCode.NoContent} - No data found";

@@ -113,7 +113,7 @@
                                             <p class="small">
                                                 @riwayarpraktek.StartDate.Year
                                                 -
-                                                @(riwayarpraktek.EndDate.HasValue && riwayarpraktek.EndDate.Value.Year == DateTime.Now.Year
+                                                @(riwayarpraktek.EndDate.HasValue && riwayarpraktek.EndDate.Value.Year >= DateTime.Now.Year
                                                     ? "Sekarang"
                                                     : riwayarpraktek.EndDate.HasValue ? riwayarpraktek.EndDate.Value.Year.ToString() : "")
                                             </p>

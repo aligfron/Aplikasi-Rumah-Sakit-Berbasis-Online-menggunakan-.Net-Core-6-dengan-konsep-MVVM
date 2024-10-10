@@ -19,6 +19,7 @@ namespace HealthCare340B.ViewModel
         public DateTime? DeletedOn { get; set; }
         public bool IsDelete { get; set; }
         public string? fullname { get; set; }
+        public string? fullnameMod { get; set; }
         public long IdUser { get; set; }
 
         public VMMSpecialization()

@@ -44,12 +44,48 @@
                         <form id="frmpage" method="get" asp-controller="Specialization" asp-action="Index" class="d-flex flex-wrap mx-md-5 mb-2">
                             <div class="input-group">
                                 <span class="input-group-text">Tampilkan Jumlah Data : </span>
-                                <select class="form-control" id="currPageSize" name="currPageSize">
+                                <select class="form-select" id="currPageSize" name="currPageSize" style="min-width: 150px;">
+                                    @if (ViewBag.PageSize == 5)
+                                    {
+                                        <option value="@ViewBag.PageSize" selected>
+                                            @ViewBag.PageSize
+                                        </option>
+                                    }
+                                    else
+                                    {
+                                        <option value="5">5</option>
+                                    }
+                                    @if (ViewBag.PageSize == 10)
+                                    {
+                                        <option value="@ViewBag.PageSize" selected>
+                                            @ViewBag.PageSize
+                                        </option>
+                                    }
+                                    else
+                                    {
+                                        <option value="10">10</option>
+                                    }
+                                    @if (ViewBag.PageSize == 15)
+                                    {
+                                        <option value="@ViewBag.PageSize" selected>
+                                            @ViewBag.PageSize
+                                        </option>
+                                    }
+                                    else
+                                    {
+                                        <option value="15">15</option>
+                                    }
+                                    @if (ViewBag.PageSize == 20)
+                                    {
+                                        <option value="@ViewBag.PageSize" selected>
+                                            @ViewBag.PageSize
+                                        </option>
+                                    }
+                                    else
+                                    {
+                                        <option value="20">20</option>
+                                    }
                                    
-                                    <option value="10">5</option>
-                                    <option value="10">10</option>
-                                    <option value="10">15</option>
-                                    <option value="10">20</option>
                                     
                                     
                                 </select>
@@ -90,19 +126,10 @@
                                                     <td class="text-center align-middle">@no</td>
                                                     <td class="text-center align-middle">@spesialisasi.fullname</td>
                                                     <td class="text-center align-middle">@spesialisasi.Name</td>
-                                                    @if (spesialisasi.ModifiedBy == spesialisasi.IdUser)
-                                                        {
-                                                        <td class="text-center align-middle">@spesialisasi.fullname</td>
-                                                            
-                                                        }else{
-                                                        <td class="text-center align-middle"> - </td>
-                                                        }
-                                                    
-
-
+                                                    <td class="text-center align-middle">@spesialisasi.fullnameMod</td>                         
                                                     <td class="text-center align-middle">
                                                         <div class="btn-group" role="group">
-                                                            <button data-id="@spesialisasi.Id" class="btn btn-primary" title="Edit" data-bs-toggle="modal" data-bs-target="#staticModal"><i class="fas fa-edit"></i></button>
+                                                            <button data-id="@spesialisasi.Id" class="btn btn-primary btnEdit" title="Edit" data-bs-toggle="modal" data-bs-target="#staticModal"><i class="fas fa-edit"></i></button>
                                                             <button data-id="@spesialisasi.Id" data-page="@Model.PageIndex" data-size="@ViewBag.PageSize" class="btn btn-danger" title="Delete" data-bs-toggle="modal" data-bs-target="#staticModal"><i class="fas fa-trash-alt"></i></button>
                                                         </div>
                                                     </td>
@@ -167,7 +194,7 @@
         $("#staticModalBody").load("/Specialization/Create/");
     });
 
-    $(".btn-primary").click(function (e) {
+    $(".btnEdit").click(function (e) {
         $("#staticModalBody").html("");
         $("#staticModalBody").load("/Specialization/Edit/" + $(this).data("id"));
     });

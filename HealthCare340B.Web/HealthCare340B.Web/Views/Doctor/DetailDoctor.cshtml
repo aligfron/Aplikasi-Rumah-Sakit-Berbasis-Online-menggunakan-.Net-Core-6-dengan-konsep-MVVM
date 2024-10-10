@@ -42,13 +42,21 @@
                             {
                                 <p>Belum Ada Spesialisasi</p>
                             }
+                            @if (Model.maxendTotalYearsExperience >= DateTime.Now.Year)
+                            {
+                                <p>@(DateTime.Now.Year - Model.minstartTotalYearsExperience) Tahun Pengalaman</p>
+                            }
+                            else
+                            {
+                                <p>@(Model.maxendTotalYearsExperience - Model.minstartTotalYearsExperience) Tahun Pengalaman</p>
+                            }
 
-                            <p>@(Model.maxendTotalYearsExperience - Model.minstartTotalYearsExperience) Tahun Pengalaman</p>
-                               
-                            
+
+
                         </div>
                         <div class="col-4 text-center">
-                            @if (ViewBag.IsOnline)
+                            
+                            @if (ViewBag.IsOnline && ViewBag.IsAvailable)
                             {
                                 <button class="btn btn-primary">Chat Dokter</button>
 
@@ -60,6 +68,11 @@
                                 {
                                     <p class="mt-3">Tidak Membuka layanan Online</p>
                                 }
+                            }
+                            else if (ViewBag.IsOnline && !ViewBag.IsAvailable)
+                            {
+                                <button class="btn btn-primary" disabled>Chat Dokter</button>
+                                <p class="mt-3">Bukan Jam Operasional</p>
                             }
                             else
                             {
@@ -105,7 +118,7 @@
                                                 <p class="small">
                                                     @riwayarpraktek.StartDate.Year
                                                     -
-                                                    @(riwayarpraktek.EndDate.HasValue && riwayarpraktek.EndDate.Value.Year == DateTime.Now.Year
+                                                    @(riwayarpraktek.EndDate.HasValue && riwayarpraktek.EndDate.Value.Year >= DateTime.Now.Year
                                                         ? "Sekarang"
                                                         : riwayarpraktek.EndDate.HasValue ? riwayarpraktek.EndDate.Value.Year.ToString() : "")
                                                 </p>
@@ -156,7 +169,7 @@
                             {
                                 @foreach (VMTDoctorOffice riwayarpraktek in Model.DoctorOffice)
                                 {
-                                    if (riwayarpraktek.EndDate.Value.Year == DateTime.Now.Year)
+                                    if (riwayarpraktek.EndDate.Value.Year >= DateTime.Now.Year)
                                     {
                                         <div style="border: 2px solid var(--bs-primary); border-radius: 5px; padding: 10px;  margin-top: 10px;">
                                             <div class="row">
@@ -202,7 +215,7 @@
                                                         <div class="col-2">
                                                         </div>
                                                         <div class="col-4 d-flex justify-content-center align-items-center">
-                                                            <button class="btn btn-primary">Buat Janji</button>
+                                                            <button data-id="@Model.Id" class="btn btn-primary btnAppointment" data-bs-toggle="modal" data-bs-target="#staticModal">Buat Janji</button>
                                                         </div>
 
                                                     </div>
@@ -296,7 +309,7 @@
 @if (@Context.Session.GetString("userId") != null && @Context.Session.GetString("userRoleCode") == "ROLE_PASIEN")
 {
     <script>
-        $("#btnAppointment").click(function (e) {
+        $(".btnAppointment").click(function (e) {
             $("#staticModalBody").html(spinner);
             $("#staticModalBody").load("/Appointment/Create/" + $(this).attr("data-id"));
             $("#staticModal").modal("show");
@@ -306,7 +319,7 @@
 else if (@Context.Session.GetString("userId") != null && @Context.Session.GetString("userRoleCode") != "ROLE_PASIEN")
 {
     <script>
-        $("#btnAppointment").click(function (e) {
+        $(".btnAppointment").click(function (e) {
             toastAlert("You're not authorized!", "error")
         });
     </script>
@@ -314,7 +327,7 @@ else if (@Context.Session.GetString("userId") != null && @Context.Session.GetStr
 else
 {
     <script>
-        $("#btnAppointment").click(function (e) {
+        $(".btnAppointment").click(function (e) {
             $("#staticModalBody").html(spinner);
             var currentUrl = $(location).attr('href')
             $("#staticModalBody").load(`/Auth/Login`);

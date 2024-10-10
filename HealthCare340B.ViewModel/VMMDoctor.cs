@@ -80,10 +80,13 @@ namespace HealthCare340B.ViewModel
         public bool IsOnline { get; set; }
         public bool IsAvailable { get; set; }
 
-        public string MedicalFacilityCategory { get; set; }
-        public string MedicalFacilityScheduleDay { get; set; }
+        public string? MedicalFacilityCategory { get; set; }
+        public string? MedicalFacilityScheduleDay { get; set; }
         public TimeSpan? MedicalFacilityScheduleStartTime { get; set; }
         public TimeSpan? MedicalFacilityScheduleEndTime { get; set; }
-        
+        public List<string>? Day { get; set; }
+        public List<string>? TimeScheduleStart { get; set; }
+        public List<string>? TimeScheduleEnd { get; set; }
+
     }
 }

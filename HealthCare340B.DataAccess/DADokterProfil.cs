@@ -272,18 +272,17 @@ namespace HealthCare340B.DataAccess
                                         MedicalFacilityCategory = mfc.Name,
                                         Servicename = service.Name,
                                         JadwalPraktek = (
-                                                from mfs in db.MMedicalFacilitySchedules
-                                                join mf in db.MMedicalFacilities on mfs.MedicalFacilityId equals mf.Id
-                                                join mfc in db.MMedicalFacilityCategories on mf.MedicalFacilityCategoryId equals mfc.Id
-                                                join dof in db.TDoctorOffices on mf.Id equals dof.MedicalFacilityId
-                                                where dof.DoctorId == DetailDokter.Id && mfs.IsDelete == false && mfs.MedicalFacilityId == riwayarpraktek.MedicalFacilityId
-                                                select new VMMMedicalFacilitySchedule
-                                                {
-                                                    Day = mfs.Day,
-                                                    TimeScheduleStart = mfs.TimeScheduleStart,
-                                                    TimeScheduleEnd = mfs.TimeScheduleEnd
+                                               from dos in db.TDoctorOfficeSchedules
+                                               join mfs in db.MMedicalFacilitySchedules on dos.MedicalFacilityScheduleId equals mfs.Id
+                                               join dof in db.TDoctorOffices on mfs.MedicalFacilityId equals dof.MedicalFacilityId
+                                               where dos.DoctorId == DetailDokter.Id && dos.IsDelete == false && mfs.MedicalFacilityId == d.Id
+                                               select new VMMMedicalFacilitySchedule
+                                               {
+                                                   Day = mfs.Day,
+                                                   TimeScheduleStart = mfs.TimeScheduleStart,
+                                                   TimeScheduleEnd = mfs.TimeScheduleEnd
 
-                                                }
+                                               }
                                             ).ToList(),
                                         HargaKonsulMulai = (
                                                 from dotp in db.TDoctorOfficeTreatmentPrices
@@ -350,7 +349,8 @@ namespace HealthCare340B.DataAccess
 
                 //detail dokter tambahan
                 DetailDokter.JadwalPraktek = (
-                                 from mfs in db.MMedicalFacilitySchedules
+                                 from dos in db.TDoctorOfficeSchedules
+                                 join mfs in db.MMedicalFacilitySchedules on dos.MedicalFacilityScheduleId equals mfs.Id
                                  join mf in db.MMedicalFacilities on mfs.MedicalFacilityId equals mf.Id
                                  join mfc in db.MMedicalFacilityCategories on mf.MedicalFacilityCategoryId equals mfc.Id
                                  join dof in db.TDoctorOffices on mf.Id equals dof.MedicalFacilityId
