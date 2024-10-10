@@ -32,11 +32,17 @@ namespace HealthCare340B.Web.Controllers
 
             return _userId != null;
         }
-        private bool isInRole(string role)
+        private bool isInRolePasien()
         {
             _roleCode = HttpContext.Session.GetString("userRoleCode") ?? null;
 
-            return _roleCode == role;
+            return _roleCode == "ROLE_PASIEN";
+        }
+        private bool isInRoleDokter()
+        {
+            _roleCode = HttpContext.Session.GetString("userRoleCode") ?? null;
+
+            return _roleCode == "ROLE_DOKTER";
         }
 
         public async Task<IActionResult> Index()
@@ -66,9 +72,6 @@ namespace HealthCare340B.Web.Controllers
                     return RedirectToAction("IndexDoctorProfile");
 
                 case "ROLE_ADMIN":
-                    return RedirectToAction("IndexAdminProfile");
-
-                case "ROLE_FASKES":
                     break;
             }
 
@@ -81,7 +84,7 @@ namespace HealthCare340B.Web.Controllers
             {
                 HttpContext.Session.SetString("errMsg", "Please login first!");
             }
-            if (!isInRole("ROLE_DOKTER"))
+            if (!isInRoleDokter())
             {
                 HttpContext.Session.SetString("errMsg", "You are not authorized!");
                 return RedirectToAction("Index", "Home");
@@ -108,30 +111,7 @@ namespace HealthCare340B.Web.Controllers
             {
                 HttpContext.Session.SetString("errMsg", "Please login first!");
             }
-            if (!isInRole("ROLE_PASIEN"))
-            {
-                HttpContext.Session.SetString("errMsg", "You are not authorized!");
-                return RedirectToAction("Index", "Home");
-            }
-            ViewBag.Title = "Profil";
-            ViewBag.imgFolder = imageFolder;
-
-            ViewBag.Breadcrumb = new List<BreadcrumbItem>
-            {
-                new BreadcrumbItem { Name = "Beranda", Controller = "Home", Action = "Index" },
-                new BreadcrumbItem { Name = "Profile", IsActive = true }
-            };
-
-            return View();
-        }
-
-        public async Task<IActionResult> IndexAdminProfile()
-        {
-            if (!isInSession())
-            {
-                HttpContext.Session.SetString("errMsg", "Please login first!");
-            }
-            if (!isInRole("ROLE_ADMIN"))
+            if (!isInRolePasien())
             {
                 HttpContext.Session.SetString("errMsg", "You are not authorized!");
                 return RedirectToAction("Index", "Home");
@@ -198,6 +178,19 @@ namespace HealthCare340B.Web.Controllers
             var location = await profile.GetAllLocation();
             ViewBag.Location = location ?? new List<VMMLocation>();
 
+            //List<VMMBiodataAddress>? data = new List<VMMBiodataAddress>();
+            //try
+            //{
+            //    int BioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
+            //    data = await profile.GetBioAddressByBioId(BioId);
+            //}
+            //catch (Exception ex)
+            //{
+            //    HttpContext.Session.SetString("errMsg", ex.Message);
+            //}
+
+            //ViewBag.Label = data.Label;
+
             return View();
         }
 
@@ -227,10 +220,12 @@ namespace HealthCare340B.Web.Controllers
         {
             ViewBag.Title = "Daftar Alamat";
 
+            long bioId = (long)HttpContext.Session.GetInt32("userBiodataId");
+
             List<VMMBiodataAddress>? data = new List<VMMBiodataAddress>();
             try
             {
-                data = await profile.GetByFilter(filter);
+                data = await profile.GetByFilter(filter, bioId);
             }
             catch (Exception ex)
             {
@@ -334,7 +329,7 @@ namespace HealthCare340B.Web.Controllers
             try
             {
                 int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
-                data = await profile.GetCustomerByBioId(bioId);
+                data = await profile.GetBioById(bioId);
             }
             catch (Exception ex)
             {
@@ -355,7 +350,7 @@ namespace HealthCare340B.Web.Controllers
             try
             {
                 int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
-                data = await profile.GetCustomerByBioId(bioId);
+                data = await profile.GetBioById(bioId);
             }
             catch (Exception ex)
             {
@@ -384,7 +379,7 @@ namespace HealthCare340B.Web.Controllers
             try
             {
                 int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
-                data = await profile.GetCustomerByBioId(bioId);
+                data = await profile.GetBioById(bioId);
             }
             catch (Exception ex)
             {
@@ -407,7 +402,7 @@ namespace HealthCare340B.Web.Controllers
             try
             {
                 int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
-                data = await profile.GetCustomerByBioId(bioId);
+                data = await profile.GetBioById(bioId);
             }
             catch (Exception ex)
             {
@@ -432,7 +427,7 @@ namespace HealthCare340B.Web.Controllers
             try
             {
                 int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
-                data = await profile.GetCustomerByBioId(bioId);
+                data = await profile.GetBioById(bioId);
             }
             catch (Exception ex)
             {
@@ -445,6 +440,7 @@ namespace HealthCare340B.Web.Controllers
                 data = new VMMCustomer();
             }
             ViewBag.Password = data.Password;
+            ViewBag.Email = data.Email;
             return View(data);
         }
 
@@ -495,7 +491,7 @@ namespace HealthCare340B.Web.Controllers
             }
             return (response);
         }
-        public async Task<IActionResult> EditSpecializationDoctor(long id)
+        public async Task<IActionResult> EditSpecializationDoctor(int id)
         {
             VMTCurrentDoctorSpecialization? data = await profile.GetByIdSpecializationDoctor(id);
             ViewBag.Specialization = await specialization.getByFilter("");
@@ -602,7 +598,24 @@ namespace HealthCare340B.Web.Controllers
             Console.WriteLine("Received token: " + data.Token);
             return await profile.VerifyOTPAsync(data);
         }
+
+        [HttpPost]
+        public async Task<VMResponse<VMTResetPassword>?> CreateResetPasswordAsync([FromBody] VMTResetPassword data)
+        {
+            try
+            {
+                data.CreatedBy = long.Parse(HttpContext.Session.GetString("userId")!);
+                return await profile.CreateResetPassword(data);
+
+            }
+            catch(Exception e)
+            {
+                throw;
+            }
+        }
     }
+
+
     public class VMToken
     {
         public string Token { get; set; }

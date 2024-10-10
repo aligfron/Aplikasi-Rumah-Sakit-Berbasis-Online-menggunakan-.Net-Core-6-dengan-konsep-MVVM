@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using HealthCare340B.DataModel;
 using Microsoft.CodeAnalysis;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace HealthCare340B.Web.Models
 {
@@ -68,6 +69,98 @@ namespace HealthCare340B.Web.Models
                 throw new Exception($"DokterModel.GetAll: {e.Message}");
             }
         }
+
+        public async Task<List<VMMLocation>?> GetAllLocation()
+        {
+            VMResponse<List<VMMLocation>>? apiResponse = null;
+            try
+            {
+                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync($"{apiUrl}Doctor/GetAllLocation");
+
+                if (apiResponseMsg != null)
+                {
+                    if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
+                    {
+                        apiResponse = JsonConvert.DeserializeObject<VMResponse<List<VMMLocation>>?>(await apiResponseMsg.Content.ReadAsStringAsync());
+                        return apiResponse?.Data;
+                    }
+                    else
+                    {
+                        throw new Exception($"Error: {apiResponseMsg.StatusCode}, {await apiResponseMsg.Content.ReadAsStringAsync()}");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Dokter API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"DokterModel.GetAllLocation: {e.Message}");
+            }
+        }
+
+
+        public async Task<VMMLocation?> GetLocationById(string? id)
+        {
+            VMResponse<VMMLocation>? apiResponse = null;
+            try
+            {
+                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync($"{apiUrl}Doctor/GetLocationById/{id}");
+
+                if (apiResponseMsg != null)
+                {
+                    if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
+                    {
+                        apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMLocation>?>(await apiResponseMsg.Content.ReadAsStringAsync());
+                        return apiResponse?.Data;
+                    }
+                    else
+                    {
+                        throw new Exception($"Error: {apiResponseMsg.StatusCode}, {await apiResponseMsg.Content.ReadAsStringAsync()}");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Dokter API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"DokterModel.GetAllLocation: {e.Message}");
+            }
+        }
+
+        public async Task<VMMSpecialization?> GetSpecializationById(string? id)
+        {
+            VMResponse<VMMSpecialization>? apiResponse = null;
+            try
+            {
+                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync($"{apiUrl}Specialization/{id}");
+
+                if (apiResponseMsg != null)
+                {
+                    if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
+                    {
+                        apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMSpecialization>?>(await apiResponseMsg.Content.ReadAsStringAsync());
+                        return apiResponse?.Data;
+                    }
+                    else
+                    {
+                        throw new Exception($"Error: {apiResponseMsg.StatusCode}, {await apiResponseMsg.Content.ReadAsStringAsync()}");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Specialization API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"DokterModel.GetSpecializationById: {e.Message}");
+            }
+        }
+
 
         public async Task<List<VMMDoctor>?> GetByFilter(string? location, string? doctorName, string? specialization, string? treatment)
         {

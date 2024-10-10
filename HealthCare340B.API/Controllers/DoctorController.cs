@@ -11,10 +11,12 @@ namespace HealthCare340B.API.Controllers
     public class DoctorController : ControllerBase
     {
         private readonly DADoctor doctor;
+        private readonly DAMedicalFacility medfac;
 
         public DoctorController(HealthCare340BContext _db)
         {
             doctor = new DADoctor(_db);
+            medfac = new DAMedicalFacility(_db);
         }
 
         [HttpGet("[action]")]
@@ -37,6 +39,31 @@ namespace HealthCare340B.API.Controllers
             {
                 // Console Logging
                 Console.WriteLine("DoctorController.GetAll: " + ex.Message);
+
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("[action]")]
+        public async Task<ActionResult> GetAllLocation()
+        {
+            try
+            {
+                VMResponse<List<VMMLocation>?> response = await Task.Run(() => medfac.GetAllLocation());
+                if (response.Data != null && response.Data.Count > 0)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    Console.WriteLine(response.Message);
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Console Logging
+                Console.WriteLine("DoctorController.GetAllLocation: " + ex.Message);
 
                 return BadRequest(ex.Message);
             }
@@ -89,6 +116,33 @@ namespace HealthCare340B.API.Controllers
             {
                 // Console Logging
                 Console.WriteLine("DoctorController.GetById: " + e.Message);
+
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("[action]/{id?}")]
+        public async Task<ActionResult> GetLocationById(long? id)
+        {
+            try
+            {
+                if (id == null)
+                    throw new ArgumentNullException();
+                VMResponse<VMMLocation?> response = await Task.Run(() => medfac.GetLocationById((long)id));
+                if (response.Data != null)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    Console.WriteLine(response.Message);
+                    return NoContent();
+                }
+            }
+            catch (Exception e)
+            {
+                // Console Logging
+                Console.WriteLine("DoctorController.GetLocationById: " + e.Message);
 
                 return BadRequest(e.Message);
             }

@@ -12,6 +12,7 @@ namespace HealthCare340B.ViewModel
         public long? BiodataId { get; set; }
         public string? Str { get; set; }
         public long CreatedBy { get; set; }
+        public string? LocationId { get; set; }
         public DateTime CreatedOn { get; set; }
         public long? ModifiedBy { get; set; }
         public DateTime? ModifiedOn { get; set; }
@@ -43,17 +44,7 @@ namespace HealthCare340B.ViewModel
         public List<VMTDoctorOffice>? MinStarDate { get; set; }
         public int? minstartTotalYearsExperience { get; set; }
         public int? maxendTotalYearsExperience { get; set; }
-        public int TotalYearsExperience
-        {
-            get
-            {
-                if (LastEducationEndYear != null && int.TryParse(LastEducationEndYear, out int endYear))
-                {
-                    return DateTime.Now.Year - endYear;
-                }
-                return 0;
-            }
-        }
+        public int TotalYearsExperience { get; set; }
         //pendidikan
         public List<VMMDoctorEducation>? InstitutionName { get; set; }
 
@@ -85,7 +76,7 @@ namespace HealthCare340B.ViewModel
                 return 0;
             }
         }
-
+        public int? totalExpYears { get; set; }
         public bool IsOnline { get; set; }
         public bool IsAvailable { get; set; }
 
@@ -93,6 +84,7 @@ namespace HealthCare340B.ViewModel
         public string MedicalFacilityScheduleDay { get; set; }
         public TimeSpan? MedicalFacilityScheduleStartTime { get; set; }
         public TimeSpan? MedicalFacilityScheduleEndTime { get; set; }
+        public List<VMMMedicalFacility>? MedicalFacilities { get; set; }
 
     }
 }

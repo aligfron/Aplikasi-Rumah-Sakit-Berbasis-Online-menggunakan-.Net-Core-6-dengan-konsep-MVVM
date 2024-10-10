@@ -194,7 +194,7 @@ namespace HealthCare340B.Web.Models
         }
 
         // ali model spesialisasi doctor
-        public async Task<VMTCurrentDoctorSpecialization?> GetByIdSpecializationDoctor(long id)
+        public async Task<VMTCurrentDoctorSpecialization?> GetByIdSpecializationDoctor(int id)
         {
             VMTCurrentDoctorSpecialization? data = null;
             try
@@ -371,14 +371,14 @@ namespace HealthCare340B.Web.Models
             return apiResponse!.Data;
         }
 
-        public async Task<List<VMMBiodataAddress>?> GetByFilter(string filter)
+        public async Task<List<VMMBiodataAddress>?> GetByFilter(string filter, long bioId)
         {
             VMResponse<List<VMMBiodataAddress>>? apiResponse = null;
             try
             {
                 HttpResponseMessage apiResponseMsg = await httpClient.GetAsync(
                     (string.IsNullOrEmpty(filter))
-                        ? $"{apiUrl}TabAlamat/GetAll"
+                        ? $"{apiUrl}TabAlamat/GetBioAddressByBioId/{bioId}"
                         : $"{apiUrl}TabAlamat/GetByFilter/{filter}"
                 );
 
@@ -476,6 +476,38 @@ namespace HealthCare340B.Web.Models
             return data;
         }
 
+        public async Task<VMMBiodataAddress?> GetBioAddressByBioId(int id)
+        {
+            VMMBiodataAddress? data = null;
+
+            try
+            {
+                VMResponse<VMMBiodataAddress>? apiResponse =
+                    JsonConvert.DeserializeObject<VMResponse<VMMBiodataAddress>?>(
+                        await httpClient.GetStringAsync($"{apiUrl}TabAlamat/GetBioAddressByBioId/{id}")
+                    );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode == HttpStatusCode.OK)
+                        data = apiResponse.Data;
+                    else
+                        throw new Exception(apiResponse.Message);
+                }
+                else
+                {
+                    throw new Exception("TabAlamat API cannot be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                //Logging
+                throw new Exception($"ProfileModel.GetBioAddressByBioId: {e.Message}");
+            }
+
+            return data;
+        }
+
         public async Task<VMMCustomer?> GetByIdCustomerProfile(int id)
         {
             VMMCustomer? data = null;
@@ -537,6 +569,40 @@ namespace HealthCare340B.Web.Models
             {
                 //Logging
                 throw new Exception($"ProfileModel.GetByIdAlamat: {e.Message}");
+            }
+
+            return data;
+        }
+
+        public async Task<VMMCustomer?> GetBioById(int bioId)
+        {
+            VMMCustomer? data = null;
+
+            try
+            {
+                VMResponse<VMMCustomer>? apiResponse =
+                    JsonConvert.DeserializeObject<VMResponse<VMMCustomer>?>(
+                        await httpClient.GetStringAsync(
+                            $"{apiUrl}TabProfile/GetBioById/{bioId}"
+                        )
+                    );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode == HttpStatusCode.OK)
+                        data = apiResponse.Data;
+                    else
+                        throw new Exception(apiResponse.Message);
+                }
+                else
+                {
+                    throw new Exception("TabProfile API cannot be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                //Logging
+                throw new Exception($"ProfileModel.GetBioById: {e.Message}");
             }
 
             return data;
@@ -918,6 +984,41 @@ namespace HealthCare340B.Web.Models
             catch (Exception e)
             {
                 throw new Exception($"ProfileModel.VerifyOTPAsync: {e.Message}");
+            }
+
+            return apiResponse;
+        }
+
+        public async Task<VMResponse<VMTResetPassword>?> CreateResetPassword(VMTResetPassword data)
+        {
+            VMResponse<VMTResetPassword>? apiResponse = new VMResponse<VMTResetPassword>();
+
+            try
+            {
+                jsonData = JsonConvert.SerializeObject(data);
+                content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                apiResponse = JsonConvert.DeserializeObject<VMResponse<VMTResetPassword>?>(
+                    await httpClient
+                        .PostAsync($"{apiUrl}TabProfile/CreateResetPassword", content)
+                        .Result.Content.ReadAsStringAsync()
+                );
+
+                if (apiResponse != null)
+                {
+                    if (apiResponse.StatusCode != HttpStatusCode.Created)
+                    {
+                        throw new Exception(apiResponse.Message);
+                    }
+                }
+                else
+                {
+                    throw new Exception("TabAlamat API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"ProfileModel.CreateResetPassword: {e.Message}");
             }
 
             return apiResponse;

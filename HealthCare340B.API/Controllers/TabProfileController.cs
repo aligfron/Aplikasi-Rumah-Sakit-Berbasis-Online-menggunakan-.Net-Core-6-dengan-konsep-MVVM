@@ -42,6 +42,30 @@ namespace HealthCare340B.API.Controllers
         }
 
         [HttpGet("[action]/{id?}")]
+        public async Task<ActionResult> GetBioById(long id)
+        {
+            try
+            {
+                VMResponse<VMMCustomer> response = await Task.Run(() => tabProfile.GetBioById(id));
+                if (response.Data != null)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    Console.WriteLine(response.Message);
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("TabProfileController.GetCustomerByBioId: " + ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+        [HttpGet("[action]/{id?}")]
         public async Task<ActionResult> GetCustomerByBioId(long id)
         {
             try
@@ -251,6 +275,22 @@ namespace HealthCare340B.API.Controllers
                 return BadRequest(ex.Message);
             }
 
+        }
+
+        [HttpPost("[action]")]
+        public async Task<ActionResult> CreateResetPassword(VMTResetPassword data)
+        {
+            try
+            {
+                return Created("",  await Task.Run(() => tabProfile.CreateResetPassword(data)));
+            }
+            catch (Exception e)
+            {
+                //Console Logging
+                Console.WriteLine("TabProfileController.CreateResetPassword: " + e.Message);
+
+                return BadRequest(e.Message);
+            }
         }
 
     }

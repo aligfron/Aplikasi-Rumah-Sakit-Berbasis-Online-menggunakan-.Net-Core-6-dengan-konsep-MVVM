@@ -67,6 +67,29 @@ namespace HealthCare340B.API.Controllers
             }
         }
 
+        [HttpGet("[action]/{id?}")]
+        public async Task<ActionResult> GetBioAddressByBioId(long? id)
+        {
+            try
+            {
+                VMResponse<List<VMMBiodataAddress>> response = await Task.Run(() => tabAlamat.GetBioAddressByBioId(id));
+                if (response.Data != null)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    Console.WriteLine(response.Message);
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("TabAlamatController.GetBioAddressByBioId: " + ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet("[action]/{filter?}")]
         public async Task<ActionResult> GetByFilter(string? filter)
         {

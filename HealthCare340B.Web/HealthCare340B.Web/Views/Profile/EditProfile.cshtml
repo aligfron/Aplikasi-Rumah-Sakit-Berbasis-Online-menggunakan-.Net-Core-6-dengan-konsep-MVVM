@@ -3,13 +3,7 @@
 *@
 @model VMMCustomer
 @{
-
     Layout = null;
-
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 
     // Remove the prefix +62 or leading 0 from the MobilePhone for display purposes
     string displayMobilePhone = @Model.MobilePhone;
@@ -29,13 +23,12 @@
             <form id="frmUpdateProfile">
                 <div class="form-group">
                     <label style="font-weight: bold;" for="fullName">Nama Lengkap*</label>
-                    <input class="form-control" type="text" name="Fullname" value="@Model.Fullname" />
+                    <input class="form-control" type="text" name="Fullname" value="@Model.Fullname" required maxlength="100" minlength="3" />
                 </div>
                 <div class="form-group">
                     <label for="birthDate">Tanggal Lahir</label>
                     <div class="input-group">
-                        <input style="border-right: 0;" type="date" name="Dob" class="form-control" id="birthDate" value="@Model.Dob?.ToString("yyyy-MM-dd")">
-                        
+                        <input style="border-right: 0;" type="date" name="Dob" class="form-control" id="birthDate" value="@Model.Dob?.ToString("yyyy-MM-dd")" max="@DateTime.Today.ToString("yyyy-MM-dd")">
                     </div>
                 </div>
                 <div class="form-group">
@@ -44,7 +37,7 @@
                         <div class="input-group-prepend">
                             <span style="background-color: white;" class="input-group-text">+62</span>
                         </div>
-                        <input type="text" class="form-control" name="MobilePhone" id="phoneNumber" value="@displayMobilePhone">
+                        <input type="text" class="form-control" name="MobilePhone" id="phoneNumber" value="@displayMobilePhone" required digits="true" minlength="10" maxlength="15">
                     </div>
                 </div>
 
@@ -60,23 +53,13 @@
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+
 <script>
     $("#staticModalLabel").text("@ViewBag.Title");
+
     $(document).ready(function () {
-        // Initialize datepicker
-        $(".date").datepicker({
-            dateFormat: "dd/mm/yy",
-            changeMonth: true,
-            changeYear: true,
-            yearRange: "-100:+0", // Allows selecting dates from 100 years ago to the current year
-            maxDate: 0
-        });
-
-        // Click event on calendar icon to open datepicker
-        $(".input-group-text").click(function () {
-            $(this).prev("input.date").datepicker("show");
-        });
-
         // Form validation
         $("#frmUpdateProfile").validate({
             rules: {
@@ -86,9 +69,11 @@
                     minlength: 3
                 },
                 Dob: {
+                    required: true,
                     date: true
                 },
                 MobilePhone: {
+                    required: true,
                     digits: true,
                     minlength: 10,
                     maxlength: 15
@@ -111,6 +96,7 @@
 
                 console.log("form valid");
                 console.log($("#frmUpdateProfile").serialize());
+
                 $.ajax({
                     url: "/Profile/EditProfile",
                     type: "post",
@@ -139,5 +125,4 @@
             $("#frmUpdateProfile")[0].reset();
         });
     });
-
 </script>

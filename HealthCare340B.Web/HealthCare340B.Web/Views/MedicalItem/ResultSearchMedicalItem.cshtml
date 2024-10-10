@@ -123,10 +123,10 @@
     <div class="mt-4 d-flex justify-content-between">
         <span>Page @Model.PageIndex of @Model.TotalPages (Total Data: @Model.TotalData)</span>
         <div role="group" class="btn-group">
-            <a id="btnPrev" class="btn btn-secondary @(Model.HasPreviousPage ? "" : "disabled")" href="javascript:void(0)" data-pagenumber="@(Model.PageIndex - 1)" data-currentpagesize="@ViewBag.PageSize">
+            <a id="btnPrev" class="btn btn-secondary @(Model.HasPreviousPage ? "" : "disabled")" href="javascript:void(0)" data-filter="" data-pagenumber="@(Model.PageIndex - 1)" data-currentpagesize="@ViewBag.PageSize">
                 <i class="fas fa-backward"></i>
             </a>
-            <a id="btnNext" class="btn btn-secondary @(Model.HasNextPage ? "" : "disabled")" href="javascript:void(0)" data-pagenumber="@(Model.PageIndex + 1)" data-currentpagesize="@ViewBag.PageSize">
+            <a id="btnNext" class="btn btn-secondary @(Model.HasNextPage ? "" : "disabled")" href="javascript:void(0)" data-filter="" data-pagenumber="@(Model.PageIndex + 1)" data-currentpagesize="@ViewBag.PageSize">
                 <i class="fas fa-forward"></i>
             </a>
         </div>
@@ -209,6 +209,14 @@
                 url: "/MedicalItem/ResultSearchMedicalItem",
                 type: "post",
                 data: {
+                    "dataFilter": {
+                        Indication : "@ViewBag.Indication",
+                        Name : "@ViewBag.Name",
+                        MedicalItemCategoryId: "@ViewBag.MedicalItemCategoryId",
+                        PriceMax : "@ViewBag.PriceMax",
+                        PriceMin: "@ViewBag.PriceMin",
+                        IsSegmentation : "@ViewBag.Segmentation"
+                    },
                     "pageNumber": pageNumber,
                     "currentPageSize": currentPageSize,
                 },

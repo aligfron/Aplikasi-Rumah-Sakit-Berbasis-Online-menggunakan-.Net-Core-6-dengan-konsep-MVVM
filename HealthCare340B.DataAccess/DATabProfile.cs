@@ -1,5 +1,6 @@
 ﻿using HealthCare340B.DataModel;
 using HealthCare340B.ViewModel;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
@@ -107,6 +108,48 @@ namespace HealthCare340B.DataAccess
                    : HttpStatusCode.NoContent;
                 response.Message = (response.Data != null)
                     ? $"{HttpStatusCode.OK} Profile Customer successfully created!"
+                    : $"{HttpStatusCode.NoContent} - Profile Customer does not exist!";
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+            }
+            return response;
+        }
+
+        public VMResponse<VMMCustomer> GetBioById(long id)
+        {
+            VMResponse<VMMCustomer> response = new VMResponse<VMMCustomer>();
+            try
+            {
+                response.Data = (
+                    from b in db.MBiodata
+                    join u in db.MUsers on b.Id equals u.BiodataId
+                    join m in db.MCustomers on b.Id equals m.BiodataId into temp
+                    from m in temp.DefaultIfEmpty()
+                    where b.IsDelete == false && b.Id == id
+                    select new VMMCustomer
+                    {
+                        Id = m.Id != null ? m.Id : 0 ,
+                        BiodataId = b.Id,
+                        Fullname = b.Fullname,
+                        MobilePhone = b.MobilePhone,
+                        Email = u.Email,
+                        Password = u.Password,
+                        CreatedBy = m.CreatedBy != null ? m.CreatedBy : 0,
+                        CreatedOn = m.CreatedOn != null ? m.CreatedOn : DateTime.Now,
+                        ModifiedBy = m.ModifiedBy != null ? m.ModifiedBy : 0,
+                        ModifiedOn = m.ModifiedOn != null ? m.ModifiedOn : DateTime.Now,
+                        DeletedOn = m.DeletedOn != null ? m.DeletedOn : DateTime.Now,
+                        DeletedBy = m.DeletedBy != null ? m.DeletedBy : 0,
+                        IsDelete = m.IsDelete != null ? m.IsDelete : false
+                    }
+                ).FirstOrDefault();
+                response.StatusCode = (response.Data != null)
+                   ? HttpStatusCode.OK
+                   : HttpStatusCode.NoContent;
+                response.Message = (response.Data != null)
+                    ? $"{HttpStatusCode.OK} Profile Customer successfully fetched!"
                     : $"{HttpStatusCode.NoContent} - Profile Customer does not exist!";
             }
             catch (Exception ex)
@@ -272,7 +315,7 @@ namespace HealthCare340B.DataAccess
                             IsDelete = updatedData.IsDelete
                         };
 
-                        response.Message = "Email updated successfully. Please verify OTP.";
+                        response.Message = "Email updated successfully.";
                         response.StatusCode = HttpStatusCode.OK;
                     }
                     else
@@ -348,7 +391,7 @@ namespace HealthCare340B.DataAccess
                             IsDelete = updatedData.IsDelete
                         };
 
-                        response.Message = "Email updated successfully. Please verify OTP.";
+                        response.Message = "Password updated successfully.";
                         response.StatusCode = HttpStatusCode.OK;
                     }
                     else
@@ -630,9 +673,85 @@ namespace HealthCare340B.DataAccess
         }
 
 
+        public VMResponse<VMTResetPassword> GetResetPasswordById(long id)
+        {
+            VMResponse<VMTResetPassword> response = new VMResponse<VMTResetPassword>();
+            try
+            {
+                response.Data = (
+                    from m in db.TResetPasswords
+                    
+                    where m.IsDelete == false && m.Id == id
+                    select new VMTResetPassword
+                    {
+                        Id = m.Id,
+                        OldPassword = m.OldPassword,
+                        NewPassword = m.NewPassword,
+                        ResetFor = m.ResetFor,
+                        CreatedBy = m.CreatedBy,
+                        CreatedOn = m.CreatedOn,
+                        ModifiedBy = m.ModifiedBy,
+                        ModifiedOn = m.ModifiedOn,
+                        DeletedOn = m.DeletedOn,
+                        DeletedBy = m.DeletedBy,
+                        IsDelete = m.IsDelete,
+                    }
+                ).FirstOrDefault();
+                response.StatusCode = (response.Data != null)
+                   ? HttpStatusCode.OK
+                   : HttpStatusCode.NoContent;
+                response.Message = (response.Data != null)
+                    ? $"{HttpStatusCode.OK} Data Reset Password successfully created!"
+                    : $"{HttpStatusCode.NoContent} - Data Reset Password does not exist!";
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+            }
+            return response;
+        }
 
+        public VMResponse<VMTResetPassword> CreateResetPassword(VMTResetPassword data)
+        {
+            VMResponse<VMTResetPassword> response = new VMResponse<VMTResetPassword>();
+            using (IDbContextTransaction dbTran = db.Database.BeginTransaction())
+            {
+                try
+                {
 
+                    TResetPassword newData = new TResetPassword();
+                    newData.OldPassword = data.OldPassword;
+                    newData.NewPassword = data.NewPassword;
+                    newData.ResetFor = "Reset Password";
+                    newData.CreatedBy = data.CreatedBy;
+                    newData.CreatedOn = DateTime.Now;
+                    newData.IsDelete = false;
 
+                    db.Add(newData);
+                    db.SaveChanges();
 
+                    dbTran.Commit();
+
+                    response.Data = GetResetPasswordById(newData.Id).Data;
+
+                    response.StatusCode = HttpStatusCode.Created;
+                    response.Message = $"{HttpStatusCode.Created} - New password reset has been successfully created";
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    dbTran.Rollback(); // Rollback transaction on error
+                    var innerException = dbEx.InnerException?.Message;
+                    response.Message = $"{HttpStatusCode.InternalServerError} - {dbEx.Message} - {innerException}";
+                    response.StatusCode = HttpStatusCode.InternalServerError;
+                }
+                catch (Exception ex)
+                {
+                    dbTran.Rollback(); // Rollback transaction on error
+                    response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+                    response.StatusCode = HttpStatusCode.InternalServerError;
+                }
+                return response;
+            }
+        }
     }
 }

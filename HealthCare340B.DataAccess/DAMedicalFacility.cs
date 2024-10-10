@@ -25,6 +25,7 @@ namespace HealthCare340B.DataAccess
             {
                 var query = from m in db.MMedicalFacilities
                             join f in db.MMedicalFacilityCategories on m.MedicalFacilityCategoryId equals f.Id
+                            join l in db.MLocations on m.LocationId equals l.Id
                             select new VMMMedicalFacility
                             {
                                 Id = m.Id,
@@ -32,6 +33,7 @@ namespace HealthCare340B.DataAccess
                                 MedicalFacilityCategoryId = m.MedicalFacilityCategoryId,
                                 LocationId = m.LocationId,
                                 FullAddress = m.FullAddress,
+                                LocationName = l.Name,
                                 Email = m.Email,
                                 PhoneCode = m.PhoneCode,
                                 Phone = m.Phone,
@@ -111,5 +113,72 @@ namespace HealthCare340B.DataAccess
             return response;
         }
 
+        public VMResponse<List<VMMLocation>?> GetAllLocation()
+        {
+            VMResponse<List<VMMLocation>?> response = new VMResponse<List<VMMLocation>?>();
+            try
+            {
+                var query = from m in db.MLocations
+                            join l in db.MMedicalFacilities on m.Id equals l.LocationId
+                            where m.IsDelete == false
+                            select new VMMLocation
+                            {
+                                Id = m.Id,
+                                Name = m.Name
+                            };
+                var result = query.Distinct().ToList();
+                Console.WriteLine($"Query returned {result.Count} location");
+
+                response.Data = result;
+                response.Message = (response.Data.Count > 0)
+                    ? $"{HttpStatusCode.OK} - {response.Data.Count} location(s) successfully fetched"
+                    : $"{HttpStatusCode.NoContent} - No location is found";
+                response.StatusCode = (response.Data.Count > 0)
+                    ? HttpStatusCode.OK
+                    : HttpStatusCode.NoContent;
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+                response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return response;
+
+
+        }
+
+        public VMResponse<VMMLocation?> GetLocationById(long id)
+        {
+            VMResponse<VMMLocation?> response = new VMResponse<VMMLocation?>();
+
+            try
+            {
+                response.Data = (
+                    from m in db.MLocations
+                    join l in db.MMedicalFacilities on m.Id equals l.LocationId
+                    where m.IsDelete == false   
+                    select new VMMLocation
+                    {
+                        Id = m.Id,
+                        Name = m.Name
+                    }
+                    ).FirstOrDefault();
+
+                response.Message = (response.StatusCode == HttpStatusCode.OK)
+                   ? $"{HttpStatusCode.OK} -  medical facility(s) successfully fetched"
+                   : $"{HttpStatusCode.NoContent} - No medical facility is found";
+
+                response.StatusCode = (response.StatusCode == HttpStatusCode.OK)
+                    ? HttpStatusCode.OK
+                    : HttpStatusCode.NoContent;
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+                response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+
+            return response;
+        }
     }
 }

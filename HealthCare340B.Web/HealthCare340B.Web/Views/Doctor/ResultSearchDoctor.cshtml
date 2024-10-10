@@ -46,7 +46,7 @@
                     }
                     @if (!string.IsNullOrEmpty(ViewBag.Specialization))
                     {
-                        <span>Spesialisasi: @ViewBag.Specialization</span>
+                        <span>Spesialisasi: @ViewBag.SpecializationName</span>
                         <br />
                     }
                     @if (!string.IsNullOrEmpty(ViewBag.Treatment))
@@ -79,7 +79,7 @@
                                     <div class="col-md-8">
                                         <h5 class="card-title">@doctor.Fullname</h5>
                                         <p class="text-secondary">@doctor.Specialization</p>
-                                        <p class="text-danger">Pengalaman: @doctor.ExperienceYears tahun</p>
+                                        <p class="text-danger">Pengalaman: @doctor.TotalYearsExperience tahun</p>
                                         @foreach (var medfac in doctor.DoctorOffice)
                                         {
                                             <p><i class="fas fa-hospital"></i> @medfac.MedicalFacilityName</p>

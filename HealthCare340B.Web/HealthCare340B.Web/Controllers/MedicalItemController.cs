@@ -59,6 +59,7 @@ namespace HealthCare340B.Web.Controllers
                 VMMMedicalItemCategory category = await medItem.GetById(ViewBag.MedicalItemCategoryId);
                 ViewBag.CategoryName = category.Name;
             }
+            ViewBag.MedicalItemCategoryId = dataFilter.MedicalItemCategoryId;
             ViewBag.Segmentation = dataFilter.isSegmentation;
             ViewBag.PriceMax = dataFilter.PriceMax;
             ViewBag.PriceMin = dataFilter.PriceMin;

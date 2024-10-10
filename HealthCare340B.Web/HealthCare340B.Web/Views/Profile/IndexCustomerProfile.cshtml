@@ -44,7 +44,8 @@
 
     $(document).ready(function () {
         console.log("Document Profile is ready");
-        $("#profil").load('/Profile/TabProfile', function (response, status, xhr) {
+        console.log("masuk ga");
+        $("#profil").load('/Profile/TabProfile/', function (response, status, xhr) {
             if (status == "error") {
                 console.log("Error: " + xhr.status + " " + xhr.statusText);
             } else {

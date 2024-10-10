@@ -41,7 +41,8 @@
             success: function (response) {
                 if (response.statusCode == 200) {
                     alert(response.statusCode + "-" + response.message);
-                    $("#alamat").html(response)
+                    $("#staticModal").modal("hide")
+                    $("#alamat").load('/Profile/TabAlamat')
                 }
             },
             error: function (errResponse) {

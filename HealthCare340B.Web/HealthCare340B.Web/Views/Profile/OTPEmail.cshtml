@@ -121,7 +121,7 @@
                         }),
                         success: function (response) {
                             console.log("Email updated to: " + "@ViewBag.Email");
-                            location.reload();
+                            window.location.href = '/Auth/Logout';
                         },
                         error: function (error) {
                             console.error("Error updating email: ", error);

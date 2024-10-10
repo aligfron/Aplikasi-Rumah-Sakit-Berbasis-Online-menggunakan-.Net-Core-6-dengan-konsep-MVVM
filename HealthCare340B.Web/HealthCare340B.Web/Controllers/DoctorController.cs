@@ -41,17 +41,17 @@ namespace HealthCare340B.Web.Controllers
             return View();
         }
 
-        
+
         public async Task<IActionResult> SearchDoctor()
         {
             ViewBag.Title = "Cari Dokter";
-            
-            var medFac = await medicalFacility.GetAll();
-            ViewBag.MedicalFacility = medFac ?? new List<VMMMedicalFacility>();
-       
+
+            var medFac = await doctor.GetAllLocation();
+            ViewBag.Location = medFac ?? new List<VMMLocation>();
+
             var spec = await specialization.GetAll();
             ViewBag.Specialization = spec ?? new List<VMMSpecialization>();
-           
+
             var treatment = await doctorTreatment.GetAll();
             ViewBag.DoctorTreatment = treatment ?? new List<VMTDoctorTreatment>();
 
@@ -63,14 +63,15 @@ namespace HealthCare340B.Web.Controllers
         public async Task<IActionResult> ResultSearchDoctor(VMMDoctor dataFilter)
         {
             List<VMMDoctor>? data = await doctor.GetByFilter(
-                dataFilter.MedicalFacilityName?.Trim(),
+                dataFilter.LocationId?.Trim(),
                 dataFilter.Fullname?.Trim(),
                 dataFilter.Specialization?.Trim(),
                 dataFilter.Treatment?.Trim()
             );
 
             ViewBag.Fullname = dataFilter.Fullname?.Trim();
-            ViewBag.MedFacName = dataFilter.MedicalFacilityName?.Trim();
+            //ViewBag.MedFacName = dataFilter.MedicalFacilityName?.Trim();
+            ViewBag.LocationId = dataFilter.LocationId?.Trim();
             ViewBag.Specialization = dataFilter.Specialization?.Trim();
             ViewBag.Treatment = dataFilter.Treatment?.Trim();
 
@@ -79,7 +80,7 @@ namespace HealthCare340B.Web.Controllers
                 // Log or Debug the received data
                 foreach (var doc in data)
                 {
-                    Console.WriteLine($"Doctor: {doc.Fullname}, Specialization: {doc.Specialization}, Medical Facility: {doc.MedicalFacilityName}");
+                    Console.WriteLine($"Doctor: {doc.Fullname}, Specialization: {doc.Specialization}, Location: {doc.LocationId}");
                 }
 
 
@@ -89,9 +90,17 @@ namespace HealthCare340B.Web.Controllers
                     doc.IsAvailable = DetermineIfDoctorIsAvailable(doc);
                 }
             }
+            if (dataFilter.LocationId != null)
+            {
+                var medFac = await doctor.GetLocationById(dataFilter?.LocationId);
+                ViewBag.Location = medFac.Name;
+            }
 
-            ViewBag.Location = dataFilter.MedicalFacilityName;
-            ViewBag.Specialization = dataFilter.Specialization;
+            if(dataFilter.Specialization != null)
+            {
+                var spec = await doctor.GetSpecializationById(dataFilter?.Specialization);
+                ViewBag.SpecializationName = spec.Name;
+            }
             ViewBag.DoctorName = dataFilter.Fullname;
             ViewBag.Treatment = dataFilter.Treatment;
             ViewBag.ImgFolder = imageFolder;
@@ -132,7 +141,7 @@ namespace HealthCare340B.Web.Controllers
 
         //punya ali
 
-        public async Task<IActionResult> DetailDoctor(int id, bool? isOnline, bool? isAvailable)
+        public async Task<IActionResult> DetailDoctor(int? id)
         {
             ViewBag.Title = "Detail Dokter";
             ViewBag.imgFolder = imageFolder;
@@ -140,19 +149,32 @@ namespace HealthCare340B.Web.Controllers
 
             VMMDoctor? data = null;
 
-            data = await profile.GetByDetailDokter(id);
-            if (data == null)
+            if (id == null)
             {
-                return NotFound("Doctor not found for the given ID.");
-            }
+                int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
+                if (bioId == 0)
+                {
+                    return NotFound("Biodata ID not found in session.");
+                }
 
-            // Ambil nilai isOnline dan isAvailable dari query string
-            ViewBag.IsOnline = isOnline ?? false;
-            ViewBag.IsAvailable = isAvailable ?? false;
+                VMMDoctor? GetDoctorByBiodataId = await profile.GetDoctorByBiodataId(bioId);
+                if (GetDoctorByBiodataId == null)
+                {
+                    return NotFound("Doctor not found for the given Biodata ID.");
+                }
+                data = await profile.GetByDetailDokter(GetDoctorByBiodataId.Id);
+            }
+            else
+            {
+                data = await profile.GetByDetailDokter(id.Value);
+                if (data == null)
+                {
+                    return NotFound("Doctor not found for the given ID.");
+                }
+            }
 
             return View(data);
         }
-
 
     }
 }

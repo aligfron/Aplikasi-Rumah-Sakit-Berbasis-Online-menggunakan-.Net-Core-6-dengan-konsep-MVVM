@@ -12,8 +12,9 @@
             <div class="row mb-3">
                 <label class="col-12 col-form-label">Label Alamat<span class="text-danger">*</span></label>
                 <div class="col-12">
-                    <input class="form-control" type="text" name="Label" />
+                    <input id="Label" class="form-control" type="text" name="Label" />
                 </div>
+                <small id="label-alert" style="display: none; color: red;">* label sudah digunakan</small>
             </div>
 
             <!-- Nama Penerima -->
@@ -59,12 +60,9 @@
 
             <!-- Alamat -->
             <div class="row mb-3">
-                <label class="col-12 col-form-label">Alamat</label>
+                <label class="col-12 col-form-label">Alamat<span class="text-danger">*</span></label>
                 <div class="col-12">
-                    <div class="form-floating">
-                        <textarea Name="Address" class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
-                        <label class="text-muted" for="floatingTextarea2">Masukkan Alamat</label>
-                    </div>
+                    <input type="text" Name="Address" class="form-control" placeholder="Leave a Address here" style="height: 100px"></input>
                 </div>
             </div>
 
@@ -83,12 +81,25 @@
 <script>
     $("#staticModalLabel").text("@ViewBag.Title");
 
+    //Fungsi validate Label
+    function validateLabel(dbLabel) {
+        const dataLabel = $("#Label").val();
+        const alert = document.getElementById('label-alert');
+
+        // if (dataLabel === dbLabel) {
+
+        // } else {
+        //     $("#label-alert").show();
+        // }
+    }
+
     $("#frmCreateAlamat").validate({
         rules: {
             Label: {
                 maxlength: 100,
                 minlength: 3,
                 required : true
+
             },
             Recipient: {
                 required: true
@@ -96,9 +107,13 @@
             RecipientPhoneNumber: {
                 required: true
             },
-            Location: {
+            LocationId: {
                 required: true
+            }, 
+            Address : {
+                required : true
             }
+
         },
         messages: {
             Label: {
@@ -112,6 +127,9 @@
             },
             LocationId: {
                 required: "Silahkan masukkan Kecamatan / Kota"
+            },
+            Address : {
+                required : "Silahkan masukkan Alamat penerima"
             }
         },
         errorClass: "text-danger"

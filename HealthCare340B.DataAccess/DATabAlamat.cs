@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using HealthCare340B.DataModel;
@@ -53,7 +54,7 @@ namespace HealthCare340B.DataAccess
                    ? HttpStatusCode.OK
                    : HttpStatusCode.NoContent;
                 response.Message = (response.Data != null)
-                    ? $"{HttpStatusCode.OK} Biodata Address successfully created!"
+                    ? $"{HttpStatusCode.OK} Biodata Address successfully fetched!"
                     : $"{HttpStatusCode.NoContent} - Biodata Address does not exist!";
             }
             catch (Exception ex)
@@ -156,6 +157,49 @@ namespace HealthCare340B.DataAccess
                    where m.IsDelete == false &&
                    (m.Label!.Contains(label!))
                    select new VMMBiodataAddress(m, l)
+               ).ToList();
+                response.StatusCode = (response.Data != null)
+                   ? HttpStatusCode.OK
+                   : HttpStatusCode.NoContent;
+                response.Message = (response.Data != null)
+                    ? $"{HttpStatusCode.OK} Biodata Address successfully fetched!"
+                    : $"{HttpStatusCode.NoContent} - Biodata Address does not exist!";
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+            }
+
+            return response;
+        }
+
+        public VMResponse<List<VMMBiodataAddress>> GetBioAddressByBioId(long? id)
+        {
+            VMResponse<List<VMMBiodataAddress>> response = new VMResponse<List<VMMBiodataAddress>>();
+            try
+            {
+                response.Data = (
+                   from m in db.MBiodataAddresses
+                   join l in db.MBiodata on m.BiodataId equals l.Id
+                   where m.IsDelete == false && m.BiodataId == id
+                   select new VMMBiodataAddress
+                   {
+                       Id = m.Id,
+                       BiodataId = m.BiodataId,
+                       Label = m.Label,
+                       Recipient = m.Recipient,
+                       RecipientPhoneNumber = m.RecipientPhoneNumber,
+                       LocationId = m.LocationId,
+                       PostalCode = m.PostalCode,
+                       Address = m.Address,
+                       CreatedBy = m.CreatedBy,
+                       CreatedOn = m.CreatedOn,
+                       ModifiedBy = m.ModifiedBy,
+                       ModifiedOn = m.ModifiedOn,
+                       DeletedBy = m.DeletedBy,
+                       DeletedOn = m.DeletedOn,
+                       IsDelete = m.IsDelete,
+                   }  
                ).ToList();
                 response.StatusCode = (response.Data != null)
                    ? HttpStatusCode.OK

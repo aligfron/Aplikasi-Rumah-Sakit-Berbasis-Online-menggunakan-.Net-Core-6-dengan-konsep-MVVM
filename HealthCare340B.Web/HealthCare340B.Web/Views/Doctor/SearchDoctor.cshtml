@@ -12,13 +12,13 @@
             <div class="row mb-3">
                 <label class="col-12 col-form-label">Lokasi</label>
                 <div class="col-12">
-                    <select id="MedFacilityId" name="MedicalFacilityName" class="form-select">
+                    <select id="MedFacilityId" name="LocationId" class="form-select">
                         <option value="">--Select Medical Facility--</option>
-                        @if (ViewBag.MedicalFacility != null)
+                        @if (ViewBag.Location != null)
                         {
-                            foreach (VMMMedicalFacility medFac in ViewBag.MedicalFacility)
+                            foreach (VMMLocation medFac in ViewBag.Location)
                             {
-                                <option value="@medFac.Name">@medFac.Name</option>
+                                <option value="@medFac.Id">@medFac.Name</option>
                             }
                         }
                     </select>
@@ -43,7 +43,7 @@
                         {
                             foreach (VMMSpecialization spec in ViewBag.Specialization)
                             {
-                                <option value="@spec.Name">@spec.Name</option>
+                                <option value="@spec.Id">@spec.Name</option>
                             }
                         }
                     </select>
@@ -60,7 +60,7 @@
                         {
                             foreach (VMTDoctorTreatment treatment in ViewBag.DoctorTreatment)
                             {
-                                <option value="@treatment.Name">@treatment.Name</option>
+                                <option value="@treatment.Id">@treatment.Name</option>
                             }
                         }
                     </select>
