@@ -302,14 +302,15 @@
 else
 {
     <script>
+        var filter = "@ViewBag.filter";
         $("#orderBy").change(function (e) {
             let orderValue = $(this).val();
-            location.href = `?filter=${@ViewBag.filter}&pageNumber=${@Model.PageIndex}&currPageSize=${@ViewBag.PageSize}&orderBy=${orderValue}&ascDesc=@ViewBag.AscDesc`;
+            location.href = `?filter=${filter}&pageNumber=${@Model.PageIndex}&currPageSize=${@ViewBag.PageSize}&orderBy=${orderValue}&ascDesc=@ViewBag.AscDesc`;
         });
 
         $("#ascDesc").change(function (e) {
             let ascDescValue = $(this).val();
-            location.href = `?filter=${@ViewBag.filter}&pageNumber=${@Model.PageIndex}&currPageSize=${@ViewBag.PageSize}&orderBy=@ViewBag.OrderBy&ascDesc=${ascDescValue}`;
+            location.href = `?filter=${filter}&pageNumber=${@Model.PageIndex}&currPageSize=${@ViewBag.PageSize}&orderBy=@ViewBag.OrderBy&ascDesc=${ascDescValue}`;
         });
     </script>
 }

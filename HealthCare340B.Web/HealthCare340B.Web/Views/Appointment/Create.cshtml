@@ -95,9 +95,11 @@
                         $.each(
                             response.data,
                             function (idx, data) {
-                                $("#member").append(
-                                    `<option value="${data.customerId}">${data.fullname}, ${data.customerRelationName}</option>`
-                                );
+                                if (data.fullname != "@Context.Session.GetString("userName")") {
+                                    $("#member").append(
+                                        `<option value="${data.customerId}">${data.fullname}, ${data.customerRelationName}</option>`
+                                    );
+                                }
                             }
                         );
                     }
