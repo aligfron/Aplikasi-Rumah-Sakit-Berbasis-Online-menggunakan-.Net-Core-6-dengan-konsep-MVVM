@@ -79,7 +79,14 @@
                                     <div class="col-md-8">
                                         <h5 class="card-title">@doctor.Fullname</h5>
                                         <p class="text-secondary">@doctor.Specialization</p>
-                                        <p class="text-danger">Pengalaman: @doctor.TotalYearsExperience tahun</p>
+                                        @if (doctor.maxendTotalYearsExperience >= DateTime.Now.Year)
+                                        {
+                                            <p>@(DateTime.Now.Year - doctor.minstartTotalYearsExperience) Tahun Pengalaman</p>
+                                        }
+                                        else
+                                        {
+                                            <p>@(doctor.maxendTotalYearsExperience - doctor.minstartTotalYearsExperience) Tahun Pengalaman</p>
+                                        }
                                         @foreach (var medfac in doctor.DoctorOffice)
                                         {
                                             <p><i class="fas fa-hospital"></i> @medfac.MedicalFacilityName</p>

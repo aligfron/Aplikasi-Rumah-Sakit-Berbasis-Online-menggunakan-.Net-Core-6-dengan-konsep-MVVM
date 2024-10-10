@@ -84,7 +84,6 @@ namespace HealthCare340B.ViewModel
         public string MedicalFacilityScheduleDay { get; set; }
         public TimeSpan? MedicalFacilityScheduleStartTime { get; set; }
         public TimeSpan? MedicalFacilityScheduleEndTime { get; set; }
-        public List<VMMMedicalFacility>? MedicalFacilities { get; set; }
-
+        
     }
 }

@@ -85,7 +85,7 @@ namespace HealthCare340B.DataAccess
             VMResponse<List<VMMDoctor>?> response = new VMResponse<List<VMMDoctor>?>();
             try
             {
-               
+
                 var query = (
                     from d in db.MDoctors
                     join b in db.MBiodata on d.BiodataId equals b.Id
@@ -94,10 +94,10 @@ namespace HealthCare340B.DataAccess
                     join s in db.MSpecializations on cds.SpecializationId equals s.Id into HaveSpecialization
                     from s in HaveSpecialization.DefaultIfEmpty()
                     where !d.IsDelete && (string.IsNullOrEmpty(specialization) || s.Id == long.Parse(specialization))
-                    && db.TDoctorOffices.Any(doff => doff.DoctorId == d.Id && !doff.IsDelete 
+                    && db.TDoctorOffices.Any(doff => doff.DoctorId == d.Id && !doff.IsDelete
                     && (string.IsNullOrEmpty(location) || doff.MedicalFacility.LocationId == long.Parse(location)))
-                    &&(string.IsNullOrEmpty(doctorName) || b.Fullname.Contains(doctorName))
-                    && db.TDoctorTreatments.Any(dt => dt.DoctorId == d.Id && !dt.IsDelete 
+                    && (string.IsNullOrEmpty(doctorName) || b.Fullname.Contains(doctorName))
+                    && db.TDoctorTreatments.Any(dt => dt.DoctorId == d.Id && !dt.IsDelete
                     && (string.IsNullOrEmpty(treatment) || dt.Name.Contains(treatment)))
                     select new VMMDoctor
                     {
@@ -129,9 +129,19 @@ namespace HealthCare340B.DataAccess
                                         TimeScheduleStart = mfs.TimeScheduleStart,
                                         TimeScheduleEnd = mfs.TimeScheduleEnd
                                     }
-                                ).ToList()
+                                ).ToList(),
+                                
                             }
-                        ).ToList()
+                        ).ToList(),
+                        maxendTotalYearsExperience = (
+                        db.TDoctorOffices.Where(dos => dos.DoctorId == d.Id && !dos.IsDelete).Select(dos => dos.EndDate.Value.Year)
+                        ).Max(),
+
+                        minstartTotalYearsExperience = (
+                            from riwayarpraktek in db.TDoctorOffices
+                            where riwayarpraktek.DoctorId == d.Id && !riwayarpraktek.IsDelete
+                            select riwayarpraktek.StartDate.Year
+                        ).Min()
                     }
                     ).ToList();
 
