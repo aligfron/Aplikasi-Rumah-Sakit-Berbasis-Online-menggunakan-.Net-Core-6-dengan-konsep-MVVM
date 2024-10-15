@@ -35,6 +35,7 @@ namespace HealthCare340B.DataAccess
                     {
                         Id = m.Id,
                         Label = m.Label,
+                        BiodataId = m.BiodataId,
                         Recipient = m.Recipient,
                         RecipientPhoneNumber = m.RecipientPhoneNumber,
                         LocationId = l.Id,
@@ -108,7 +109,7 @@ namespace HealthCare340B.DataAccess
             return response;
         }
 
-        public VMResponse<List<VMMBiodataAddress>> GetByFilter(string? filter)
+        public VMResponse<List<VMMBiodataAddress>> GetByFilter(string? filter, long? id)
         {
             VMResponse<List<VMMBiodataAddress>> response = new VMResponse<List<VMMBiodataAddress>>();
             try
@@ -120,7 +121,7 @@ namespace HealthCare340B.DataAccess
                     from m in db.MBiodataAddresses
                     join l in db.MLocations on m.LocationId equals l.Id
                     join e in db.MLocationLevels on l.LocationLevelId equals e.Id
-                    where m.IsDelete == false &&
+                    where m.IsDelete == false && m.BiodataId == id &&
                           (m.Recipient.ToLower().Contains(filter) || m.Address.Contains(filter))
                     select new VMMBiodataAddress(m, l)
                 ).ToList();
@@ -181,6 +182,7 @@ namespace HealthCare340B.DataAccess
                 response.Data = (
                    from m in db.MBiodataAddresses
                    join l in db.MBiodata on m.BiodataId equals l.Id
+                   join loc in db.MLocations on m.LocationId equals loc.Id
                    where m.IsDelete == false && m.BiodataId == id
                    select new VMMBiodataAddress
                    {
@@ -190,6 +192,7 @@ namespace HealthCare340B.DataAccess
                        Recipient = m.Recipient,
                        RecipientPhoneNumber = m.RecipientPhoneNumber,
                        LocationId = m.LocationId,
+                       LocationName = loc.Name,
                        PostalCode = m.PostalCode,
                        Address = m.Address,
                        CreatedBy = m.CreatedBy,
@@ -224,6 +227,13 @@ namespace HealthCare340B.DataAccess
             {
                 try
                 {
+                    MBiodataAddress existingData = db.MBiodataAddresses.FirstOrDefault(addr => addr.Label == data.Label && !addr.IsDelete && addr.BiodataId == data.BiodataId)!;
+                    if(existingData != null)
+                    {
+                        response.StatusCode = HttpStatusCode.BadRequest;
+                        response.Message = "Label telah digunakan";
+                        return response;
+                    }
                     MBiodataAddress newData = new MBiodataAddress();
                     newData.BiodataId = data.BiodataId;
                     newData.Label = data.Label;

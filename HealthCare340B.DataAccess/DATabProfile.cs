@@ -135,6 +135,7 @@ namespace HealthCare340B.DataAccess
                         Fullname = b.Fullname,
                         MobilePhone = b.MobilePhone,
                         Email = u.Email,
+                        Dob = m.Dob,
                         Password = u.Password,
                         CreatedBy = m.CreatedBy != null ? m.CreatedBy : 0,
                         CreatedOn = m.CreatedOn != null ? m.CreatedOn : DateTime.Now,
@@ -262,6 +263,47 @@ namespace HealthCare340B.DataAccess
             }
         }
 
+        public VMResponse<List<VMMCustomer>?> GetAllCustomer()
+        {
+            VMResponse<List<VMMCustomer>?> response = new VMResponse<List<VMMCustomer>?>();
+            try
+            {
+                var query = from m in db.MCustomers
+                            join b in db.MBiodata on m.BiodataId equals b.Id
+                            join u in db.MUsers on b.Id equals u.BiodataId
+                            where (m.IsDelete == false)
+                            select new VMMCustomer
+                            {
+                                Id = m.Id,
+                                BiodataId = m.BiodataId,
+                                Email = u.Email,
+                                Password = u.Password,                               
+                                CreatedBy = m.CreatedBy,
+                                CreatedOn = m.CreatedOn,
+                                ModifiedBy = m.ModifiedBy,
+                                ModifiedOn = m.ModifiedOn,
+                                DeletedBy = m.DeletedBy,
+                                DeletedOn = m.DeletedOn,
+                                IsDelete = m.IsDelete,
+                            };
+                var result = query.ToList();
+                Console.WriteLine($"Query returned {result.Count} biodata address");
+
+                response.Data = result;
+                response.Message = (response.Data.Count > 0)
+                    ? $"{HttpStatusCode.OK} - {response.Data.Count} biodata address(s) successfully fetched"
+                    : $"{HttpStatusCode.NoContent} - No biodata address is found";
+                response.StatusCode = (response.Data.Count > 0)
+                    ? HttpStatusCode.OK
+                    : HttpStatusCode.NoContent;
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+                response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return response;
+        }
         public VMResponse<VMMUser> UpdateEmail(VMMUser data)
         {
             VMResponse<VMMUser> response = new VMResponse<VMMUser>();

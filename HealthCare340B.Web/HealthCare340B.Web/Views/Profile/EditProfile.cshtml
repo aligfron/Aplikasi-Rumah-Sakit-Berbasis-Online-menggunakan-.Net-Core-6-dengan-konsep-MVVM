@@ -44,8 +44,7 @@
                 <input type="hidden" name="ModifiedBy" value="@Context.Session.GetString("userId")" />
                 <input type="hidden" name="Id" value="@Model.Id" />
 
-                <div class="form-group d-flex justify-content-between mt-2">
-                    <button type="button" class="btn btn-outline-primary" style="width: 100px;">Batal</button>
+                <div class="form-group d-flex justify-content-end mt-2">
                     <button id="btnSave" type="submit" class="btn btn-primary" style="width: 100px;">Simpan</button>
                 </div>
             </form>
@@ -82,11 +81,12 @@
             errorClass: "text-danger"
         });
 
+
         // Form submission
         $("#btnSave").click(function (e) {
             e.preventDefault();
 
-            if ($("#frmUpdateProfile").valid()) {
+            if ($("#frmUpdateProfile").validate()) {
                 // Append +62 prefix to the mobile phone number
                 let mobilePhone = $("#phoneNumber").val();
                 if (!mobilePhone.startsWith("+62")) {
@@ -119,10 +119,6 @@
             } else {
                 console.error("Form profile data is not valid");
             }
-        });
-
-        $("#btnReset").click(() => {
-            $("#frmUpdateProfile")[0].reset();
         });
     });
 </script>

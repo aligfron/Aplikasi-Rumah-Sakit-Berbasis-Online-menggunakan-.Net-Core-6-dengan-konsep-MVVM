@@ -277,6 +277,30 @@ namespace HealthCare340B.API.Controllers
 
         }
 
+        [HttpGet("[action]")]
+        public async Task<ActionResult> GetAllCustomer()
+        {
+            try
+            {
+                VMResponse<List<VMMCustomer>> response = await Task.Run(() => tabProfile.GetAllCustomer());
+                if (response.Data != null)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    Console.WriteLine(response.Message);
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("TabProfileController.GetAllCustomer: " + ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
+
         [HttpPost("[action]")]
         public async Task<ActionResult> CreateResetPassword(VMTResetPassword data)
         {

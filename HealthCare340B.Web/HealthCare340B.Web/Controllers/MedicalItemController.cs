@@ -32,8 +32,8 @@ namespace HealthCare340B.Web.Controllers
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> ResultSearchMedicalItem(VMMMedicalItem dataFilter, int? pageNumber, int? currentPageSize)
+        //[HttpPost]
+        public async Task<IActionResult> ResultSearchMedicalItem( VMMMedicalItem dataFilter, int? pageNumber, int? currentPageSize)
         {
             List<VMMMedicalItem>? data = await medItem.GetByFilter(
                 dataFilter.MedicalItemCategoryId,

@@ -341,6 +341,8 @@ namespace HealthCare340B.Web.Controllers
                 ViewBag.Message = "Tidak ada Profil Customer ditemukan berdasarkan pencarian Anda.";
                 data = new VMMCustomer();
             }
+
+            ViewBag.Dob = data.Dob;
             return View(data);
         }
         public async Task<IActionResult> EditProfile()
@@ -363,6 +365,8 @@ namespace HealthCare340B.Web.Controllers
                 data = new VMMCustomer();
             }
 
+            ViewBag.Dob = data.Dob;
+
             return View(data);
         }
 
@@ -375,11 +379,11 @@ namespace HealthCare340B.Web.Controllers
         public async Task<IActionResult> EditEmail()
         {
             ViewBag.Title = "Edit Email";
-            VMMCustomer? data = new VMMCustomer();
+            List<VMMCustomer>? data = new List<VMMCustomer>();
             try
             {
                 int bioId = HttpContext.Session.GetInt32("userBiodataId") ?? 0;
-                data = await profile.GetBioById(bioId);
+                data = await profile.GetAllCustomer();
             }
             catch (Exception ex)
             {
@@ -389,7 +393,7 @@ namespace HealthCare340B.Web.Controllers
             if (data == null)
             {
                 ViewBag.Message = "Tidak ada Profil Customer ditemukan berdasarkan pencarian Anda.";
-                data = new VMMCustomer();
+                data = new List<VMMCustomer>();
             }
             return View(data);
         }

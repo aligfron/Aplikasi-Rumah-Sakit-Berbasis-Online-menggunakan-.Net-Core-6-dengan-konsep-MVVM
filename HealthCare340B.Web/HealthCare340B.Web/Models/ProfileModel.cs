@@ -379,7 +379,7 @@ namespace HealthCare340B.Web.Models
                 HttpResponseMessage apiResponseMsg = await httpClient.GetAsync(
                     (string.IsNullOrEmpty(filter))
                         ? $"{apiUrl}TabAlamat/GetBioAddressByBioId/{bioId}"
-                        : $"{apiUrl}TabAlamat/GetByFilter/{filter}"
+                        : $"{apiUrl}TabAlamat/GetByFilter/{filter}/{bioId}"
                 );
 
                 if (apiResponseMsg != null)
@@ -418,17 +418,19 @@ namespace HealthCare340B.Web.Models
                 jsonData = JsonConvert.SerializeObject(data);
                 content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
-                apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMBiodataAddress>?>(
-                    await httpClient
-                        .PostAsync($"{apiUrl}TabAlamat", content)
-                        .Result.Content.ReadAsStringAsync()
-                );
-
-                if (apiResponse != null)
+               
+                HttpResponseMessage? apiResponseMsg = await httpClient.PostAsync($"{apiUrl}TabAlamat", content);
+                if(apiResponseMsg != null)
                 {
-                    if (apiResponse.StatusCode != HttpStatusCode.Created)
+                    if(apiResponseMsg.StatusCode == HttpStatusCode.Created)
                     {
-                        throw new Exception(apiResponse.Message);
+                        apiResponse = JsonConvert.DeserializeObject<VMResponse<VMMBiodataAddress>?>(
+                            await apiResponseMsg.Content.ReadAsStringAsync());
+                    }
+                    else
+                    {
+                        apiResponse.StatusCode = apiResponseMsg.StatusCode;
+                        apiResponse.Message = await apiResponseMsg.Content.ReadAsStringAsync();
                     }
                 }
                 else
@@ -572,6 +574,42 @@ namespace HealthCare340B.Web.Models
             }
 
             return data;
+        }
+
+        public async Task<List<VMMCustomer>?> GetAllCustomer()
+        {
+            VMResponse<List<VMMCustomer>>? apiResponse = null;
+            try
+            {
+                HttpResponseMessage apiResponseMsg = await httpClient.GetAsync(
+                    $"{apiUrl}TabAlamat/GetAllCustomer"
+                );
+
+                if (apiResponseMsg != null)
+                {
+                    if (apiResponseMsg.StatusCode == HttpStatusCode.OK)
+                    {
+                        apiResponse = JsonConvert.DeserializeObject<VMResponse<List<VMMCustomer>>?>(
+                            await apiResponseMsg.Content.ReadAsStringAsync()
+                        );
+                    }
+                    else
+                    {
+                        apiResponse!.StatusCode = apiResponseMsg.StatusCode;
+                        apiResponse.Message = await apiResponseMsg.Content.ReadAsStringAsync();
+                    }
+                }
+                else
+                {
+                    throw new Exception("Tab Profile (GetAllCustomer) API could not be reached!");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Profile.GetAllCustomer: {e.Message}");
+            }
+
+            return apiResponse!.Data;
         }
 
         public async Task<VMMCustomer?> GetBioById(int bioId)

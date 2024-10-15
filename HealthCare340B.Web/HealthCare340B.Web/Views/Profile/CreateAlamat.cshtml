@@ -85,55 +85,51 @@
     function validateLabel(dbLabel) {
         const dataLabel = $("#Label").val();
         const alert = document.getElementById('label-alert');
-
-        // if (dataLabel === dbLabel) {
-
-        // } else {
-        //     $("#label-alert").show();
-        // }
     }
 
-    $("#frmCreateAlamat").validate({
-        rules: {
-            Label: {
-                maxlength: 100,
-                minlength: 3,
-                required : true
+    $(document).ready(function(e){
+        $("#frmCreateAlamat").validate({
+            rules: {
+                Label: {
+                    maxlength: 100,
+                    minlength: 3,
+                    required: true
+
+                },
+                Recipient: {
+                    required: true
+                },
+                RecipientPhoneNumber: {
+                    required: true
+                },
+                LocationId: {
+                    required: true
+                },
+                Address: {
+                    required: true
+                }
 
             },
-            Recipient: {
-                required: true
+            messages: {
+                Label: {
+                    required: "Silahkan masukkan Label Alamat"
+                },
+                Recipient: {
+                    required: "Silahkan masukkan Nama Penerima"
+                },
+                RecipientPhoneNumber: {
+                    required: "Silahkan masukkan Kontak Penerima"
+                },
+                LocationId: {
+                    required: "Silahkan masukkan Kecamatan / Kota"
+                },
+                Address: {
+                    required: "Silahkan masukkan Alamat penerima"
+                }
             },
-            RecipientPhoneNumber: {
-                required: true
-            },
-            LocationId: {
-                required: true
-            }, 
-            Address : {
-                required : true
-            }
-
-        },
-        messages: {
-            Label: {
-                required: "Silahkan masukkan Label Alamat"
-            },
-            Recipient: {
-                required: "Silahkan masukkan Nama Penerima"
-            },
-            RecipientPhoneNumber: {
-                required: "Silahkan masukkan Kontak Penerima"
-            },
-            LocationId: {
-                required: "Silahkan masukkan Kecamatan / Kota"
-            },
-            Address : {
-                required : "Silahkan masukkan Alamat penerima"
-            }
-        },
-        errorClass: "text-danger"
-    });
+            errorClass: "text-danger"
+        });
+    })
 
     $("#btnSave").click(function (e) {
         // debugger;
@@ -154,6 +150,8 @@
                     }
                     else {
                         alert(response.statusCode + " - " + response.message);
+                        $("#staticModal").modal("hide");
+                        $("#alamat").load('/Profile/TabAlamat');
                     }
                 },
                 error: function (errResponse) {

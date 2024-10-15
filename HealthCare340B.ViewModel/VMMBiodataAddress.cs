@@ -15,6 +15,7 @@ namespace HealthCare340B.ViewModel
         public string? Recipient { get; set; }
         public string? RecipientPhoneNumber { get; set; }
         public long? LocationId { get; set; }
+        public string LocationName { get; set; }
         public string? PostalCode { get; set; }
         public string? Address { get; set; }
         public long CreatedBy { get; set; }

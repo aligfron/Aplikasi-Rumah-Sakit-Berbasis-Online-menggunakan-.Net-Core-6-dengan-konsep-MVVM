@@ -111,7 +111,7 @@ namespace HealthCare340B.DataAccess
                             where m.IsDelete == false
                             && (!categoryId.HasValue || i.Id == categoryId)
                             && (!segmentation.HasValue || (segmentation.Value ? s.Id != 5 : true))
-                            && (!priceMax.HasValue || m.PriceMax <= priceMax)
+                            && (!priceMax.HasValue || m.PriceMax <= priceMax || m.PriceMin <= priceMax)
                             && (!priceMin.HasValue || m.PriceMin >= priceMin)
                             && (string.IsNullOrEmpty(filter) || m.Name.ToLower().Contains(filter) || m.Indication.Contains(filter))
                             select new VMMMedicalItem

@@ -90,12 +90,13 @@ namespace HealthCare340B.API.Controllers
             }
         }
 
-        [HttpGet("[action]/{filter?}")]
-        public async Task<ActionResult> GetByFilter(string? filter)
+        [HttpGet("[action]/{filter?}/{bioId?}")]
+        public async Task<ActionResult> GetByFilter(string? filter,long? bioId)
         {
+            //long id = (long)HttpContext.Session.GetInt32("biodataId");
             try
             {
-                VMResponse<List<VMMBiodataAddress>> response = await Task.Run(() => tabAlamat.GetByFilter(filter));
+                VMResponse<List<VMMBiodataAddress>> response = await Task.Run(() => tabAlamat.GetByFilter(filter, bioId));
                 if (response.Data != null)
                 {
                     return Ok(response);

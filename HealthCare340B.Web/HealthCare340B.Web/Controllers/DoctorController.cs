@@ -86,8 +86,20 @@ namespace HealthCare340B.Web.Controllers
 
                 foreach (var doc in data)
                 {
-                    doc.IsOnline = DetermineIfDoctorIsOnline(doc);
-                    doc.IsAvailable = DetermineIfDoctorIsAvailable(doc);
+                    foreach (var docOffice in doc.DoctorOffice)
+                    {
+                        doc.IsOnline = DetermineIfDoctorIsOnline(docOffice);
+                        Console.WriteLine("doctor isonline : " + doc.IsOnline);
+
+                        foreach (var jadwalPraktek in docOffice.JadwalPraktek)
+                        {
+                            doc.IsAvailable = DetermineIfDoctorIsAvailable(jadwalPraktek);
+                            Console.WriteLine("doctor isAvailable : " + doc.IsAvailable);
+                            if (doc.IsAvailable) break;
+                        }
+
+                        if (doc.IsOnline) break;
+                    }
                 }
             }
             if (dataFilter.LocationId != null)
@@ -114,22 +126,25 @@ namespace HealthCare340B.Web.Controllers
             return View("ResultSearchDoctor", data);
         }
 
-        private bool DetermineIfDoctorIsOnline(VMMDoctor doctor)
+        private bool DetermineIfDoctorIsOnline(VMTDoctorOffice doctorOffice)
         {
-            return doctor.MedicalFacilityCategory != null && doctor.MedicalFacilityCategory.Equals("Online", StringComparison.OrdinalIgnoreCase);
+            return doctorOffice.MedicalFacilityCategory != null && doctorOffice.MedicalFacilityCategory.Equals("Online", StringComparison.OrdinalIgnoreCase);
         }
 
-        private bool DetermineIfDoctorIsAvailable(VMMDoctor doctor)
+        private bool DetermineIfDoctorIsAvailable(VMMMedicalFacilitySchedule doctor)
         {
             var now = DateTime.Now;
             var currentDay = now.DayOfWeek.ToString();
             var currentTime = now.TimeOfDay;
 
-            if (doctor.MedicalFacilityScheduleDay != null && doctor.MedicalFacilityScheduleDay.Equals(currentDay, StringComparison.OrdinalIgnoreCase))
+            if (doctor.Day != null && doctor.Day.Equals(currentDay, StringComparison.OrdinalIgnoreCase))
             {
-                if (doctor.MedicalFacilityScheduleStartTime.HasValue && doctor.MedicalFacilityScheduleEndTime.HasValue)
+                if (!string.IsNullOrEmpty(doctor.TimeScheduleStart) && !string.IsNullOrEmpty(doctor.TimeScheduleEnd))
                 {
-                    if (currentTime >= doctor.MedicalFacilityScheduleStartTime.Value && currentTime <= doctor.MedicalFacilityScheduleEndTime.Value)
+                    TimeSpan startTime = TimeSpan.Parse(doctor.TimeScheduleStart);
+                    TimeSpan endTime = TimeSpan.Parse(doctor.TimeScheduleEnd);
+
+                    if (currentTime >= startTime && currentTime <= endTime)
                     {
                         return true;
                     }
