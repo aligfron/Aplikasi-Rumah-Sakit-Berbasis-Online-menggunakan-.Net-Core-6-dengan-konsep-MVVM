@@ -41,6 +41,7 @@
                                 <button type="submit" class="btn btn-success input-group-text"><i class="fas fa-search"></i></button>
                             </div>
                         </form>
+                        <button id="btnresetpencarian" class="btn btn-success mb-2">Reset</button>
                         <form id="frmpage" method="get" asp-controller="Specialization" asp-action="Index" class="d-flex flex-wrap mx-md-5 mb-2">
                             <div class="input-group">
                                 <span class="input-group-text">Tampilkan Jumlah Data : </span>
@@ -208,5 +209,9 @@
 
         // Kirim ID, Page Number, dan Page Size ke modal delete
         $("#staticModalBody").load("/Specialization/Delete/" + id + "?pageNumber=" + pageNumber + "&currPageSize=" + pageSize);
+    });
+    $("#btnresetpencarian").click((e) => {
+        var filter = "";
+        window.location.href = "/Specialization/Index/" + filter;
     });
 </script>

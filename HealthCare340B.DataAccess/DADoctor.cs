@@ -136,14 +136,14 @@ namespace HealthCare340B.DataAccess
                             }
                         ).ToList(),
                         maxendTotalYearsExperience = (
-                        db.TDoctorOffices.Where(dos => dos.DoctorId == d.Id && !dos.IsDelete).Select(dos => dos.EndDate.Value.Year)
+                        db.TDoctorOffices.Where(dos => dos.DoctorId == d.Id && dos.MedicalFacilityId != 16 && !dos.IsDelete).Select(dos => dos.EndDate.Value.Year)
                         ).Max(),
 
                         minstartTotalYearsExperience = (
                             from riwayarpraktek in db.TDoctorOffices
-                            where riwayarpraktek.DoctorId == d.Id && !riwayarpraktek.IsDelete
+                            where riwayarpraktek.DoctorId == d.Id && !riwayarpraktek.IsDelete && riwayarpraktek.MedicalFacilityId != 16
                             select riwayarpraktek.StartDate.Year
-                        ).Min()
+                        ).Min(),
                     }
                     ).ToList();
 

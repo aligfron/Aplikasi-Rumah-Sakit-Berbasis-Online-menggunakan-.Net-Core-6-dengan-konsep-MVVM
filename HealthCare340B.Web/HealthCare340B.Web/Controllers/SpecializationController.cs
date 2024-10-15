@@ -77,6 +77,7 @@ namespace HealthCare340B.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
             ViewBag.Title = "New Spesialisasi";
+            ViewBag.CreatedBy = HttpContext.Session.GetString("userName");
             List<VMMSpecialization>? data = new List<VMMSpecialization>();
 
             data = await spesialisasi.getByFilter("");

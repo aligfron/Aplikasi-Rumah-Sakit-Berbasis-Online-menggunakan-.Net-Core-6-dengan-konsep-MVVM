@@ -97,11 +97,11 @@
                                     <div class="col-md-4 text-center">
                                         @if (!string.IsNullOrEmpty(doctor.ImagePath))
                                         {
-                                            <img id="profileImage" src="~/@ViewBag.ImgFolder/@(doctor.ImagePath ?? "images/blank-profile-picture.png")" alt="Avatar" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                                            <img id="profileImage" src="~/@ViewBag.ImgFolder/@doctor.ImagePath" alt="Avatar" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
                                         }
                                         else
                                         {
-                                            <img id="profileImage" src="~/images/images_doctor.jpeg" alt="Avatar" class="rounded-circle" style="width: 100px; height: 100px;">
+                                            <img id="profileImage" src="~/images/blank-profile-picture.png" alt="Avatar" class="rounded-circle" style="width: 100px; height: 100px;">
                                         }
                                         <div class="d-grid gap-2">
                                             @if (doctor.IsOnline && doctor.IsAvailable)
@@ -112,7 +112,7 @@
                                             else if (doctor.IsOnline && !doctor.IsAvailable)
                                             {
                                                 <button class="btn btn-primary mt-2" disabled>Chat</button>
-                                                <button data-isonline="@doctor.IsOnline" data-isavailable="@doctor.IsAvailable" id="researchBtn" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticModal" disabled>Buat Janji</button>
+                                                <button data-isonline="@doctor.IsOnline" data-isavailable="@doctor.IsAvailable" id="researchBtn" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#staticModal">Buat Janji</button>
                                             }
                                             else
                                             {
@@ -169,6 +169,7 @@
         $(".btn-success").click(function (e) {
             $("#staticModalBody").html(spinner);
             $("#staticModalBody").load("/Appointment/Create/" + $(this).attr("data-id"));
+            $("#staticModal").modal("show");
         });
     </script>
 }

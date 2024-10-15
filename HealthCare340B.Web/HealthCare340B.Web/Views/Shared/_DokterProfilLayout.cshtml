@@ -181,7 +181,7 @@
 </div>
 
 <script>
-        function previewImage(event) {
+    function previewImage(event) {
         const reader = new FileReader();
         const file = event.target.files[0];
 
@@ -190,26 +190,42 @@
             const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
             if (!validImageTypes.includes(fileType)) {
-                document.getElementById('cancelImageBtn').classList.remove('d-none'); 
+                document.getElementById('cancelImageBtn').classList.remove('d-none');
                 $("#fotoError").text("File yang anda pilih bukan gambar, silahkan pilih ulang").show();
-                event.target.value = ''; 
-                document.getElementById('saveImageBtn').classList.add('d-none'); 
-                return; 
+                event.target.value = '';
+                document.getElementById('saveImageBtn').classList.add('d-none');
+                return;
             }
+            // if (!validImageTypes.includes(fileType)) {
+            //     // Tampilkan error dan reset input
+            //     document.getElementById('cancelImageBtn').classList.remove('d-none');
+            //     $("#fotoError").text("File yang anda pilih bukan gambar, silahkan pilih ulang").show();
+            //     event.target.value = '';
+            //     document.getElementById('saveImageBtn').classList.add('d-none');
+
+            //     // Buka kembali file explorer
+            //     setTimeout(() => {
+            //         document.getElementById('imageInput').click(); // Trigger klik ulang untuk input file
+            //     }, 100); // Timeout untuk memastikan browser siap membuka kembali file explorer
+
+            //     return;
+            // }
+
 
             reader.onload = function () {
                 const output = document.getElementById('profileImage');
                 output.src = reader.result;
             };
 
-            reader.readAsDataURL(file); 
+            reader.readAsDataURL(file);
 
-           
+
             document.getElementById('fotoError').classList.add('d-none');
             document.getElementById('saveImageBtn').classList.remove('d-none');
             document.getElementById('cancelImageBtn').classList.remove('d-none');
         }
     }
+    
 
     function saveImage() {
 

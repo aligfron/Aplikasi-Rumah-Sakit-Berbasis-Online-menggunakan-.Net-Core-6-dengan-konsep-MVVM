@@ -31,6 +31,19 @@ namespace HealthCare340B.ViewModel
         public string? MedicalFacilityCategory { get; set; }
         
         public decimal? HargaKonsulMulai { get; set; }
+
+        public string? Fullname { get; set; }
+        public string? SpecializationName { get; set; }
+        public string? ImagePath { get; set; }
+        public List<VMTDoctorOffice>? DoctorOffice { get; set; }
+        public string? LastEducationEndYear { get; set; }
+        public List<VMTDoctorTreatment>? Treatments { get; set; }
+        public List<string>? Day { get; set; }
+        public List<string>? TimeScheduleStart { get; set; }
+        public List<string>? TimeScheduleEnd { get; set; }
+
+        public int? minstartTotalYearsExperience { get; set; }
+        public int? maxendTotalYearsExperience { get; set; }
         public VMTDoctorOffice() { }
         public VMTDoctorOffice(TDoctorOffice doctorOffice, MMedicalFacility mMedicalFacility, MLocation mLocation )
         {

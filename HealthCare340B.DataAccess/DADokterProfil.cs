@@ -68,7 +68,7 @@ namespace HealthCare340B.DataAccess
                                     
                                     join e in db.MLocations on d.LocationId equals e.Id // untuk ngambil lokasi rumah sakit  
                                     where riwayarpraktek.DoctorId == DetailDokter.Id &&
-                                    riwayarpraktek.IsDelete == false
+                                    riwayarpraktek.IsDelete == false && d.Name != "Online"
                                     orderby riwayarpraktek.EndDate descending
                                     select new VMTDoctorOffice
                                     {
@@ -258,7 +258,7 @@ namespace HealthCare340B.DataAccess
                                     join e in db.MLocations on d.LocationId equals e.Id // untuk ngambil nama lokasi rumah sakit dan spesialisasi
                                     join service in db.MServiceUnits on riwayarpraktek.ServiceUnitId equals service.Id
                                     where riwayarpraktek.DoctorId == DetailDokter.Id &&
-                                    riwayarpraktek.IsDelete == false
+                                    riwayarpraktek.IsDelete == false && d.Name != "Online"
                                     orderby riwayarpraktek.EndDate descending
                                     select new VMTDoctorOffice
                                     {
@@ -272,18 +272,26 @@ namespace HealthCare340B.DataAccess
                                         MedicalFacilityCategory = mfc.Name,
                                         Servicename = service.Name,
                                         JadwalPraktek = (
-                                               from dos in db.TDoctorOfficeSchedules
-                                               join mfs in db.MMedicalFacilitySchedules on dos.MedicalFacilityScheduleId equals mfs.Id
-                                               join dof in db.TDoctorOffices on mfs.MedicalFacilityId equals dof.MedicalFacilityId
-                                               where dos.DoctorId == DetailDokter.Id && dos.IsDelete == false && mfs.MedicalFacilityId == d.Id
-                                               select new VMMMedicalFacilitySchedule
-                                               {
-                                                   Day = mfs.Day,
-                                                   TimeScheduleStart = mfs.TimeScheduleStart,
-                                                   TimeScheduleEnd = mfs.TimeScheduleEnd
+                                                from dos in db.TDoctorOfficeSchedules
+                                                join mfs in db.MMedicalFacilitySchedules on dos.MedicalFacilityScheduleId equals mfs.Id
+                                                join dof in db.TDoctorOffices on mfs.MedicalFacilityId equals dof.MedicalFacilityId
+                                                where dos.DoctorId == DetailDokter.Id && dos.IsDelete == false && mfs.MedicalFacilityId == d.Id
+                                                group new { mfs.Day, mfs.TimeScheduleStart, mfs.TimeScheduleEnd } by new { mfs.Day, mfs.TimeScheduleStart, mfs.TimeScheduleEnd } into g
+                                                orderby (g.Key.Day == "Monday" ? 1 :
+                                                         g.Key.Day == "Tuesday" ? 2 :
+                                                         g.Key.Day == "Wednesday" ? 3 :
+                                                         g.Key.Day == "Thursday" ? 4 :
+                                                         g.Key.Day == "Friday" ? 5 :
+                                                         g.Key.Day == "Saturday" ? 6 : 7)
 
-                                               }
+                                                select new VMMMedicalFacilitySchedule
+                                                {
+                                                    Day = g.Key.Day,
+                                                    TimeScheduleStart = g.Key.TimeScheduleStart,
+                                                    TimeScheduleEnd = g.Key.TimeScheduleEnd
+                                                }
                                             ).ToList(),
+
                                         HargaKonsulMulai = (
                                                 from dotp in db.TDoctorOfficeTreatmentPrices
                                                 join dot in db.TDoctorOfficeTreatments on dotp.DoctorOfficeTreatmentId equals dot.Id
@@ -304,13 +312,13 @@ namespace HealthCare340B.DataAccess
                 //    ).Sum();
                 var maxTest = (
                     from riwayarpraktek in db.TDoctorOffices
-                    where riwayarpraktek.DoctorId == DetailDokter.Id && riwayarpraktek.IsDelete == false
+                    where riwayarpraktek.DoctorId == DetailDokter.Id && riwayarpraktek.IsDelete == false && riwayarpraktek.MedicalFacilityId != 16
                     select riwayarpraktek.EndDate.Value.Year
                 ).ToList();
 
                 var minTest = (
                     from riwayarpraktek in db.TDoctorOffices
-                    where riwayarpraktek.DoctorId == DetailDokter.Id && riwayarpraktek.IsDelete == false
+                    where riwayarpraktek.DoctorId == DetailDokter.Id && riwayarpraktek.IsDelete == false && riwayarpraktek.MedicalFacilityId != 16
                     select riwayarpraktek.StartDate.Year
                 ).ToList();
                 if ( maxTest.Count > 0)
@@ -520,20 +528,70 @@ namespace HealthCare340B.DataAccess
 
                                 }
                             ).ToList(),
-                            /*HargaKonsulMulai = (
-                                from dotp in db.TDoctorOfficeTreatmentPrices
-                                join dot in db.TDoctorOfficeTreatments on dotp.DoctorOfficeTreatmentId equals dot.Id
-                                join dof in db.TDoctorOffices on dot.DoctorOfficeId equals dof.Id
-                                where doktor.Id == dof.DoctorId && dotp.IsDelete == false
-                                select new VMTDoctorOfficeTreatmentPrice
-                                {
-                                    Price = dotp.Price,
-                                    PriceStartFrom = dotp.PriceStartFrom,
-                                    PriceUntilFrom = dotp.PriceUntilFrom
-                                }
-                            ).ToList()*/
+                                    /*var periods = (
+            from riwayatpraktek in db.TDoctorOffices
+            where riwayatpraktek.DoctorId == DetailDokter.Id
+                  && riwayatpraktek.IsDelete == false
+                  && riwayatpraktek.MedicalFacilityId != 16
+            select new
+            {
+                StartYear = riwayatpraktek.StartDate.Year,
+                EndYear = riwayatpraktek.EndDate.HasValue ? riwayatpraktek.EndDate.Value.Year : DateTime.Now.Year
+            }
+        ).ToList();
 
+                                    // Mengurutkan periode berdasarkan StartYear
+                                    var sortedPeriods = periods.OrderBy(p => p.StartYear).ToList();
+
+                                    // Menggabungkan periode yang overlap
+                                    var mergedPeriods = new List<(int StartYear, int EndYear)>();
+                               foreach (var period in sortedPeriods)
+                            {
+                                if (mergedPeriods.Count == 0)
+                                {
+                                    // Tambahkan periode pertama
+                                    mergedPeriods.Add((period.StartYear, period.EndYear));
+                                }
+                                else
+                                {
+                                    // Periksa periode sebelumnya
+                                    var lastPeriod = mergedPeriods.Last();
+                                    if (period.StartYear <= lastPeriod.EndYear)
+                                    {
+                                        // Jika overlap, gabungkan dengan memperpanjang EndYear
+                                        mergedPeriods[mergedPeriods.Count - 1] = (lastPeriod.StartYear, Math.Max(lastPeriod.EndYear, period.EndYear));
+                                    }
+                                    else
+                                    {
+                                        // Jika tidak overlap, tambahkan periode baru
+                                        mergedPeriods.Add((period.StartYear, period.EndYear));
+                                    }
+                                }
+                            }
+
+                            // Menghitung total durasi pengalaman dari periode yang sudah digabung
+                            int totalYearsExperienceWithoutOverlap = mergedPeriods
+                                .Select(p => p.EndYear - p.StartYear + 1) // Hitung durasi setiap periode
+                                .Sum(); // Jumlahkan semua durasi
+
+                            // Simpan hasil total pengalaman ke DetailDokter
+                            DetailDokter.totalYearsExperience = totalYearsExperienceWithoutOverlap;*/
+                                    
+
+                    /*HargaKonsulMulai = (
+                        from dotp in db.TDoctorOfficeTreatmentPrices
+                        join dot in db.TDoctorOfficeTreatments on dotp.DoctorOfficeTreatmentId equals dot.Id
+                        join dof in db.TDoctorOffices on dot.DoctorOfficeId equals dof.Id
+                        where doktor.Id == dof.DoctorId && dotp.IsDelete == false
+                        select new VMTDoctorOfficeTreatmentPrice
+                        {
+                            Price = dotp.Price,
+                            PriceStartFrom = dotp.PriceStartFrom,
+                            PriceUntilFrom = dotp.PriceUntilFrom
                         }
+                    ).ToList()*/
+
+                }
 
                     ).FirstOrDefault();
 

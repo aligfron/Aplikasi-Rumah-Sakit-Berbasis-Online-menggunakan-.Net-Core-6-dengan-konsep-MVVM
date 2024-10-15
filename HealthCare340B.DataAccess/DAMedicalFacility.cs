@@ -156,7 +156,7 @@ namespace HealthCare340B.DataAccess
                 response.Data = (
                     from m in db.MLocations
                     join l in db.MMedicalFacilities on m.Id equals l.LocationId
-                    where m.IsDelete == false   
+                    where m.IsDelete == false  &&  m.Id == id 
                     select new VMMLocation
                     {
                         Id = m.Id,
